@@ -24,7 +24,7 @@
     "@capacitor-community/in-app-review": "^8.0.0",
     "@capacitor-community/sqlite": "^8.1.1",
     "@capacitor/app": "^8.1.2",
-    "@capacitor/core": "^8.5.3",
+    "@capacitor/core": "^8.6.0",
     "@capacitor/filesystem": "^8.1.5",
     "@capacitor/local-notifications": "^8.3.1",
     "@capacitor/share": "^8.0.3",
@@ -38,9 +38,9 @@
     "vue-router": "^5.4.0"
   },
   "devDependencies": {
-    "@capacitor/android": "^8.5.3",
-    "@capacitor/cli": "^8.5.3",
-    "@capacitor/ios": "^8.5.3",
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/cli": "^8.6.0",
+    "@capacitor/ios": "^8.6.0",
     "@playwright/test": "1.64.1",
     "@types/sql.js": "^1.4.11",
     "@vitejs/plugin-vue": "^6.0.10",
