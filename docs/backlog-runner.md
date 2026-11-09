@@ -31,11 +31,13 @@ on the session's `claude/...` branch and ships through a PR it merges itself aft
 
 ## Backlog repo (#944)
 
-Issues and code can live in different repos: the plan (#937, `docs/decisions.md` > Public code repo,
-private backlog) is public code in `repbunny-code` and the backlog staying here. One setting says
-where issues are: `BACKLOG_REPO` (`owner/repo`, default `DeanPhillipsOKC/repbunny`), read by
-`scripts/backlog-repo.mjs` (`node scripts/backlog-repo.mjs` prints it). Until the cutover both are
-this repo, so nothing changes.
+Code and issues live in different repos since the cutover (2026-11-09, #946; `docs/decisions.md` >
+Public code repo, private backlog): the code is public in `DeanPhillipsOKC/repbunny-code`, and the
+backlog, its automation, and the archive of the old code stay private in `DeanPhillipsOKC/repbunny`.
+One setting says where issues are: `BACKLOG_REPO` (`owner/repo`, default `DeanPhillipsOKC/repbunny`),
+read by `scripts/backlog-repo.mjs` (`node scripts/backlog-repo.mjs` prints it). The code repo is
+whatever repo the checkout is: `scripts/code-repo.mjs` reads `CODE_REPO`, then `GITHUB_REPOSITORY`,
+then the `origin` remote, so PR, ruleset, and app-token calls follow the code without naming it.
 
 - **Scripts** send every issue, label, issue comment, and issue event call to the backlog repo
   (`backlogApi()` from `scripts/backlog-repo.mjs`) and keep PRs, commits, check runs, and Actions
@@ -59,10 +61,22 @@ this repo, so nothing changes.
   the issue events of `dispatch-lanes` also check that they run in the backlog repo, so once the
   code repo is public an outsider's issue or comment there starts nothing (#945; the audit is in
   `docs/governance/threat-model.md` > Public code repo: workflow audit).
-- **At the cutover:** set the `BACKLOG_REPO` variable in the code repo, install the Builder app on
-  both repos, give the code repo the `BUILDER_APP_ID` and `BUILDER_APP_KEY` secrets (also as
-  Dependabot secrets, since `dependabot-issue.yml`'s runs only get those), and set `BACKLOG_REPO`
-  in the cloud environment the routines run in.
+- **Where each piece runs now:**
+  - `repbunny-code` (public): the code, PRs, CI, the `main` and `store tags` rulesets, Releases to
+    Google Play, Cut release, sprint review, the Builder and Reviewer bot steps, Dependabot, CodeQL,
+    and the site (Cloudflare Pages project `repbunny-code-site`, domain `repbunny.app`). iPhone builds
+    run in the Codemagic app connected to it; their build number comes from TestFlight, not
+    Codemagic's counter. Its issue-side workflows (`ask-dean`, `dean-replied`, the three
+    dispatchers, `human-digest`, `automation-pause`, `support-evidence`) are disabled.
+  - `repbunny` (private): issues, labels, and the issue-side workflows above. Personal Android
+    releases are published here too, since the APK has Premium unlocked
+    (`Release-PersonalAndroid.ps1` publishes to `RELEASE_REPO`, else the backlog repo, and records
+    the source commit and file tree in hidden markers in the notes), so Obtainium's source didn't
+    change. Its code workflows are disabled and its code is a frozen archive; don't open PRs there.
+  - Routines and the cloud environment have both repos, the code repo first.
+- **Pause switch:** `AUTOMATION_PAUSED` is a per-repo variable. Lanes, dispatchers, and
+  `scripts/automation-paused.mjs` read it from the backlog repo, but `pr-merged.yml` runs in the code
+  repo and reads that repo's own variable. To pause everything, set it in both.
 - **Dry run:** `BACKLOG_REPO=<owner>/<scratch> node scripts/next-issue.mjs`, or any other script,
   sends its issue calls to that repo and nothing else.
 
@@ -576,7 +590,8 @@ Anything the owner has to do on or after a date goes on their Google Calendar
 
 ## Pausing automation (#682)
 
-One switch stops everything: the repo variable `AUTOMATION_PAUSED` set to `true`.
+One switch stops everything: the repo variable `AUTOMATION_PAUSED` set to `true`, in the backlog repo
+and, for `pr-merged.yml`, in the code repo too (Backlog repo (#944) > Pause switch).
 
 - **Flip it from the phone:** GitHub app > Actions > **Pause automation** > Run workflow, pick
   `pause` or `resume`, and type a reason. It sets or deletes the variable and comments who, when,

@@ -11,9 +11,9 @@
   by release scripts.
 - **Personal releases (#68, #69):** `scripts/Release-PersonalAndroid.ps1` builds the web app with
   `VITE_PREMIUM_UNLOCKED=true` and `VITE_DEV_TOOLS=true` (#784), runs `assemblePersonalRelease` on JDK 21, signs with the personal
-  key, and publishes the APK as a GitHub release in this repo, tagged at the built commit. The
-  repo is private, which is what keeps the premium-unlocked APK private; the script refuses to
-  publish if the repo is public. The owner's phone gets updates through Obtainium with a
+  key, and publishes the APK as a GitHub release in the private backlog repo
+  (`DeanPhillipsOKC/repbunny`, #946), not in this public code repo. That repo being private is what
+  keeps the premium-unlocked APK private; the script refuses to publish to a public one. The owner's phone gets updates through Obtainium with a
   read-only token.
   - **Versioning:** the next `versionCode` is the latest release tag's + 1, so a release changes
     no files. Tags and `versionName` are `1.0.<versionCode>`. Release
