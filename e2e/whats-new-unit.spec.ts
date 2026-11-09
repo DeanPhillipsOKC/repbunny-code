@@ -24,6 +24,7 @@ import {
   subjectNumbers,
   testFlightNotes,
 } from '../scripts/collect-release-notes.mjs'
+import { subjectIssueNumbers } from '../scripts/backlog-repo.mjs'
 
 // Issue #101's pieces that don't need a page (same "no separate unit-test
 // runner" reasoning as client-error-log-unit.spec.ts).
@@ -239,5 +240,15 @@ test('the testing email lists the iPhone checks to do in TestFlight (owner check
   expect(html).toContain('https://github.com/o/r/issues/926')
   expect(html).toContain('#926 Back &amp; swipe')
   expect(html).toContain('the iPhone checks are clean')
-  expect(subjectNumbers(['Fix the sheet (#823) (#922)', 'Revert "x"', 'Add y (#5)'])).toEqual([823, 922, 5])
+  // One repo for code and issues (before #946): every bare number counts.
+  const shared = { backlog: 'DeanPhillipsOKC/repbunny', code: 'DeanPhillipsOKC/repbunny' }
+  expect(subjectNumbers(['Fix the sheet (#823) (#922)', 'Revert "x"', 'Add y (#5)'], shared)).toEqual([823, 922, 5])
+})
+
+test('after the cutover only the backlog-qualified number is an issue (#946)', () => {
+  const split = { backlog: 'DeanPhillipsOKC/repbunny', code: 'DeanPhillipsOKC/repbunny-code' }
+  const subjects = ['Show the store version (DeanPhillipsOKC/repbunny#1045) (#9)', 'Bump uuid (#4)', 'Docs (dean/other#12)']
+  expect(subjectNumbers(subjects, split)).toEqual([1045])
+  expect(subjectIssueNumbers(['Shared form (#1045) (#1046)'], { backlog: 'DeanPhillipsOKC/repbunny' })).toEqual([1045, 1046])
+  expect(subjectIssueNumbers(['Case (deanphillipsokc/REPBUNNY#7)'], split)).toEqual([7])
 })

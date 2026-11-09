@@ -14,7 +14,8 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { loadReleaseNotes } from './lib/release-notes.mjs'
-import { backlogApi } from './backlog-repo.mjs'
+import { backlogApi, subjectIssueNumbers } from './backlog-repo.mjs'
+import { CODE_REPO } from './code-repo.mjs'
 import { commitBuild, sinceTagRange, storeTags, tagBuild } from './lib/history.mjs'
 
 // Play's "What's new" limit. TestFlight's "What to Test" allows 4000.
@@ -163,9 +164,10 @@ function git(...args) {
   return execFileSync('git', args, { encoding: 'utf8' }).trim()
 }
 
-// Pure: the issue numbers in commit subjects, from "(#<issue>)" and "(#<issue>) (#<PR>)".
-export function subjectNumbers(subjects) {
-  return [...new Set(subjects.flatMap((s) => [...s.matchAll(/\(#(\d+)\)/g)].map((m) => Number(m[1]))))]
+// The backlog issue numbers in commit subjects (scripts/backlog-repo.mjs > subjectIssueNumbers):
+// "(<backlog repo>#<issue>)", and bare "(#<issue>)" only while code and issues share a repo (#946).
+export function subjectNumbers(subjects, repos = { code: CODE_REPO }) {
+  return subjectIssueNumbers(subjects, repos)
 }
 
 // The open `verify:iphone` issues among the commits in `range`. A PR number never has the label.

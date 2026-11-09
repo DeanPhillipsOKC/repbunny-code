@@ -180,7 +180,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Creating the GitHub release failed.' }
 Write-Host "Released v$versionName to $Repo. Obtainium will pick it up on its next check."
 
 # Owner check (docs/backlog.md): tell each issue waiting on the owner (`status:verify`) which build
-# has it. Commit subjects end in "(#<issue>)" or "(#<issue>) (#<PR>)"; a PR number never carries
+# has it. Commit subjects name it as "(<backlog repo>#<issue>)" (bare "(#<issue>)" before #946); a PR number never carries
 # the label, so checking every number is enough. Each commit is in one release's range, so each
 # issue hears once. A failure here never fails the release.
 $env:GH_TOKEN = $codeToken
@@ -190,9 +190,9 @@ if ($lastSource) {
     # release-android.yml passes a token that can reach the backlog repo; locally gh's own login does.
     $releaseToken = $env:GH_TOKEN
     if ($env:BACKLOG_GH_TOKEN) { $env:GH_TOKEN = $env:BACKLOG_GH_TOKEN }
+    # Which numbers name a backlog issue: scripts/backlog-repo.mjs > subjectIssueNumbers (#946).
     $numbers = git log --format='%s' "$lastSource..$commit" 2>$null |
-        ForEach-Object { [regex]::Matches($_, '\(#(\d+)\)') | ForEach-Object { $_.Groups[1].Value } } |
-        Sort-Object -Unique
+        node scripts/backlog-repo.mjs --subject-issues | Sort-Object -Unique
     foreach ($n in $numbers) {
         $labels = & $gh api "repos/$BacklogRepo/issues/$n" --jq 'select(.state == "open") | .labels[].name' 2>$null
         if ($LASTEXITCODE -ne 0 -or -not ($labels -contains 'status:verify')) { continue }
