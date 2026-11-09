@@ -25,7 +25,8 @@ import { promisify } from 'node:util'
 import { delimiter } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { laneOf, modelOf as defaultModelOf } from './lib/lanes.mjs'
-import { backlogApi, issueRefSource } from './backlog-repo.mjs'
+import { BACKLOG_REPO, backlogApi, issueRefSource, subjectIssueNumbers } from './backlog-repo.mjs'
+import { CODE_REPO } from './code-repo.mjs'
 
 const run = promisify(execFile)
 const PER_PAGE = 100
@@ -176,7 +177,9 @@ async function main() {
       for (const n of msg.match(/#\d+/g) ?? []) reverted.set(Number(n.slice(1)), c.sha.slice(0, 7))
       continue
     }
-    const n = subject.match(/\(#(\d+)\)\s*$/)?.[1]
+    // Since the cutover (#946) a subject's trailing "(#N)" is this code repo's PR number, and the
+    // issue is named "(<backlog repo>#N)"; before it, the trailing number is the one.
+    const n = CODE_REPO.toLowerCase() === BACKLOG_REPO.toLowerCase() ? subject.match(/\(#(\d+)\)\s*$/)?.[1] : subjectIssueNumbers([subject], { code: CODE_REPO })[0]
     if (n) shaToIssue.set(c.sha, Number(n))
   }
 

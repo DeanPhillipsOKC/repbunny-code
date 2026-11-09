@@ -30,4 +30,23 @@ export function issueRefSource(repo = BACKLOG_REPO) {
   return `(?:${repo.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')})?#(\\d+)`
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) console.log(BACKLOG_REPO)
+// Pure: the backlog issue numbers named in commit subjects, from "(<backlog repo>#12)" (#946). A bare
+// "(#12)" counts only while code and issues share a repo: since the cutover it's this code repo's PR
+// number (squash merges end with it), and reading it as an issue would reach an unrelated one.
+export function subjectIssueNumbers(subjects, { backlog = BACKLOG_REPO, code = backlog } = {}) {
+  const repo = backlog.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')
+  const shared = code.toLowerCase() === backlog.toLowerCase()
+  const ref = new RegExp(shared ? `\\((?:${repo})?#(\\d+)\\)` : `\\(${repo}#(\\d+)\\)`, 'gi')
+  return [...new Set(subjects.flatMap((s) => [...s.matchAll(ref)].map((m) => Number(m[1]))))]
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  // `--subject-issues`: the issue numbers in the commit subjects on stdin, one per line, for
+  // Release-PersonalAndroid.ps1.
+  if (process.argv.includes('--subject-issues')) {
+    const { readFileSync } = await import('node:fs')
+    const { CODE_REPO } = await import('./code-repo.mjs')
+    const subjects = readFileSync(0, 'utf8').split(/\r?\n/).filter(Boolean)
+    for (const n of subjectIssueNumbers(subjects, { code: CODE_REPO })) console.log(n)
+  } else console.log(BACKLOG_REPO)
+}
