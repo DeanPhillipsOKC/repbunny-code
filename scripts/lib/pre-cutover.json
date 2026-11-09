@@ -1,0 +1,263 @@
+{
+  "_comment": "Frozen facts from before the code moved to this repo as one snapshot commit (#946). Generated once from DeanPhillipsOKC/repbunny at sourceCommit; never edit. See scripts/lib/history.mjs.",
+  "snapshotCommit": "30b57ce825a73e5a2c618d5e0e6efa58f9eee56d",
+  "sourceCommit": "f0ebec8c5061fa0e57c9fd545f33cb4263705e3e",
+  "sourceBuild": 969,
+  "storeTags": {
+    "store/v1.0.0": 529,
+    "store/v1.1.0": 641,
+    "store/v1.1.1": 642,
+    "store/v1.2.0": 656,
+    "store/v1.2.1": 704,
+    "store/v1.2.2": 746,
+    "store/v1.3.0": 774,
+    "store/v1.4.0": 788,
+    "store/v1.5.0": 854,
+    "store/v1.5.1": 864,
+    "store/v1.5.2": 876,
+    "store/v1.5.3": 886,
+    "store/v1.5.4": 890,
+    "store/v1.6.0": 893,
+    "store/v1.7.0": 914,
+    "store/v1.8.0": 939,
+    "store/v1.9.0": 962
+  },
+  "notes": {
+    "release-notes/1002.json": {
+      "date": "2026-11-05",
+      "build": 952
+    },
+    "release-notes/1012.json": {
+      "date": "2026-11-05",
+      "build": 957
+    },
+    "release-notes/1015.json": {
+      "date": "2026-11-05",
+      "build": 958
+    },
+    "release-notes/169.json": {
+      "date": "2026-10-26",
+      "build": 885
+    },
+    "release-notes/432.json": {
+      "date": "2026-10-27",
+      "build": 891
+    },
+    "release-notes/531.json": {
+      "date": "2026-10-15",
+      "build": 740
+    },
+    "release-notes/568.json": {
+      "date": "2026-10-15",
+      "build": 735
+    },
+    "release-notes/569.json": {
+      "date": "2026-10-15",
+      "build": 744
+    },
+    "release-notes/573.json": {
+      "date": "2026-10-15",
+      "build": 745
+    },
+    "release-notes/578.json": {
+      "date": "2026-10-15",
+      "build": 749
+    },
+    "release-notes/579.json": {
+      "date": "2026-10-15",
+      "build": 752
+    },
+    "release-notes/580.json": {
+      "date": "2026-10-16",
+      "build": 754
+    },
+    "release-notes/581.json": {
+      "date": "2026-10-16",
+      "build": 787
+    },
+    "release-notes/582.json": {
+      "date": "2026-10-16",
+      "build": 785
+    },
+    "release-notes/583.json": {
+      "date": "2026-10-16",
+      "build": 786
+    },
+    "release-notes/600.json": {
+      "date": "2026-10-16",
+      "build": 782
+    },
+    "release-notes/601.json": {
+      "date": "2026-10-16",
+      "build": 779
+    },
+    "release-notes/602.json": {
+      "date": "2026-10-16",
+      "build": 780
+    },
+    "release-notes/603.json": {
+      "date": "2026-10-16",
+      "build": 783
+    },
+    "release-notes/604.json": {
+      "date": "2026-10-16",
+      "build": 784
+    },
+    "release-notes/639.json": {
+      "date": "2026-10-16",
+      "build": 768
+    },
+    "release-notes/640.json": {
+      "date": "2026-10-16",
+      "build": 777
+    },
+    "release-notes/641.json": {
+      "date": "2026-10-16",
+      "build": 775
+    },
+    "release-notes/642.json": {
+      "date": "2026-10-16",
+      "build": 776
+    },
+    "release-notes/726.json": {
+      "date": "2026-10-21",
+      "build": 823
+    },
+    "release-notes/727.json": {
+      "date": "2026-10-21",
+      "build": 817
+    },
+    "release-notes/776.json": {
+      "date": "2026-10-23",
+      "build": 864
+    },
+    "release-notes/781.json": {
+      "date": "2026-10-23",
+      "build": 859
+    },
+    "release-notes/783.json": {
+      "date": "2026-10-22",
+      "build": 847
+    },
+    "release-notes/790.json": {
+      "date": "2026-10-22",
+      "build": 850
+    },
+    "release-notes/820.json": {
+      "date": "2026-10-24",
+      "build": 870
+    },
+    "release-notes/821.json": {
+      "date": "2026-10-24",
+      "build": 868
+    },
+    "release-notes/825.json": {
+      "date": "2026-10-24",
+      "build": 871
+    },
+    "release-notes/826.json": {
+      "date": "2026-10-24",
+      "build": 872
+    },
+    "release-notes/827.json": {
+      "date": "2026-10-24",
+      "build": 875
+    },
+    "release-notes/828.json": {
+      "date": "2026-10-24",
+      "build": 873
+    },
+    "release-notes/831.json": {
+      "date": "2026-10-24",
+      "build": 874
+    },
+    "release-notes/832.json": {
+      "date": "2026-10-24",
+      "build": 876
+    },
+    "release-notes/840.json": {
+      "date": "2026-10-26",
+      "build": 878
+    },
+    "release-notes/841.json": {
+      "date": "2026-10-26",
+      "build": 883
+    },
+    "release-notes/842.json": {
+      "date": "2026-10-26",
+      "build": 879
+    },
+    "release-notes/845.json": {
+      "date": "2026-10-26",
+      "build": 882
+    },
+    "release-notes/849.json": {
+      "date": "2026-10-26",
+      "build": 881
+    },
+    "release-notes/850.json": {
+      "date": "2026-10-26",
+      "build": 880
+    },
+    "release-notes/851.json": {
+      "date": "2026-10-26",
+      "build": 884
+    },
+    "release-notes/861.json": {
+      "date": "2026-10-27",
+      "build": 888
+    },
+    "release-notes/862.json": {
+      "date": "2026-10-27",
+      "build": 889
+    },
+    "release-notes/863.json": {
+      "date": "2026-10-27",
+      "build": 890
+    },
+    "release-notes/871.json": {
+      "date": "2026-10-27",
+      "build": 892
+    },
+    "release-notes/874.json": {
+      "date": "2026-10-27",
+      "build": 893
+    },
+    "release-notes/880.json": {
+      "date": "2026-10-31",
+      "build": 894
+    },
+    "release-notes/886.json": {
+      "date": "2026-11-02",
+      "build": 900
+    },
+    "release-notes/925.json": {
+      "date": "2026-11-04",
+      "build": 918
+    },
+    "release-notes/931.json": {
+      "date": "2026-11-04",
+      "build": 919
+    },
+    "release-notes/960.json": {
+      "date": "2026-11-04",
+      "build": 937
+    },
+    "release-notes/968.json": {
+      "date": "2026-11-04",
+      "build": 934
+    },
+    "release-notes/969.json": {
+      "date": "2026-11-04",
+      "build": 936
+    },
+    "release-notes/970.json": {
+      "date": "2026-11-05",
+      "build": 943
+    },
+    "release-notes/987.json": {
+      "date": "2026-11-04",
+      "build": 947
+    }
+  }
+}

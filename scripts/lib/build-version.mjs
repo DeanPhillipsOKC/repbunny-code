@@ -1,4 +1,5 @@
 import { execSync } from 'node:child_process'
+import { buildFromCount } from './history.mjs'
 
 function run(cmd, cwd) {
   return execSync(cmd, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
@@ -27,7 +28,8 @@ export function ensureFullHistory(cwd) {
 export function getBuildVersion(cwd = process.cwd()) {
   try {
     ensureFullHistory(cwd)
-    const count = run('git rev-list --count HEAD', cwd)
+    // Commit count plus the pre-cutover offset (#946), so builds keep counting up across the move.
+    const count = buildFromCount(Number(run('git rev-list --count HEAD', cwd)))
     const sha = run('git rev-parse --short HEAD', cwd)
     // Compare tracked-file content only, ignoring the executable-bit-only
     // diffs that CI checkouts (Cloudflare's included) can introduce — those

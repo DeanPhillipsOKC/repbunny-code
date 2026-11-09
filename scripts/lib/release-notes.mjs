@@ -3,7 +3,9 @@
 // item: `{ "text": "...", "guide": "<slug>/", "platforms": ["android"], "theme": "halloween" }` (guide, platforms,
 // and theme optional; see src/lib/releaseNotes.ts for what they mean). Nothing in the file says when it
 // shipped: the commit that added it does. Its date is that commit's date, and its build is that
-// commit's `git rev-list --count`, the build number the app shows. A file not committed yet
+// commit's build (`git rev-list --count` plus the #946 offset, scripts/lib/history.mjs), the build
+// number the app shows. Notes the cutover's snapshot commit brought over keep their real date and
+// build from scripts/lib/pre-cutover.json. A file not committed yet
 // (a local run) gets today and the next build. `release-notes/archive.json` is the frozen list
 // from before #558, `{ date, build, items }` per day; never add to it.
 //
@@ -13,6 +15,7 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ensureFullHistory } from './build-version.mjs'
+import { buildFromCount, PRE_CUTOVER_NOTES, SNAPSHOT_COMMIT } from './history.mjs'
 
 export const NOTES_DIR = 'release-notes'
 export const ARCHIVE_FILE = 'archive.json'
@@ -83,7 +86,11 @@ function addedIn(cwd) {
     const [sha, date] = head.split(' ')
     for (const path of paths.filter(Boolean)) {
       if (added.has(path)) continue
-      if (!counts.has(sha)) counts.set(sha, Number(git(cwd, 'rev-list', '--count', sha)))
+      if (sha === SNAPSHOT_COMMIT && PRE_CUTOVER_NOTES[path]) {
+        added.set(path, PRE_CUTOVER_NOTES[path])
+        continue
+      }
+      if (!counts.has(sha)) counts.set(sha, buildFromCount(Number(git(cwd, 'rev-list', '--count', sha))))
       added.set(path, { date, build: counts.get(sha) })
     }
   }
@@ -92,7 +99,7 @@ function addedIn(cwd) {
 
 function nextBuild(cwd) {
   try {
-    return Number(git(cwd, 'rev-list', '--count', 'HEAD')) + 1
+    return buildFromCount(Number(git(cwd, 'rev-list', '--count', 'HEAD'))) + 1
   } catch {
     return 0
   }
