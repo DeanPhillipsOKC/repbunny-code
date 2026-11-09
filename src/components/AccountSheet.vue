@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { currentVersionLabel } from '../lib/storeVersion'
 import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue'
 import { Capacitor } from '@capacitor/core'
 import { deliveredTitle, NATIVE_SAVE_HINT } from '../lib/deliveredTitle'
@@ -112,7 +113,6 @@ const deleteError = ref('')
 const resetting = ref(false)
 const resetError = ref('')
 
-const appVersion = __APP_VERSION__
 const deleteWord = 'ERASE'
 const canDelete = computed(() => matchesConfirmWord(confirmText.value, deleteWord))
 const canReset = computed(() => matchesConfirmWord(confirmText.value, 'RESET'))
@@ -661,7 +661,7 @@ async function handleDeleteAccount() {
         </button>
         <div class="data-item">
           <span class="data-title">Version</span>
-          <span class="about-version">{{ appVersion }}</span>
+          <span class="about-version">{{ currentVersionLabel() }}</span>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core'
 import type { ClientErrorEntry } from '../data/types'
+import { getStoreVersion } from './storeVersion'
 
 // Issue #84: "Report a bug" in the Account sheet. The user picks which logged
 // errors (src/lib/errorLog.ts) to include, and Send opens their email app
@@ -103,6 +104,7 @@ function deviceLines(appVersion: string | null, now: Date): string[] {
   return [
     `App version: ${appVersion ?? 'unknown'}`,
     `Build: ${buildNumber(appVersion)}`,
+    ...(getStoreVersion() ? [`Store version: ${getStoreVersion()}`] : []),
     `Platform: ${platformName()}`,
     `OS: ${osName(ua)}`,
     `Device model: ${deviceModel(ua)}`,

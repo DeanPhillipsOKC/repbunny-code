@@ -11,6 +11,7 @@ import { loadAppIcon } from './lib/appIcon'
 import { refreshPremiumEntitlement } from './lib/premium'
 import { ensureRestAlertChannels } from './lib/restAlert'
 import { checkLocalData } from './lib/localRecovery'
+import { loadStoreVersion } from './lib/storeVersion'
 import './style.css'
 
 document.title = `RepBunny ${__APP_VERSION__}`
@@ -24,6 +25,7 @@ installTheme()
 async function start() {
   // Issue #431: the on-device data is checked before anything mounts. If it
   // can't open, the recovery screen shows instead of the app.
+  await loadStoreVersion()
   const recovery = await checkLocalData()
   if (recovery) {
     const { default: RecoveryScreen } = await import('./components/RecoveryScreen.vue')

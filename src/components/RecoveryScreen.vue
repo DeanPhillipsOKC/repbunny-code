@@ -5,6 +5,7 @@ import { NATIVE_SAVE_HINT } from '../lib/deliveredTitle'
 import { backupFileName, deliverFile, parseBackup, type BackupFile } from '../lib/backup'
 import { backupForFailedUpdate, restoreAfterDamage, startFreshAfterDamage, type RecoveryReason } from '../lib/localRecovery'
 import { listRestorePoints, loadRestorePoint, type RestorePointSummary } from '../lib/restorePoints'
+import { getStoreVersion, recoveryVersionLine } from '../lib/storeVersion'
 import BugReportSheet from './BugReportSheet.vue'
 import RestorePoints from './RestorePoints.vue'
 
@@ -24,7 +25,7 @@ const busy = ref(false)
 const error = ref('')
 const note = ref('')
 const fileInput = ref<HTMLInputElement | null>(null)
-const appVersion = __APP_VERSION__
+const versionLine = recoveryVersionLine(getStoreVersion(), __APP_VERSION__)
 
 onMounted(async () => {
   if (props.reason !== 'damaged') return
@@ -208,7 +209,7 @@ function bugSent() {
       <button v-if="reason === 'damaged'" type="button" class="ghost" :disabled="busy" @click="confirmingFresh = true">Start fresh</button>
       <button type="button" class="ghost" :disabled="busy" @click="view = 'bug'">Send a bug report</button>
       </template>
-      <p class="version">RepBunny {{ appVersion }}</p>
+      <p class="version">{{ versionLine }}</p>
     </div>
 
     <input
