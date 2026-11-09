@@ -1,0 +1,216 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Template Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --danger: #e0687a; --cardio: #f4a07a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: Manrope, sans-serif; }
+  .page { display: flex; gap: 28px; padding: 28px; align-items: flex-start; }
+  .col { width: 360px; }
+  .step { display: inline-block; margin-bottom: 8px; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(242,192,105,0.16); color: var(--highlight); }
+  .col-title { font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; margin: 0 0 2px; }
+  .col-note { color: var(--text-dim); font-size: 0.82rem; margin: 0 0 14px; line-height: 1.45; min-height: 72px; }
+  .phone { position: relative; height: 700px; overflow: hidden; background: var(--bg); border: 1px solid var(--border); border-radius: 26px; padding: 18px 16px; display: flex; flex-direction: column; gap: 12px; }
+
+  h2 { margin: 0 0 4px; font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; }
+  .btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; border-radius: 12px; background: var(--accent); color: var(--accent-text); font-weight: 700; border: 0; font: inherit; font-weight: 700; width: 100%; }
+  .btn-ghost { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--text-dim); font: inherit; font-size: 0.85rem; font-weight: 600; }
+  .btn-add { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; border-radius: 14px; border: 1.5px dashed var(--border); color: var(--accent); font-weight: 700; }
+
+  .row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .row-body { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
+  .row-title { font-weight: 600; }
+  .row-sub { font-size: 0.8rem; color: var(--text-dim); }
+  .icon { flex-shrink: 0; width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+  .icon svg { width: 26px; height: 26px; }
+  .sq { flex-shrink: 0; width: 36px; height: 36px; border-radius: 11px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); display: flex; align-items: center; justify-content: center; }
+  .chev { color: var(--text-dim); flex-shrink: 0; }
+
+  /* editor */
+  .ed-head { display: flex; align-items: center; gap: 10px; }
+  .back { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text); flex-shrink: 0; }
+  .ed-name { flex-grow: 1; font-family: 'Baloo 2', sans-serif; font-size: 1.5rem; line-height: 1.1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .ed-name svg { color: var(--text-dim); flex-shrink: 0; }
+  .label { margin: 4px 0 0; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); display: flex; justify-content: space-between; align-items: center; }
+  .label .aux { text-transform: none; letter-spacing: 0; font-weight: 600; }
+  .cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .cat { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+  .cat .b { width: 22px; height: 22px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .cat .b svg { width: 15px; height: 15px; }
+  .cat.auto { border-style: dashed; border-color: var(--text-dim); }
+  .cat.sel { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  .cat.sel .b { background: rgba(255,255,255,0.35) !important; color: var(--accent-text) !important; }
+
+  .ex-list { display: flex; flex-direction: column; gap: 8px; }
+  .ex { display: flex; align-items: center; gap: 8px; padding: 10px 10px 10px 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+  .grip { color: var(--text-dim); opacity: 0.7; flex-shrink: 0; width: 22px; display: flex; justify-content: center; }
+  .ex .n { flex-grow: 1; font-weight: 600; font-size: 0.95rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .step-ctl { display: flex; align-items: center; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); flex-shrink: 0; }
+  .step-ctl span { width: 32px; height: 34px; display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-weight: 700; font-size: 1.05rem; }
+  .step-ctl b { min-width: 46px; text-align: center; font-size: 0.85rem; }
+  .step-ctl b small { display: block; font-size: 0.62rem; color: var(--text-dim); font-weight: 600; margin-top: -2px; }
+  .trash { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; color: var(--text-dim); flex-shrink: 0; }
+  .ex.dragging { border-color: var(--accent); box-shadow: 0 10px 24px rgba(0,0,0,0.45); transform: rotate(-1.2deg) translateX(4px); }
+  .ex.gap { border-style: dashed; background: transparent; height: 56px; }
+  .ex .archived { display: block; width: fit-content; font-size: 0.68rem; font-weight: 500; color: var(--text-dim); border: 1px solid var(--border); border-radius: 8px; padding: 0 6px; margin-top: 2px; }
+
+  .toast { position: absolute; left: 16px; right: 16px; bottom: 18px; display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 14px; background: #3a2b40; box-shadow: 0 8px 24px rgba(0,0,0,0.4); font-size: 0.88rem; }
+  .toast b { color: var(--accent); }
+
+  .empty-hint { text-align: center; color: var(--text-dim); font-size: 0.85rem; padding: 6px 0 0; }
+
+  /* sheets */
+  .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: flex-end; }
+  .sheet { width: 100%; background: var(--surface); border-top: 1px solid var(--border); border-radius: 22px 22px 0 0; padding: 10px 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .handle { width: 40px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto 4px; }
+  .sheet-head { display: flex; justify-content: space-between; align-items: center; font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; }
+  .field-label { font-size: 0.85rem; font-weight: 600; }
+  .input { min-height: 46px; border-radius: 12px; border: 1px solid var(--accent); background: var(--bg); padding: 0 12px; display: flex; align-items: center; color: var(--text); }
+  .input.search { border-color: var(--border); color: var(--text-dim); gap: 8px; }
+  .caret { display: inline-block; width: 1.5px; height: 18px; background: var(--accent); margin-left: 1px; }
+  .sec { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); margin-top: 4px; }
+  .item { display: flex; flex-direction: column; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+  .item .s { font-size: 0.76rem; color: var(--text-dim); }
+  .item.create { color: var(--accent); font-weight: 700; border-style: dashed; }
+  .item.added { opacity: 0.55; }
+  .item.added .s { color: var(--success); }
+  .row2 { display: flex; gap: 8px; }
+  .row2 .btn-primary { flex: 1; }
+  .dim-top { opacity: 0.35; }
+  .callout { font-size: 0.72rem; color: var(--highlight); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 1. List -->
+  <div class="col">
+    <span class="step">1 · Templates list</span>
+    <h2 class="col-title">Rows open the editor</h2>
+    <p class="col-note">No more inline expand. Tapping a row opens the full-screen editor (chevron shows it goes somewhere). Archive stays on the row, same confirm as today.</p>
+    <div class="phone" id="p1"></div>
+  </div>
+
+  <!-- 2. Name -->
+  <div class="col">
+    <span class="step">2 · New template</span>
+    <h2 class="col-title">Name, then straight in</h2>
+    <p class="col-note">Same small sheet, but the button reads "Next". It creates the template and goes directly into the editor.</p>
+    <div class="phone" id="p2"></div>
+  </div>
+
+  <!-- 3. Editor + picker -->
+  <div class="col">
+    <span class="step">3 · Editor, first visit</span>
+    <h2 class="col-title">Picker opens itself</h2>
+    <p class="col-note">A new template opens with the logger's Add exercise sheet already up. Picking adds it at 3 sets and keeps the sheet open, so you can pick several in a row. "+ New exercise" is allowed here.</p>
+    <div class="phone" id="p3"></div>
+  </div>
+
+  <!-- 4. Editor filled -->
+  <div class="col">
+    <span class="step">4 · Editor, filled</span>
+    <h2 class="col-title">Everything on one screen</h2>
+    <p class="col-note">Tap the name to rename. Compact category chips (dashed = automatic). Drag the grip to reorder, − / + for sets (saves on tap), trash removes with an Undo toast.</p>
+    <div class="phone" id="p4"></div>
+  </div>
+
+</div>
+
+<script>
+  const tint = { upper: 'var(--accent)', lower: 'var(--secondary)', full: 'var(--highlight)', cardio: 'var(--cardio)', core: 'var(--success)', other: 'var(--text-dim)' }
+  const glyph = {
+    upper: '<path d="M4 10h3M17 10h3M7 7v6M17 7v6M7 10h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    lower: '<path d="M9 3v8l-3 10M15 3v8l3 10M9 11h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>',
+    full: '<circle cx="12" cy="5" r="2.2" fill="currentColor"/><path d="M5 9h14M12 9v6M12 15l-4 6M12 15l4 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>',
+    cardio: '<path d="M12 20s-7-4.5-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.5-7 10-7 10z" stroke="currentColor" stroke-width="2" fill="none"/>',
+    core: '<rect x="7" y="4" width="10" height="16" rx="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M7 10h10M7 14h10M12 4v16" stroke="currentColor" stroke-width="1.5"/>',
+    other: '<circle cx="6" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="18" cy="12" r="1.8" fill="currentColor"/>',
+  }
+  const label = { upper: 'Upper', lower: 'Lower', full: 'Full', cardio: 'Cardio', core: 'Core', other: 'Other' }
+  const svg = (c) => `<svg viewBox="0 0 24 24" fill="none">${glyph[c]}</svg>`
+  const bg = (c) => `background: color-mix(in srgb, ${tint[c]} 16%, transparent); color: ${tint[c]}`
+
+  const archive = `<span class="sq"><svg viewBox="0 0 24 24" width="15" height="15" fill="none"><rect x="4" y="5" width="16" height="4" rx="1.3" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 9.5V17a1.6 1.6 0 001.6 1.6h9.8A1.6 1.6 0 0018.5 17V9.5" stroke="currentColor" stroke-width="1.7"/><path d="M10 13h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>`
+  const chevron = `<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+  const plus = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`
+  const trow = (n, sub, c) => `<div class="row"><span class="icon" style="${bg(c)}">${svg(c)}</span><span class="row-body"><span class="row-title">${n}</span><span class="row-sub">${sub}</span></span>${archive}${chevron}</div>`
+
+  const listScreen = `
+    <h2>Templates</h2>
+    <div class="btn-primary">${plus} Add template</div>
+    ${trow('Push Day', '5 exercises · Upper body', 'upper')}
+    ${trow('Leg Day', '6 exercises · Lower body', 'lower')}
+    ${trow('Full Body A', '7 exercises · Full body', 'full')}
+    ${trow('Zone 2', '1 exercise · Cardio', 'cardio')}
+    ${trow('Abs Finisher', '4 exercises · Core', 'core')}`
+
+  document.getElementById('p1').innerHTML = listScreen
+
+  document.getElementById('p2').innerHTML = `
+    <div class="dim-top" style="display:flex;flex-direction:column;gap:12px">${listScreen}</div>
+    <div class="overlay"><div class="sheet">
+      <div class="handle"></div>
+      <div class="sheet-head">New template</div>
+      <span class="field-label">Name</span>
+      <div class="input">Pull Day<span class="caret"></span></div>
+      <div class="row2"><div class="btn-primary">Next</div><span class="btn-ghost" style="min-height:48px">Cancel</span></div>
+    </div></div>`
+
+  const pencil = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 20h4L19 9l-4-4L4 16v4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`
+  const header = (name) => `
+    <div class="ed-head">
+      <span class="back"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="ed-name">${name} ${pencil}</span>
+    </div>`
+  const cats = (selected, auto) => `
+    <p class="label">Category <span class="aux">${selected ? 'Use automatic' : 'Auto: ' + label[auto]}</span></p>
+    <div class="cats">${Object.keys(label).map((c) =>
+      `<span class="cat ${c === selected ? 'sel' : ''} ${!selected && c === auto ? 'auto' : ''}"><span class="b" style="${bg(c)}">${svg(c)}</span>${label[c]}</span>`).join('')}</div>`
+
+  const grip = `<span class="grip"><svg width="14" height="18" viewBox="0 0 14 18" fill="currentColor"><circle cx="4" cy="4" r="1.6"/><circle cx="10" cy="4" r="1.6"/><circle cx="4" cy="9" r="1.6"/><circle cx="10" cy="9" r="1.6"/><circle cx="4" cy="14" r="1.6"/><circle cx="10" cy="14" r="1.6"/></svg></span>`
+  const trash = `<span class="trash"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`
+  const ex = (n, sets, cls = '', extra = '') =>
+    `<div class="ex ${cls}">${grip}<span class="n">${n}${extra}</span><span class="step-ctl"><span>−</span><b>${sets}<small>sets</small></b><span>+</span></span>${trash}</div>`
+
+  document.getElementById('p3').innerHTML = `
+    ${header('Pull Day')}
+    ${cats(null, 'other')}
+    <p class="label">Exercises</p>
+    <div class="ex-list">${ex('Pull-Up', 3)}</div>
+    <div class="overlay"><div class="sheet">
+      <div class="handle"></div>
+      <div class="sheet-head">Add exercise <span style="font-size:0.9rem;color:var(--accent);font-family:Manrope">Done</span></div>
+      <div class="input search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Search exercises</div>
+      <div class="item create">+ New exercise</div>
+      <span class="sec">Recently logged</span>
+      <div class="item added"><span>Pull-Up</span><span class="s">✓ Added · 3 sets</span></div>
+      <div class="item"><span>Barbell Row</span><span class="s">Last: 135 lb × 8</span></div>
+      <div class="item"><span>Lat Pulldown</span><span class="s">Last: 120 lb × 10</span></div>
+      <span class="sec">All exercises</span>
+      <div class="item"><span>Face Pull</span></div>
+    </div></div>`
+
+  document.getElementById('p4').innerHTML = `
+    ${header('Pull Day')}
+    ${cats('upper', null)}
+    <p class="label">Exercises <span class="aux">5</span></p>
+    <div class="ex-list">
+      ${ex('Pull-Up', 4)}
+      ${ex('Barbell Row', 3, 'dragging')}
+      ${ex('', '', 'gap').replace(/<span class="grip">[\s\S]*$/, '</div>')}
+      ${ex('Lat Pulldown', 3)}
+      ${ex('Face Pull', 3, '', '<span class="archived">Archived</span>')}
+    </div>
+    <div class="btn-add">${plus} Add exercise</div>
+    <div class="toast"><span>Removed Hammer Curl</span><b>Undo</b></div>`
+</script>
+</body>
+</html>

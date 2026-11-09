@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Exercise Demo Styles</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* #901 spike mockup: figure styles and placement. Static design page, not app code.
+     Figures animate from docs/design/issue-901-squat-motion.js; add ?still to freeze them at the bottom of the rep. */
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: #f5edf2; font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1300px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: #b9a8c2; font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; max-width: 1150px; }
+  .note b { color: #f5edf2; }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; display: flex; flex-direction: column; gap: 10px; }
+  .cap { color: #f2c069; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 0 4px; }
+  .capnote { color: #b9a8c2; font-size: 0.78rem; margin: 0 0 0 4px; line-height: 1.45; min-height: 58px; }
+  .capnote b { color: #f5edf2; }
+
+  /* Themes (src/style.css and src/lib/theme.ts tokens) */
+  .phone {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069;
+  }
+  .phone.chalk {
+    --bg: #121417; --surface: #1b1e23; --surface-2: #22262c; --border: #343a42;
+    --text: #eef1f4; --text-dim: #a3acb6; --accent: #8fb4d9; --accent-text: #121417; --secondary: #b8c4d0; --highlight: #d9b26a;
+  }
+  .phone.sunrise {
+    --bg: #fff8f0; --surface: #ffffff; --surface-2: #fff0e2; --border: #f2dcc6;
+    --text: #2a1e16; --text-dim: #6e5a4a; --accent: #b8501c; --accent-text: #ffffff; --secondary: #3f6fb0; --highlight: #8a6400;
+  }
+  .phone {
+    --fig-near: var(--accent);
+    --fig-far: color-mix(in srgb, var(--text-dim) 45%, var(--surface));
+    --fig-near-solid: var(--accent);
+    --fig-far-solid: color-mix(in srgb, var(--secondary) 55%, var(--surface));
+    --fig-floor: var(--border);
+    width: 377px; height: 760px; background: color-mix(in srgb, #000 55%, var(--bg)); color: var(--text);
+    border: 1px solid var(--border); border-radius: 28px; overflow: hidden; position: relative;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .phone.sunrise { background: color-mix(in srgb, #b07a52 45%, var(--bg)); }
+
+  /* History sheet (ExerciseHistoryDetail.vue) */
+  .sheet { background: var(--bg); border-radius: 22px 22px 0 0; padding: 16px 16px 20px; height: 708px; display: flex; flex-direction: column; gap: 10px; }
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; }
+  .sheet-head h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; margin: 0; }
+  .x { width: 36px; height: 36px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); }
+  .howto { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0 14px 12px; }
+  .howto-toggle { display: flex; justify-content: space-between; align-items: center; min-height: 46px; font-weight: 800; font-size: .9rem; }
+  .howto-toggle span:last-child { color: var(--text-dim); }
+  .demo { position: relative; background: var(--surface-2); border-radius: 10px; margin: 0 0 10px; padding: 6px 0 38px; }
+  .demo svg { display: block; width: 100%; height: 190px; }
+  .demo-bar { position: absolute; left: 8px; right: 8px; bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: .72rem; color: var(--text-dim); font-weight: 700; }
+  .pill { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; color: var(--text); }
+  .steps { margin: 0; padding-left: 18px; color: var(--text-dim); font-size: .82rem; line-height: 1.5; }
+  .steps li { margin-bottom: 4px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+  .card h3 { margin: 0 0 6px; font-size: .8rem; color: var(--text-dim); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+  .sess { display: flex; justify-content: space-between; font-size: .86rem; padding: 6px 0; border-top: 1px solid var(--border); }
+  .sess:first-of-type { border-top: 0; }
+  .sess b { font-weight: 800; }
+  .sess span { color: var(--text-dim); }
+
+  /* Logger card (WorkoutLogger.vue) */
+  .logger { background: var(--bg); padding: 18px 16px; height: 100%; display: flex; flex-direction: column; gap: 12px; }
+  .lhead { font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; }
+  .lcard { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+  .lcard .name { font-weight: 800; font-size: 1.05rem; }
+  .lsets { margin: 10px 0; display: flex; flex-direction: column; gap: 6px; }
+  .lset { display: flex; justify-content: space-between; font-size: .88rem; background: var(--surface-2); border-radius: 10px; padding: 8px 10px; }
+  .lfoot { font-size: .8rem; color: var(--text-dim); display: flex; gap: 6px; }
+  .lfoot b { color: var(--accent); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+  .ring { outline: 2px dashed var(--highlight); outline-offset: 4px; border-radius: 6px; }
+  .arrow { color: var(--highlight); font-size: .8rem; font-weight: 800; }
+  .faded { opacity: .45; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#901 Exercise demos: figure style and placement</h1>
+  <p class="note">A figure drawn by the app from motion data (a real <b>bodyweight squat</b> from the free CMU motion capture set, 5 KB). It lives inside the existing <b>How to</b> section of an exercise's History sheet, so it only plays after a tap and never mid-set. Far-side limbs are dimmer so the near leg reads clearly. Every color comes from the theme, so one data file works in all 7 themes.</p>
+  <p class="note"><b>Pick: A (Line).</b> It matches the app's thin line icons, reads best at 190px tall, and stays calm next to the steps. B is heavier than anything else on the sheet. C is cute but the ears move with the head and pull the eye from the hips and knees, the part people are checking. If the owner wants the bunny, C could appear only when the bunny is on, like the theme corners do.</p>
+</div>
+<div class="page">
+  <div class="col">
+    <p class="cap">A. Line (pick)</p>
+    <p class="capnote">Theme accent for the near side and trunk, dim for the far side. <b>How to</b> opens to the figure, then the steps.</p>
+    <div class="phone" data-style="line"></div>
+  </div>
+  <div class="col">
+    <p class="cap">B. Solid</p>
+    <p class="capnote">Chunky two-tone limbs with a floor shadow. Friendlier from far away, but it gets blobby at the bottom of the squat and covers the joint angles.</p>
+    <div class="phone" data-style="solid"></div>
+  </div>
+  <div class="col">
+    <p class="cap">C. Bunny ears</p>
+    <p class="capnote">Option A with ears on the head. On brand, but the ears move with the head and draw the eye away from the form.</p>
+    <div class="phone" data-style="bunny"></div>
+  </div>
+  <div class="col">
+    <p class="cap">A in Chalk (Just your numbers)</p>
+    <p class="capnote">Same data, Chalk tokens. No bunny anywhere, so the line figure fits the plain look too.</p>
+    <div class="phone chalk" data-style="line"></div>
+  </div>
+  <div class="col">
+    <p class="cap">A in Sunrise (light)</p>
+    <p class="capnote">Light theme check. The dim far side stays visible on white.</p>
+    <div class="phone sunrise" data-style="line"></div>
+  </div>
+  <div class="col">
+    <p class="cap">Where it's reached from the logger</p>
+    <p class="capnote">No new control on the exercise card (its footer line is already full, #492). <b>History</b>, then <b>How to</b>. Two taps, never autoplays during a set.</p>
+    <div class="phone">
+      <div class="logger">
+        <div class="lhead">Leg day</div>
+        <div class="lcard">
+          <div class="name">Bodyweight Squat</div>
+          <div class="lsets">
+            <div class="lset"><span>Set 1</span><b>15 reps</b></div>
+            <div class="lset"><span>Set 2</span><b>15 reps</b></div>
+            <div class="lset"><span>Set 3</span><b>12 reps</b></div>
+          </div>
+          <div class="lfoot"><span>3 sets logged</span><span>·</span><b class="ring">History</b></div>
+        </div>
+        <p class="arrow">Tap History, then How to</p>
+        <div class="lcard faded">
+          <div class="name">Barbell Back Squat</div>
+          <div class="lsets"><div class="lset"><span>Set 1</span><b>8 times 135 pounds</b></div></div>
+          <div class="lfoot"><span>1 set logged</span><span>·</span><b>History</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<template id="sheet">
+  <div class="sheet">
+    <div class="sheet-head"><h2>Bodyweight Squat</h2><div class="x">✕</div></div>
+    <div class="howto">
+      <div class="howto-toggle"><span>How to</span><span>▴</span></div>
+      <div class="demo">
+        <svg role="img" aria-label="A figure doing a bodyweight squat, seen from the side"></svg>
+        <div class="demo-bar"><span class="pill">❚❚ Pause</span><span>Side view</span></div>
+      </div>
+      <ol class="steps">
+        <li>Stand with your feet shoulder width apart and your arms out in front.</li>
+        <li>Sit down and back until your thighs are about parallel to the floor.</li>
+        <li>Push through your whole foot to stand back up.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>Recent</h3>
+      <div class="sess"><b>Today</b><span>15, 15, 12 reps</span></div>
+      <div class="sess"><b>Thu, Oct 30</b><span>15, 14, 12 reps</span></div>
+      <div class="sess"><b>Mon, Oct 27</b><span>12, 12, 10 reps</span></div>
+    </div>
+  </div>
+</template>
+<script src="issue-901-squat-motion.js"></script>
+<script src="issue-901-figure.js"></script>
+<script>
+  const still = new URLSearchParams(location.search).has('still')
+  document.querySelectorAll('.phone[data-style]').forEach((phone) => {
+    phone.appendChild(document.getElementById('sheet').content.cloneNode(true))
+    const fig = createFigure(phone.querySelector('svg'), window.MOTION.squat, phone.dataset.style)
+    if (still) fig.seek(0.45)
+    else fig.play()
+  })
+</script>
+</body>
+</html>

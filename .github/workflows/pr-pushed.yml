@@ -1,0 +1,89 @@
+# A push to a PR after /review-pr turned on auto-merge must not ride that auto-merge in (#681).
+# GitHub checks expectedHeadOid only when auto-merge is turned on, and keeps it on through later
+# pushes from anyone with write access, so on every push this turns auto-merge off and drops
+# `review:owner-approval` and `review:auto-merge` (#1020). The owner's approval is dismissed by the ruleset at the same moment
+# (dismiss_stale_reviews_on_push), so the PR goes back through review.
+#
+# A fork PR's run gets no secrets (#945), so it can't mint the Builder token. The reset job runs only
+# for a same-repo head; a fork PR that somehow has auto-merge on fails the `fork-auto-merge` job
+# instead, loudly, so the owner turns it off by hand. Neither job checks out the PR's code.
+name: PR pushed
+
+on:
+  pull_request:
+    types: [synchronize]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  reset-auto-merge:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      (github.event.pull_request.auto_merge != null ||
+       contains(github.event.pull_request.labels.*.name, 'review:owner-approval') ||
+       contains(github.event.pull_request.labels.*.name, 'review:auto-merge'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          sparse-checkout: scripts
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      # Turning auto-merge off needs the same Contents write as turning it on.
+      - name: Mint a Builder token
+        id: builder
+        env:
+          BUILDER_APP_ID: ${{ secrets.BUILDER_APP_ID }}
+          BUILDER_APP_KEY: ${{ secrets.BUILDER_APP_KEY }}
+        run: |
+          token="$(node scripts/gh-app-token.mjs --app builder)"
+          echo "::add-mask::$token"
+          echo "token=$token" >> "$GITHUB_OUTPUT"
+
+      - name: Turn auto-merge off and ask for a new review
+        env:
+          GH_TOKEN: ${{ steps.builder.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          NODE_ID: ${{ github.event.pull_request.node_id }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          AUTO_MERGE_ON: ${{ github.event.pull_request.auto_merge != null }}
+        run: |
+          # shellcheck disable=SC2016
+          query='mutation($id: ID!) { disablePullRequestAutoMerge(input: {pullRequestId: $id}) { pullRequest { number } } }'
+          # Only the label-only case (auto-merge already off) may fail here. If auto-merge was on and
+          # can't be turned off, fail loudly: the unreviewed commit could still ride it in.
+          if ! gh api graphql -f query="$query" -f id="$NODE_ID" > /dev/null; then
+            if [ "$AUTO_MERGE_ON" = "true" ]; then
+              echo "::error::Couldn't turn auto-merge off on PR #$PR; turn it off by hand before anyone approves." >&2
+              exit 1
+            fi
+            echo "auto-merge was already off"
+          fi
+          gh api -X DELETE "repos/{owner}/{repo}/issues/$PR/labels/review%3Aowner-approval" > /dev/null 2>&1 || true
+          gh api -X DELETE "repos/{owner}/{repo}/issues/$PR/labels/review%3Aauto-merge" > /dev/null 2>&1 || true
+          printf '%s\n' "New commits (${HEAD_SHA:0:7}) arrived after the review turned on auto-merge, so auto-merge is off and \`review:owner-approval\` and \`review:auto-merge\` are removed (#681). This PR needs a new review: label it \`review:requested\` and fire the review routine." > "$RUNNER_TEMP/body.md"
+          gh api -X POST "repos/{owner}/{repo}/issues/$PR/comments" -F body=@"$RUNNER_TEMP/body.md" > /dev/null
+          echo "Auto-merge off for PR #$PR after a push." | tee -a "$GITHUB_STEP_SUMMARY"
+
+  fork-auto-merge:
+    if: >-
+      github.event.pull_request.head.repo.full_name != github.repository &&
+      github.event.pull_request.auto_merge != null
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ask for auto-merge to be turned off by hand
+        env:
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          echo "::error::PR #$PR is from a fork and has auto-merge on. This run has no secrets, so it can't turn it off: turn auto-merge off by hand. No lane or review works fork PRs (#945)." >&2
+          exit 1

@@ -1,0 +1,47 @@
+<!doctype html>
+<!--
+  Sprint review end card (dry run, 2026-10-15): what's in the release but not
+  shown, and what's up next. ?items and ?next are JSON arrays of short strings.
+  A still card held long enough to pause on; the review issue has the full list.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: 'Baloo 2'; font-weight: 600 800; src: url(/site/fonts/baloo2-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 400 800; src: url(/site/fonts/manrope-latin.woff2) format('woff2'); }
+  :root { --bg: #17111c; --surface: #211829; --accent: #f2879c; --secondary: #b79cf0; --highlight: #f2c069; --text: #f5edf2; --text-soft: #cdbfca; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 480px; height: 1040px; overflow: hidden; background: var(--bg); }
+  .card { position: absolute; inset: 0; padding: 56px 28px; background: var(--bg); color: var(--text); font-family: 'Manrope', sans-serif;
+    animation: fade .5s ease-out both; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 34px; font-weight: 800; line-height: 1.05; margin-bottom: 10px; }
+  h2 small { display: block; font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-soft); margin-top: 4px; }
+  .grad { background: linear-gradient(90deg, var(--accent), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  ul { list-style: none; padding: 0; margin: 0 0 26px; }
+  li { font-size: 14.5px; line-height: 1.32; padding: 6px 0 6px 18px; position: relative; color: var(--text); border-bottom: 1px solid #2c2236; }
+  li::before { content: ''; position: absolute; left: 2px; top: 12px; width: 7px; height: 7px; border-radius: 50%; background: var(--secondary); }
+  .next li::before { background: var(--highlight); }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2><span class="grad">Also in this release</span><small id="count"></small></h2>
+  <ul id="items"></ul>
+  <h2 id="next-head"><span class="grad">Up next</span><small>Top of the queue. Reply on the review issue to change it.</small></h2>
+  <ul class="next" id="next"></ul>
+</div>
+<script>
+  const q = new URLSearchParams(location.search)
+  const items = JSON.parse(q.get('items') ?? '[]')
+  const next = JSON.parse(q.get('next') ?? '[]')
+  document.getElementById('count').textContent = ((n) => n + (n == 1 ? ' more change' : ' more changes') + ', not shown in a clip')(Number(q.get('total') ?? items.length))
+  // Nothing queued (or a public sample cut): drop the Up next heading too.
+  if (!next.length) document.getElementById('next-head').hidden = true
+  for (const [id, list] of [['items', items], ['next', next]])
+    for (const t of list) document.getElementById(id).insertAdjacentHTML('beforeend', `<li></li>`), document.getElementById(id).lastElementChild.textContent = t
+  window.CARD = { duration: Number(q.get('d') ?? 8), sounds: [['chime', 0.2]] }
+</script>
+</body>
+</html>

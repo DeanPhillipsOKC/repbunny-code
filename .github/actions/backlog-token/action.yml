@@ -1,0 +1,44 @@
+# A token for issue reads and writes in the backlog repo (#944). While the backlog repo is the repo
+# this workflow runs in, that's the run's own token, so nothing changes. Once code and issues live in
+# different repos (#937), the run's token can't reach the other one, so this mints a RepBunny Builder
+# token for the backlog repo instead (the app is installed on both). Needs a checkout first, for
+# scripts/gh-app-token.mjs. docs/backlog-runner.md > Backlog repo.
+name: Backlog token
+description: Token that can read and write issues in the backlog repo
+inputs:
+  backlog-repo:
+    description: owner/repo of the backlog (vars.BACKLOG_REPO, or DeanPhillipsOKC/repbunny)
+    required: true
+  github-token:
+    description: The run's own token, used when the backlog repo is this repo
+    required: true
+  builder-app-id:
+    description: secrets.BUILDER_APP_ID, only needed when the backlog repo is another repo
+    required: false
+    default: ''
+  builder-app-key:
+    description: secrets.BUILDER_APP_KEY, only needed when the backlog repo is another repo
+    required: false
+    default: ''
+outputs:
+  token:
+    description: The token to put in GH_TOKEN for issue calls
+    value: ${{ steps.pick.outputs.token }}
+runs:
+  using: composite
+  steps:
+    - id: pick
+      shell: bash
+      env:
+        BACKLOG_REPO: ${{ inputs.backlog-repo }}
+        RUN_TOKEN: ${{ inputs.github-token }}
+        BUILDER_APP_ID: ${{ inputs.builder-app-id }}
+        BUILDER_APP_KEY: ${{ inputs.builder-app-key }}
+      run: |
+        if [ "${BACKLOG_REPO,,}" = "${GITHUB_REPOSITORY,,}" ]; then
+          token="$RUN_TOKEN"
+        else
+          token="$(node scripts/gh-app-token.mjs --app builder --repo "$BACKLOG_REPO")"
+        fi
+        echo "::add-mask::$token"
+        echo "token=$token" >> "$GITHUB_OUTPUT"

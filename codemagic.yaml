@@ -1,0 +1,108 @@
+# Codemagic cloud builds for the iPhone app (no Mac needed). See docs/architecture.md > Native apps.
+# Pushing a store/vX.Y.Z tag starts a build (docs/architecture.md > Native apps > Releasing), and
+# starting one by hand on codemagic.io still works. It builds the store app (app.repbunny), signs
+# it, and uploads it to TestFlight.
+workflows:
+  ios-testflight:
+    name: iOS TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    # store/v*, not v*: the personal Android build's nightly releases already use v1.0.N tags.
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: 'store/v*'
+          include: true
+      cancel_previous_builds: false
+    integrations:
+      # The App Store Connect API key stored under Codemagic > Integrations > Developer Portal.
+      app_store_connect: App Manager
+    environment:
+      groups:
+        # The group's retired PWA variables (the public push key and the old backend's URL and key)
+        # are no longer read by the app (#938, #939); the owner clears them in #941.
+        # Also CERTIFICATE_PRIVATE_KEY: the RSA key the Apple Distribution certificate is made
+        # from (backed up in the owner's password manager). The signing step below creates or
+        # reuses the certificate and App Store profile through the API key, so nothing is
+        # uploaded to Codemagic's Code signing identities by hand.
+        - repbunny_web
+      node: 24
+      # 26.6 is the default and its machine pool was overloaded on 2026-10-08 (Codemagic
+      # support ticket #20828); 26.5 is a quieter pool. Bump when needed.
+      xcode: 26.5
+    scripts:
+      - name: Check the release tag
+        script: |
+          if [ -z "$CM_TAG" ]; then
+            echo "Started by hand; keeping the Xcode project's MARKETING_VERSION."
+            exit 0
+          fi
+          if ! echo "$CM_TAG" | grep -Eq '^store/v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Tag $CM_TAG isn't store/vMAJOR.MINOR.PATCH." >&2
+            exit 1
+          fi
+          # A tag build's clone may be shallow and have no origin/main yet.
+          if [ "$(git rev-parse --is-shallow-repository)" = true ]; then git fetch --quiet --unshallow; fi
+          git fetch --quiet origin +refs/heads/main:refs/remotes/origin/main
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "Tag $CM_TAG points at a commit that isn't on main." >&2
+            exit 1
+          fi
+      - name: Refuse a Premium-unlocked, dev-tools, or e2e-hooks store build
+        script: |
+          if [ -n "$VITE_PREMIUM_UNLOCKED" ] || [ -n "$VITE_DEV_TOOLS" ] || [ -n "$VITE_E2E_HOOKS" ]; then
+            echo "VITE_PREMIUM_UNLOCKED, VITE_DEV_TOOLS, or VITE_E2E_HOOKS is set; store builds must not unlock Premium, show the dev switch, or carry the e2e test hooks." >&2
+            exit 1
+          fi
+      - name: Install
+        script: npm ci
+      # #857: the default home-screen icon Cut release wrote into the tag, before the web build
+      # (the picker's Classic tile) and the Xcode build.
+      - name: Apply the default icon
+        script: |
+          if [ -z "$CM_TAG" ]; then exit 0; fi
+          node scripts/apply-default-icon.mjs --tag "$CM_TAG"
+      - name: Build web app and sync to iOS
+        script: |
+          npm run build
+          npx cap sync ios
+      - name: Set up signing
+        script: |
+          for v in APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_KEY_IDENTIFIER APP_STORE_CONNECT_PRIVATE_KEY CERTIFICATE_PRIVATE_KEY; do
+            if [ -z "${!v}" ]; then echo "$v is not set." >&2; missing=1; fi
+          done
+          [ -z "$missing" ] || exit 1
+          keychain initialize
+          app-store-connect fetch-signing-files app.repbunny --type IOS_APP_STORE --create
+          # The lock-screen rest timer's Live Activity extension (#163) has its own
+          # bundle ID and profile; --create registers both the first time.
+          app-store-connect fetch-signing-files app.repbunny.RestLive --type IOS_APP_STORE --create
+          keychain add-certificates
+          xcode-project use-profiles
+      - name: Set build number and version
+        script: |
+          cd ios/App
+          agvtool new-version -all "$BUILD_NUMBER"
+          if [ -n "$CM_TAG" ]; then
+            agvtool new-marketing-version "${CM_TAG#store/v}"
+          fi
+      - name: Build ipa
+        script: xcode-project build-ipa --project ios/App/App.xcodeproj --scheme App
+      # TestFlight's "What to Test" (#216): src/lib/releaseNotes.ts entries since the previous
+      # store/v* tag. Codemagic publishes release_notes.json from the repo root to App Store
+      # Connect; a .txt file only works for Play.
+      - name: Write release notes
+        script: |
+          if [ -z "$CM_TAG" ]; then exit 0; fi
+          git fetch --quiet --tags
+          node scripts/collect-release-notes.mjs --tag "$CM_TAG" --store ios --out release_notes.json
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        # Internal testers get every processed build without this. Turn it on (after filling in
+        # TestFlight > Test Information) only when external testers need Beta App Review.
+        submit_to_testflight: false

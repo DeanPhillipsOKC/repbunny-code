@@ -1,0 +1,701 @@
+<title>RepBunny Android QA</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap">
+<style>
+/* Layout: one phone-width column (wider on a laptop) with four tabs at the bottom, as in docs/design/issue-211-qa-procedure.html option A. Tokens are the app's own (src/style.css). */
+:root {
+  --bg: #17111c; --surface: #211829; --surface-2: #2a1f33; --border: #3a2b40;
+  --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --on-accent: #241a2c;
+  --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --danger: #e0687a; --cardio: #f4a07a;
+  --font-display: 'Baloo 2', ui-rounded, 'Segoe UI', sans-serif;
+  --font-body: Manrope, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, Consolas, 'Cascadia Mono', monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #fbf5f8; --surface: #ffffff; --surface-2: #f6edf2; --border: #e6d6df;
+    --text: #2a1d30; --text-dim: #6e5a76; --accent: #c94d6a; --on-accent: #ffffff;
+    --secondary: #6f4fc2; --highlight: #a86b06; --success: #3f7a2a; --danger: #b8314a; --cardio: #b4561f;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #fbf5f8; --surface: #ffffff; --surface-2: #f6edf2; --border: #e6d6df;
+  --text: #2a1d30; --text-dim: #6e5a76; --accent: #c94d6a; --on-accent: #ffffff;
+  --secondary: #6f4fc2; --highlight: #a86b06; --success: #3f7a2a; --danger: #b8314a; --cardio: #b4561f;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font: 500 15px/1.45 var(--font-body); }
+.app { max-width: 640px; margin: 0 auto; padding-inline: 16px; padding-block: 14px 96px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: 1.45rem; }
+h2 { font-size: 1.2rem; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dim { color: var(--text-dim); }
+.mono { font-family: var(--font-mono); }
+.row { display: flex; gap: 8px; align-items: center; }
+.stack { display: flex; flex-direction: column; gap: 8px; }
+.grow { flex: 1; min-width: 0; }
+
+.top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.top .titles { flex: 1; min-width: 0; }
+.top small { display: block; font-size: 0.74rem; color: var(--text-dim); font-weight: 600; }
+.btn { border: 1px solid var(--border); background: var(--surface); border-radius: 11px; padding: 7px 11px; font-weight: 800; font-size: 0.8rem; color: var(--text-dim); white-space: nowrap; }
+.btn.pri { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.danger { background: var(--danger); border-color: var(--danger); color: var(--on-accent); }
+.btn.wide { width: 100%; min-height: 46px; font-size: 0.92rem; border-radius: 13px; }
+.btn:disabled { opacity: .5; cursor: default; }
+
+.banner { border: 1px solid color-mix(in srgb, var(--highlight) 55%, var(--border)); background: color-mix(in srgb, var(--highlight) 12%, var(--surface)); border-radius: 12px; padding: 9px 12px; font-size: 0.82rem; margin-bottom: 12px; }
+
+.runbar { display: grid; grid-template-columns: 0.8fr 1.3fr 1.4fr; gap: 6px; margin-bottom: 10px; }
+.field { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 5px 9px; min-width: 0; display: flex; flex-direction: column; }
+.field label, .lbl { font-size: 0.62rem; text-transform: uppercase; letter-spacing: .07em; color: var(--text-dim); font-weight: 800; }
+.field input, .field select { background: none; border: 0; padding: 0; font-weight: 800; font-size: 0.86rem; width: 100%; min-width: 0; }
+.field input::placeholder { color: var(--text-dim); font-weight: 600; }
+.field select option { background: var(--surface); color: var(--text); }
+
+.chips { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.chip { border: 1px solid var(--border); background: var(--surface); color: var(--text-dim); border-radius: 999px; padding: 6px 12px; font-weight: 800; font-size: 0.78rem; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.chip .n { opacity: .75; margin-left: 4px; font-variant-numeric: tabular-nums; }
+
+.bar { height: 7px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; display: flex; }
+.bar i { display: block; height: 100%; }
+.bar .p { background: var(--success); } .bar .f { background: var(--danger); } .bar .b { background: var(--highlight); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; }
+.overall .head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; font-size: 0.84rem; }
+.big { font-family: var(--font-display); font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+.legend { display: flex; gap: 12px; font-size: 0.72rem; color: var(--text-dim); margin-top: 6px; flex-wrap: wrap; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+.sec { display: flex; justify-content: space-between; font-size: 0.68rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--text-dim); margin: 16px 2px 7px; }
+
+.list { display: flex; flex-direction: column; gap: 6px; }
+.item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 9px 11px; }
+.item .code { font-size: 0.64rem; font-weight: 800; color: var(--secondary); width: 42px; flex-shrink: 0; }
+.item .name { flex: 1; min-width: 0; }
+.item .name b { display: block; font-size: 0.9rem; }
+.item .name .bar { margin-top: 6px; height: 5px; }
+.item .cnt { font-size: 0.78rem; font-weight: 800; color: var(--text-dim); font-variant-numeric: tabular-nums; min-width: 40px; text-align: right; }
+.item .id { display: block; font-size: 0.66rem; font-weight: 800; color: var(--secondary); }
+.item .t { display: block; font-size: 0.88rem; font-weight: 700; line-height: 1.3; }
+.flags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+.flag { font-size: 0.6rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; white-space: nowrap; border: 1px solid transparent; }
+.flag.chg { background: color-mix(in srgb, var(--highlight) 20%, transparent); color: var(--highlight); }
+.flag.smoke { background: color-mix(in srgb, var(--secondary) 18%, transparent); color: var(--secondary); }
+.flag.fail { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
+.flag.pass { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+.flag.due { background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent); }
+.flag.store { background: color-mix(in srgb, var(--cardio) 18%, transparent); color: var(--cardio); }
+.flag.plain { color: var(--text-dim); border-color: var(--border); }
+.res { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--border); flex-shrink: 0; display: grid; place-items: center; font-size: 0.8rem; font-weight: 800; color: var(--on-accent); }
+.res.pass { background: var(--success); border-color: var(--success); }
+.res.fail { background: var(--danger); border-color: var(--danger); }
+.res.blocked { background: var(--highlight); border-color: var(--highlight); }
+
+.tc-id { font-size: 0.74rem; font-weight: 800; color: var(--secondary); }
+.tc-title { font-size: 1.2rem; margin: 2px 0 8px; }
+.facts { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.hist { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+.hist div { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 6px 10px; font-size: 0.72rem; color: var(--text-dim); }
+.hist b { display: block; color: var(--text); font-size: 0.84rem; font-variant-numeric: tabular-nums; }
+.box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; font-size: 0.86rem; }
+.box h3 { font-family: var(--font-body); font-size: 0.64rem; letter-spacing: .07em; text-transform: uppercase; color: var(--text-dim); margin: 0 0 6px; font-weight: 800; }
+.box h3 + * { margin-top: 0; }
+.file { font-family: var(--font-mono); font-size: 0.76rem; color: var(--highlight); background: var(--surface-2); border-radius: 6px; padding: 3px 7px; display: inline-block; margin-top: 4px; word-break: break-word; }
+.warn { color: var(--text-dim); font-size: 0.78rem; margin-top: 6px; }
+.check { display: flex; gap: 9px; align-items: flex-start; padding: 5px 0; cursor: pointer; }
+.check input { appearance: none; width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border); flex-shrink: 0; margin: 0; display: grid; place-items: center; background: var(--surface); }
+.check input:checked { background: var(--accent); border-color: var(--accent); }
+.check input:checked::after { content: ''; width: 5px; height: 10px; border: solid var(--on-accent); border-width: 0 2.5px 2.5px 0; transform: translateY(-1px) rotate(45deg); }
+.check.ux input:checked { background: var(--secondary); border-color: var(--secondary); }
+.check input:checked + span { color: var(--text-dim); }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+.seg button { padding: 10px 0; border-radius: 11px; border: 1px solid var(--border); background: var(--surface); font-weight: 800; font-size: 0.86rem; color: var(--text-dim); }
+.seg button[aria-pressed="true"][data-v="pass"] { background: var(--success); border-color: var(--success); color: var(--on-accent); }
+.seg button[aria-pressed="true"][data-v="fail"] { background: var(--danger); border-color: var(--danger); color: var(--on-accent); }
+.seg button[aria-pressed="true"][data-v="blocked"] { background: var(--highlight); border-color: var(--highlight); color: var(--on-accent); }
+textarea { width: 100%; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; font-size: 0.86rem; min-height: 64px; resize: vertical; }
+.changes { margin: 6px 0 0; padding-left: 18px; font-size: 0.78rem; color: var(--text-dim); }
+
+.nav { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom, 0px); z-index: 5; }
+.nav .in { max-width: 640px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
+.nav button { background: none; border: 0; padding: 10px 0 12px; font-weight: 800; font-size: 0.74rem; color: var(--text-dim); display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.nav button[aria-current="page"] { color: var(--accent); }
+.nav svg { width: 22px; height: 22px; }
+.badge { font-size: 0.6rem; background: var(--accent); color: var(--on-accent); border-radius: 999px; padding: 0 6px; margin-left: 3px; }
+
+.scrim { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 10; display: flex; align-items: flex-end; justify-content: center; }
+.sheet { width: 100%; max-width: 640px; background: var(--surface); border-top: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 12px 16px calc(18px + env(safe-area-inset-bottom, 0px)); max-height: 88vh; overflow-y: auto; }
+.grab { width: 40px; height: 4px; border-radius: 4px; background: var(--border); margin: 0 auto 12px; }
+.sheet p { margin: 4px 0 12px; font-size: 0.84rem; color: var(--text-dim); }
+.sheet textarea.code { font-family: var(--font-mono); font-size: 0.74rem; min-height: 260px; background: var(--bg); }
+.btns { display: flex; gap: 8px; margin-top: 10px; }
+.btns .btn { flex: 1; min-height: 46px; font-size: 0.9rem; }
+
+table.spd { width: 100%; border-collapse: collapse; font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+table.spd th { text-align: left; font-size: 0.62rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); padding: 3px 4px; }
+table.spd td { padding: 6px 4px; border-top: 1px solid var(--border); }
+table.spd .num { text-align: right; }
+.up { color: var(--danger); font-weight: 800; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.empty { text-align: center; color: var(--text-dim); padding: 22px 8px; font-size: 0.86rem; }
+@media (prefers-reduced-motion: no-preference) { .btn, .chip, .item { transition: background-color .15s, border-color .15s; } }
+</style>
+
+<div class="app" id="app"><p class="dim">Loading the QA procedure…</p></div>
+<nav class="nav" aria-label="Sections"><div class="in" id="nav"></div></nav>
+<div id="sheet-root"></div>
+
+<script>
+// Issue #211. Generated by scripts/qa/build-page.mjs from scripts/qa/procedure.mjs;
+// edit those, not the published page. Run state lives in the artifact's db.
+const DATA = /*__QA_DATA__*/null;
+
+const AREAS = new Map(DATA.areas.map((a) => [a.id, a]));
+const CASES = DATA.testCases;
+const CASE_BY_ID = new Map(CASES.map((c) => [c.id, c]));
+const TIER_LABEL = { free: 'Free', premium: 'Premium', both: 'Free and Premium' };
+const PREMIUM_NOTE = 'Needs Premium: the personal build, or a store install with Premium bought.';
+
+const state = {
+  run: { build: DATA.currentBuild, device: '', premium: false, startedAt: null },
+  progress: {}, history: {}, journeys: {}, release: { checks: {}, taps: {} }, perf: {},
+};
+let db = null;
+let saving = 'connecting'; // 'connecting' | 'on' | 'off' | 'readonly'
+
+function load(key, fallback) { try { const v = localStorage.getItem('qa-' + key); return v === null ? fallback : JSON.parse(v); } catch { return fallback; } }
+function store(key, value) { try { localStorage.setItem('qa-' + key, JSON.stringify(value)); } catch {} }
+const ui = { tab: load('tab', 'run'), filter: load('filter', 'smoke'), area: null, tier: 'free', tc: null, journey: null, sheet: null, areaConfirm: false };
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const today = () => new Date().toISOString().slice(0, 10);
+const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '';
+const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'device';
+
+// ---------- derived ----------
+const lastChange = (areaId) => AREAS.get(areaId)?.changes[0]?.build ?? 0;
+function changedSince(tc) {
+  const pass = state.history[tc.id]?.lastPass;
+  if (!pass) return [];
+  return (AREAS.get(tc.area)?.changes ?? []).filter((c) => c.build > pass.build);
+}
+// A saved run from before tiers has installed: 'personal' and no premium flag.
+const premiumOn = () => state.run.premium ?? state.run.installed === 'personal';
+const isPremiumCase = (tc) => tc.tier === 'premium';
+const inTier = (tc, tier) => (tier === 'premium') === isPremiumCase(tc);
+const counted = (tc) => !isPremiumCase(tc) || premiumOn();
+const stampInstalled = () => premiumOn() ? 'personal' : 'store';
+const isChanged = (tc) => changedSince(tc).length > 0;
+const resultOf = (tc) => state.progress[tc.id]?.result ?? null;
+function inFilter(tc) {
+  if (ui.filter === 'smoke') return !!tc.smoke;
+  if (ui.filter === 'changed') return isChanged(tc);
+  return true;
+}
+const filtered = () => CASES.filter((tc) => counted(tc) && inFilter(tc));
+function tally(cases) {
+  const t = { total: cases.length, pass: 0, fail: 0, blocked: 0, left: 0 };
+  for (const tc of cases) { const r = resultOf(tc); if (r) t[r]++; else t.left += tc.minutes; }
+  t.done = t.pass + t.fail + t.blocked;
+  return t;
+}
+function barHtml(t) {
+  if (!t.total) return '<div class="bar"></div>';
+  const w = (n) => (n / t.total * 100).toFixed(1) + '%';
+  return `<div class="bar" role="img" aria-label="${t.done} of ${t.total} done"><i class="p" style="width:${w(t.pass)}"></i><i class="f" style="width:${w(t.fail)}"></i><i class="b" style="width:${w(t.blocked)}"></i></div>`;
+}
+function journeyStatus(j) {
+  const s = state.journeys[j.id];
+  const last = s?.lastRun;
+  if (!last) return { kind: 'due', label: 'Due', note: 'Never run' };
+  const days = Math.floor((Date.now() - new Date(last.date).getTime()) / 86400000);
+  const changed = j.areas.flatMap((a) => (AREAS.get(a)?.changes ?? []).filter((c) => c.build > last.build));
+  if (days >= j.cadenceDays) return { kind: 'due', label: 'Due', note: `${days} days ago`, changed };
+  if (changed.length) return { kind: 'chg', label: 'Due early', note: `code changed since (${changed.length} commit${changed.length === 1 ? '' : 's'})`, changed };
+  const due = new Date(new Date(last.date).getTime() + j.cadenceDays * 86400000);
+  return { kind: 'pass', label: 'OK', note: `due ${fmtDate(due.toISOString())}`, changed };
+}
+const dueJourneys = () => DATA.journeys.filter((j) => journeyStatus(j).kind !== 'pass').length;
+
+// ---------- db ----------
+const chains = new Map();
+function write(path, fn) {
+  const prev = chains.get(path) ?? Promise.resolve();
+  const next = prev.then(fn).catch((e) => {
+    if (e && e.code === 'invalid_argument') { saving = 'readonly'; render(); }
+    else if (e && (e.code === 'quota_exceeded' || e.code === 'revoked')) { saving = 'off'; render(); }
+    console.warn('QA save failed', path, e);
+  });
+  chains.set(path, next);
+  return next;
+}
+function setDoc(path, body) { if (db && saving === 'on') write(path, () => db.doc(path).set(body)); }
+function deleteDoc(path) { if (db && saving === 'on') write(path, () => db.doc(path).delete()); }
+// Docs edited here and not yet saved: a snapshot mustn't overwrite them
+// with the older stored copy while the save is waiting.
+const timers = new Map();
+const unsaved = new Set();
+function setDocSoon(path, getBody, ms = 700) {
+  clearTimeout(timers.get(path));
+  unsaved.add(path);
+  const id = setTimeout(async () => {
+    setDoc(path, getBody());
+    await chains.get(path);
+    // A newer edit set its own timer; it clears the flag when it's saved.
+    if (timers.get(path) === id) { timers.delete(path); unsaved.delete(path); }
+  }, ms);
+  timers.set(path, id);
+}
+
+// A saved run from an older build restarts at the current build once the saved
+// run and progress have both loaded. Pass/fail history, perf, and journeys stay;
+// the last device name carries over.
+const seen = { run: false, progress: false };
+let resetNote = '';
+function checkNewBuild() {
+  if (!seen.run || !seen.progress || resetNote || saving !== 'on') return;
+  const saved = Number(state.run.build) || 0;
+  if (!(saved < Number(DATA.currentBuild))) return;
+  const device = state.run.device || load('device', '');
+  clearCases(Object.keys(state.progress));
+  state.release = { checks: {}, taps: {} };
+  setDoc('state/release', state.release);
+  state.run = { ...state.run, build: DATA.currentBuild, device, startedAt: null };
+  setDoc('state/run', state.run);
+  resetNote = `New build ${DATA.currentBuild}: run reset`;
+}
+
+function subscribe() {
+  const intoMap = (target) => (snap) => {
+    const next = {};
+    for (const d of snap.docs) next[d.id] = d.data();
+    for (const [id, body] of Object.entries(state[target])) if (unsaved.has(`${target}/${id}`)) next[id] = body;
+    state[target] = next;
+    if (target === 'progress') { seen.progress = true; checkNewBuild(); }
+    render();
+  };
+  const onError = () => { saving = 'off'; render(); };
+  db.collection('progress').onSnapshot(intoMap('progress'), onError);
+  db.collection('history').onSnapshot(intoMap('history'), onError);
+  db.collection('journeys').onSnapshot(intoMap('journeys'), onError);
+  db.collection('perf').onSnapshot(intoMap('perf'), onError);
+  db.doc('state/run').onSnapshot((d) => { if (d.exists && !unsaved.has('state/run')) state.run = { ...state.run, ...d.data() }; seen.run = true; checkNewBuild(); render(); }, onError);
+  db.doc('state/release').onSnapshot((d) => { if (unsaved.has('state/release')) return; state.release = d.exists ? { checks: {}, taps: {}, ...d.data() } : { checks: {}, taps: {} }; render(); }, onError);
+}
+
+async function connect() {
+  try {
+    const claude = window.claude;
+    db = claude && claude.use ? await claude.use('db') : null;
+    if (!db) { saving = 'off'; render(); return; }
+    const user = await claude.use('user');
+    const canWrite = user && user.can ? await user.can('data.write') : null;
+    saving = canWrite === false ? 'readonly' : 'on';
+    subscribe();
+  } catch (e) {
+    saving = 'off';
+  }
+  render();
+}
+
+// ---------- writes ----------
+function progressFor(id) {
+  const tc = CASE_BY_ID.get(id);
+  return state.progress[id] ?? { steps: tc.steps.map(() => false), ux: (DATA.standardUx.concat(tc.ux ?? [])).map(() => false), result: null, notes: '' };
+}
+function saveProgress(id, patch, soon = false) {
+  const p = { ...progressFor(id), ...patch, build: state.run.build, device: state.run.device, installed: stampInstalled(), at: new Date().toISOString() };
+  state.progress = { ...state.progress, [id]: p };
+  if (soon) setDocSoon('progress/' + id, () => state.progress[id]); else setDoc('progress/' + id, p);
+}
+function recordResult(id, result) {
+  const current = progressFor(id).result;
+  const next = current === result ? null : result;
+  saveProgress(id, { result: next });
+  if (next === 'pass' || next === 'fail') {
+    const stamp = { build: Number(state.run.build) || 0, device: state.run.device, installed: stampInstalled(), at: new Date().toISOString() };
+    const h = { ...(state.history[id] ?? {}), [next === 'pass' ? 'lastPass' : 'lastFail']: stamp };
+    state.history = { ...state.history, [id]: h };
+    setDoc('history/' + id, h);
+  }
+  if (!state.run.startedAt) saveRun({ startedAt: new Date().toISOString() });
+}
+function saveRun(patch) {
+  state.run = { ...state.run, ...patch };
+  setDocSoon('state/run', () => state.run, 500);
+}
+function saveRelease(patch) {
+  state.release = { ...state.release, ...patch };
+  setDocSoon('state/release', () => state.release, 500);
+}
+function clearCases(ids) {
+  const next = { ...state.progress };
+  for (const id of ids) { if (next[id]) { delete next[id]; deleteDoc('progress/' + id); } }
+  state.progress = next;
+}
+
+// ---------- views ----------
+function savingBanner() {
+  if (resetNote) return `<div class="banner" role="status">${esc(resetNote)}</div>`;
+  if (saving === 'off') return '<div class="banner" role="status"><b>Not saving.</b> Ticks and results only last until you leave this page. Open it on claude.ai while signed in to save them.</div>';
+  if (saving === 'readonly') return '<div class="banner" role="status"><b>Read only.</b> You can see this run but not change it. Ask the owner for edit access.</div>';
+  return '';
+}
+
+function runSetup() {
+  return `<div class="runbar">
+    <div class="field"><label for="run-build">Build</label><input id="run-build" inputmode="numeric" value="${esc(state.run.build)}" data-run="build"></div>
+    <div class="field"><label for="run-device">Device</label><input id="run-device" placeholder="Phone" value="${esc(state.run.device)}" data-run="device"></div>
+    <div class="field"><label for="run-premium">Premium on this install</label><select id="run-premium" data-run="premium"><option value="no" ${premiumOn() ? '' : 'selected'}>No</option><option value="yes" ${premiumOn() ? 'selected' : ''}>Yes</option></select></div>
+  </div>`;
+}
+
+function chipsHtml() {
+  const live = CASES.filter(counted);
+  const counts = { smoke: live.filter((c) => c.smoke).length, full: live.length, changed: live.filter(isChanged).length };
+  const label = { smoke: 'Smoke', full: 'Full', changed: 'Changed' };
+  return `<div class="chips" role="group" aria-label="Which test cases">${['smoke', 'full', 'changed'].map((f) => `<button class="chip" data-filter="${f}" aria-pressed="${ui.filter === f}">${label[f]}<span class="n">${counts[f]}</span></button>`).join('')}</div>`;
+}
+
+function areaRow(area, cases, tier) {
+  const t = tally(cases);
+  const changed = cases.some(isChanged);
+  return `<button class="item" data-area="${area.id}" data-tier="${tier}"><span class="code">${area.id}</span><span class="name"><b>${esc(area.name)} ${changed ? '<span class="flag chg">Changed</span>' : ''}</b>${barHtml(t)}</span><span class="cnt">${t.done}/${t.total}</span></button>`;
+}
+
+function areaSections(cases, tier) {
+  const byArea = DATA.areas.map((a) => [a, cases.filter((c) => c.area === a.id && inTier(c, tier))]).filter(([, cs]) => cs.length);
+  const changed = byArea.filter(([, cs]) => cs.some(isChanged));
+  const rest = byArea.filter(([, cs]) => !cs.some(isChanged));
+  let html = '';
+  if (changed.length) html += `<div class="sec"><span>Changed since last pass</span><span>${changed.length} area${changed.length === 1 ? '' : 's'}</span></div><div class="list">${changed.map(([a, cs]) => areaRow(a, cs, tier)).join('')}</div>`;
+  if (rest.length) html += `<div class="sec"><span>${changed.length ? 'Other areas' : 'Areas'}</span><span>tap to open</span></div><div class="list">${rest.map(([a, cs]) => areaRow(a, cs, tier)).join('')}</div>`;
+  return html || `<div class="empty">${ui.filter === 'changed' ? 'Nothing has changed since its last pass. Pass a test case once and it shows up here when its code changes.' : 'No test cases here.'}</div>`;
+}
+
+function tierHeading(label, cases) {
+  const t = tally(cases);
+  return `<div class="top" style="margin-top:18px"><div class="titles"><h2>${label}</h2><small>${t.done} of ${t.total} done${t.left ? ` · about ${t.left} min left` : ''}</small></div></div>`;
+}
+
+function viewRun() {
+  const cases = filtered();
+  const t = tally(cases);
+  const free = cases.filter((c) => inTier(c, 'free'));
+  const prem = cases.filter((c) => inTier(c, 'premium'));
+  const started = state.run.startedAt ? `started ${fmtDate(state.run.startedAt)}` : 'not started';
+  let body = `<div class="top"><div class="titles"><h1>QA run</h1><small>Android · ${started} · page built at build ${DATA.currentBuild}</small></div><button class="btn" data-action="clear-all">Clear all</button></div>
+  ${savingBanner()}${runSetup()}${chipsHtml()}
+  <div class="card overall"><div class="head"><span><span class="big">${t.done}</span> of ${t.total} done</span><span class="dim">${t.left ? `about ${t.left} min left` : 'all done'}</span></div>${barHtml(t)}
+  <div class="legend"><span><span class="dot" style="background:var(--success)"></span>${t.pass} pass</span><span><span class="dot" style="background:var(--danger)"></span>${t.fail} fail</span><span><span class="dot" style="background:var(--highlight)"></span>${t.blocked} blocked</span></div></div>`;
+  body += tierHeading('Free', free) + areaSections(cases, 'free');
+  if (premiumOn()) body += tierHeading('Premium', prem) + areaSections(cases, 'premium');
+  else body += `<div class="top" style="margin-top:18px"><div class="titles"><h2>Premium</h2><small>${PREMIUM_NOTE}</small></div></div>`;
+  return body;
+}
+
+function caseRow(tc) {
+  const r = resultOf(tc);
+  const h = state.history[tc.id] ?? {};
+  const flags = [
+    tc.smoke && ui.filter !== 'smoke' ? '<span class="flag smoke">Smoke</span>' : '',
+    isChanged(tc) ? '<span class="flag chg">Changed</span>' : '',
+    h.lastFail && (!h.lastPass || h.lastFail.build > h.lastPass.build) ? `<span class="flag fail">Failed ${h.lastFail.build}</span>` : '',
+    h.lastPass ? `<span class="flag pass">Passed ${h.lastPass.build}</span>` : '',
+  ].join('');
+  const mark = { pass: '✓', fail: '✕', blocked: '!' }[r] ?? '';
+  return `<button class="item" data-case="${tc.id}"><span class="res ${r ?? ''}" aria-label="${r ?? 'not run'}">${mark}</span><span class="name"><span class="id">${tc.id} · ${tc.minutes} min</span><span class="t">${esc(tc.title)}</span>${flags ? `<span class="flags">${flags}</span>` : ''}</span></button>`;
+}
+
+function viewArea() {
+  const area = AREAS.get(ui.area);
+  const cases = CASES.filter((c) => c.area === area.id && inTier(c, ui.tier) && inFilter(c));
+  const all = ui.filter === 'full' ? cases : CASES.filter((c) => c.area === area.id && inTier(c, ui.tier));
+  const ordered = [...cases].sort((a, b) => isChanged(b) - isChanged(a));
+  const t = tally(cases);
+  const hasProgress = all.some((c) => state.progress[c.id]);
+  const clear = ui.areaConfirm
+    ? `<div class="card row" style="margin-top:12px"><span class="grow">Clear every tick, result, and note in ${esc(area.name)}? Pass and fail history stays.</span><button class="btn" data-action="area-cancel">Cancel</button><button class="btn danger" data-action="area-clear">Clear</button></div>`
+    : (hasProgress ? '<button class="btn" style="margin-top:12px" data-action="area-confirm">Clear this area</button>' : '');
+  const paths = area.paths.length ? `<details class="box" style="margin-top:12px"><summary class="dim">Source paths this area covers</summary><ul class="changes mono">${area.paths.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></details>` : '';
+  return `<div class="top"><button class="btn" data-action="back">‹ Run</button><div class="titles"><h2>${esc(area.name)}</h2><small>${area.id} · ${ui.tier === 'premium' ? 'Premium · ' : ''}${t.done} of ${t.total} done${ui.filter !== 'full' ? ` · ${ui.filter}` : ''}</small></div></div>
+  ${savingBanner()}${barHtml(t)}<div class="list" style="margin-top:10px">${ordered.map(caseRow).join('') || '<div class="empty">No test cases in this filter.</div>'}</div>${clear}${paths}`;
+}
+
+function fixtureBox(tc) {
+  const f = DATA.fixtures[tc.id];
+  if (!f && !tc.pre) return '';
+  return `<div class="box"><h3>Preconditions</h3>${tc.pre ? `<div>${esc(tc.pre)}</div>` : ''}
+    ${f ? `<div${tc.pre ? ' style="margin-top:6px"' : ''}>${f.kind === 'csv' ? 'Account › Your data › Import from another app, pick:' : 'Account › Your data › Restore from a backup, pick:'}</div><span class="file">${esc(f.folder)}/${esc(f.name)}</span><div class="warn">${esc(f.about)}${f.kind === 'csv' ? '' : ' Restoring a full backup replaces everything on the phone: use a test device or back up first.'}</div>` : ''}</div>`;
+}
+
+function viewCase() {
+  const tc = CASE_BY_ID.get(ui.tc);
+  const area = AREAS.get(tc.area);
+  const siblings = CASES.filter((c) => c.area === tc.area && inTier(c, ui.tier) && inFilter(c));
+  const idx = siblings.findIndex((c) => c.id === tc.id);
+  const p = progressFor(tc.id);
+  const h = state.history[tc.id] ?? {};
+  const uxList = DATA.standardUx.concat(tc.ux ?? []);
+  const changes = changedSince(tc);
+  const stamp = (s) => s ? `<b>Build ${esc(s.build)}${s.device ? ' · ' + esc(s.device) : ''}</b>${fmtDate(s.at)}` : '<b>Never</b>';
+  const nextBtn = idx >= 0 && idx < siblings.length - 1 ? `<button class="btn" data-case="${siblings[idx + 1].id}">${idx + 1} of ${siblings.length} ›</button>` : (idx >= 0 ? `<span class="dim" style="font-size:.78rem">${idx + 1} of ${siblings.length}</span>` : '');
+  return `<div class="top"><button class="btn" data-action="back">‹ ${esc(area.name)}</button><div class="grow"></div>${nextBtn}</div>
+  ${savingBanner()}
+  <div class="tc-id">${tc.id}</div><h2 class="tc-title">${esc(tc.title)}</h2>
+  <div class="facts"><span class="flag store">${TIER_LABEL[tc.tier]}</span><span class="flag ${tc.priority === 'P1' ? 'fail' : 'plain'}">${tc.priority}</span>${tc.smoke ? '<span class="flag smoke">Smoke</span>' : ''}${changes.length ? '<span class="flag chg">Changed</span>' : ''}<span class="flag plain">About ${tc.minutes} min</span></div>
+  <div class="hist"><div>Last pass${stamp(h.lastPass)}</div><div>Last fail${stamp(h.lastFail)}</div></div>
+  ${changes.length ? `<div class="box"><h3>Changed since its last pass</h3><ul class="changes">${changes.slice(0, 6).map((c) => `<li>Build ${c.build}: ${esc(c.subject)}</li>`).join('')}</ul></div>` : ''}
+  ${fixtureBox(tc)}
+  <div class="box"><h3>Steps</h3>${tc.steps.map((s, i) => `<label class="check"><input type="checkbox" id="step-${i}" data-step="${i}" ${p.steps[i] ? 'checked' : ''}><span>${esc(s)}</span></label>`).join('')}
+  <h3 style="margin-top:10px">Expected</h3><div>${esc(tc.expected)}</div></div>
+  <div class="box"><h3>UX checks</h3>${uxList.map((s, i) => `<label class="check ux"><input type="checkbox" id="ux-${i}" data-ux="${i}" ${p.ux[i] ? 'checked' : ''}><span>${esc(s)}</span></label>`).join('')}</div>
+  <div class="seg" role="group" aria-label="Result">${['pass', 'fail', 'blocked'].map((v) => `<button data-v="${v}" data-result="${v}" aria-pressed="${p.result === v}">${v[0].toUpperCase() + v.slice(1)}</button>`).join('')}</div>
+  <label class="lbl" for="tc-notes">Notes (what you saw)</label>
+  <textarea id="tc-notes" data-notes placeholder="What happened, especially anything that felt off">${esc(p.notes)}</textarea>
+  ${p.result === 'fail' ? '<button class="btn pri wide" style="margin-top:10px" data-action="report">Report a bug</button>' : ''}`;
+}
+
+function bugReport(tc) {
+  const p = progressFor(tc.id);
+  const h = state.history[tc.id] ?? {};
+  const f = DATA.fixtures[tc.id];
+  const firstLine = (p.notes || '').split('\n')[0].trim();
+  const title = `${firstLine ? firstLine.slice(0, 70) : tc.title} (${tc.id})`;
+  const lines = [
+    title, '',
+    `**Test case:** ${tc.id}, ${tc.title}`,
+    `**Failed on:** build ${state.run.build}, ${state.run.device || 'device not set'}, ${premiumOn() ? 'Premium on' : 'Premium off'}`,
+    `**Last passed:** ${h.lastPass ? `build ${h.lastPass.build} (${fmtDate(h.lastPass.at)}, ${h.lastPass.device || 'device not set'})` : 'never'}`,
+  ];
+  if (f) lines.push(`**Data:** ${f.folder}/${f.name}`);
+  if (tc.pre) lines.push(`**Before you start:** ${tc.pre}`);
+  lines.push('', '**Steps**', ...tc.steps.map((s, i) => `${i + 1}. ${s}`), '', `**Expected:** ${tc.expected}`, `**Actual:** ${p.notes || '(add what happened)'}`, '', 'Found by the Android QA procedure (#211).');
+  return lines.join('\n');
+}
+
+function viewJourneys() {
+  if (ui.journey) return viewJourney();
+  return `<div class="top"><div class="titles"><h1>Journeys</h1><small>Walk the app as a new or typical user</small></div></div>${savingBanner()}
+  <div class="list">${DATA.journeys.map((j) => {
+    const st = journeyStatus(j);
+    const last = state.journeys[j.id]?.lastRun;
+    return `<button class="item" data-journey="${j.id}"><span class="name"><b>${esc(j.title)}</b><span class="dim" style="font-size:.76rem">${j.cadence} · ${last ? `last ${fmtDate(last.date)}, build ${esc(last.build)} · ` : ''}${esc(st.note)}</span></span><span class="flag ${st.kind}">${st.label}</span></button>`;
+  }).join('')}</div>
+  ${(() => {
+    const notes = DATA.journeys.flatMap((j) => (state.journeys[j.id]?.notes ?? []).map((n) => ({ ...n, title: j.title }))).sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 4);
+    return notes.length ? `<div class="sec"><span>Latest notes</span></div><div class="stack">${notes.map((n) => `<div class="box"><b>${esc(n.title)}, ${fmtDate(n.date)} (build ${esc(n.build)}):</b> <span class="dim">${esc(n.text)}</span></div>`).join('')}</div>` : '';
+  })()}`;
+}
+
+function viewJourney() {
+  const j = DATA.journeys.find((x) => x.id === ui.journey);
+  const s = state.journeys[j.id] ?? {};
+  const st = journeyStatus(j);
+  const f = DATA.journeyFixtures[j.id];
+  return `<div class="top"><button class="btn" data-action="back">‹ Journeys</button><div class="titles"><h2>${esc(j.title)}</h2><small>${j.cadence} · ${esc(st.note)}</small></div></div>${savingBanner()}
+  ${f ? `<div class="box"><h3>Data</h3>Restore <span class="file">${esc(f.folder)}/${esc(f.name)}</span><div class="warn">${esc(f.about)}</div></div>` : ''}
+  ${st.changed?.length ? `<div class="box"><h3>Changed since the last run</h3><ul class="changes">${st.changed.slice(0, 6).map((c) => `<li>Build ${c.build}: ${esc(c.subject)}</li>`).join('')}</ul></div>` : ''}
+  <div class="box"><h3>Walk through</h3>${j.prompts.map((pr, i) => `<label class="check"><input type="checkbox" id="jp-${i}" data-jprompt="${i}" ${(s.checks ?? [])[i] ? 'checked' : ''}><span>${esc(pr)}</span></label>`).join('')}</div>
+  <label class="lbl" for="j-notes">What felt stale or confusing</label>
+  <textarea id="j-notes" data-jnotes placeholder="These become issues or go to /ux-review">${esc(s.draft ?? '')}</textarea>
+  <button class="btn pri wide" style="margin-top:10px" data-action="journey-done">Finish this journey (build ${esc(state.run.build)})</button>
+  ${(s.notes ?? []).length ? `<div class="sec"><span>Earlier notes</span></div><div class="stack">${s.notes.map((n) => `<div class="box"><b>${fmtDate(n.date)}, build ${esc(n.build)}:</b> <span class="dim">${esc(n.text || 'nothing noted')}</span></div>`).join('')}</div>` : ''}`;
+}
+
+function viewRelease() {
+  const rel = state.release;
+  const runs = Object.values(state.perf);
+  const devices = [...new Set(runs.map((r) => r.device))].sort();
+  const tables = devices.map((device) => {
+    const rows = runs.filter((r) => r.device === device).sort((a, b) => b.build - a.build);
+    const cell = (r, i, key, unit, digits) => {
+      const prev = rows[i + 1]?.[key];
+      const v = r[key];
+      if (v == null || v === '') return '<td class="num dim">–</td>';
+      const jump = prev ? (v - prev) / prev : 0;
+      return `<td class="num ${jump > 0.2 ? 'up' : ''}">${Number(v).toFixed(digits)} ${unit}${jump > 0.2 ? ` ▲${Math.round(jump * 100)}%` : ''}</td>`;
+    };
+    return `<div class="sec"><span>${esc(device)}</span></div><div style="overflow-x:auto"><table class="spd"><thead><tr><th>Build</th><th class="num">Cold start</th><th class="num">Set save</th></tr></thead><tbody>${rows.map((r, i) => `<tr><td>${esc(r.build)}</td>${cell(r, i, 'coldStart', 's', 1)}${cell(r, i, 'setSave', 'ms', 0)}</tr>`).join('')}</tbody></table></div>`;
+  }).join('');
+  const mine = state.perf[`${state.run.build}_${slug(state.run.device)}`] ?? {};
+  return `<div class="top"><div class="titles"><h1>Release checks</h1><small>Before a store release · build ${esc(state.run.build)}</small></div></div>${savingBanner()}
+  <div class="box">${DATA.releaseChecks.map((c) => `<label class="check"><input type="checkbox" id="rel-${c.id}" data-rel="${c.id}" ${rel.checks?.[c.id] ? 'checked' : ''}><span>${esc(c.text)}</span></label>`).join('')}</div>
+  <div class="box"><h3>Taps on the real gym session</h3><div class="grid3">${DATA.tapCounts.map((t) => `<div class="field"><label for="tap-${t.id}">${esc(t.label)}</label><input id="tap-${t.id}" inputmode="numeric" data-tap="${t.id}" value="${esc(rel.taps?.[t.id] ?? '')}" placeholder="–"></div>`).join('')}</div>
+  <label class="lbl" for="gym-notes" style="display:block;margin-top:8px">Anything awkward</label><textarea id="gym-notes" data-gym placeholder="One-handed, bright light, locked between sets">${esc(rel.gymNotes ?? '')}</textarea></div>
+  <div class="box"><h3>Speed (TC-PERF-001, five-year file)</h3>
+    ${state.run.device ? `<div class="grid2"><div class="field"><label for="perf-cold">Cold start (s)</label><input id="perf-cold" inputmode="decimal" data-perf="coldStart" value="${esc(mine.coldStart ?? '')}" placeholder="1.6"></div><div class="field"><label for="perf-save">Set save (ms)</label><input id="perf-save" inputmode="decimal" data-perf="setSave" value="${esc(mine.setSave ?? '')}" placeholder="80"></div></div><div class="warn">Saved for build ${esc(state.run.build)} on ${esc(state.run.device)}. Red means more than 20% slower than that phone's previous build.</div>` : '<div class="dim">Set the device on the Run tab first, so numbers compare phone to phone.</div>'}
+    ${tables || '<div class="empty">No numbers yet.</div>'}
+  </div>`;
+}
+
+function viewData() {
+  const groups = new Map();
+  for (const tc of CASES) {
+    const f = DATA.fixtures[tc.id];
+    if (!f) continue;
+    if (!groups.has(f.folder)) groups.set(f.folder, []);
+    groups.get(f.folder).push({ tc, f });
+  }
+  const journeyFiles = Object.entries(DATA.journeyFixtures);
+  return `<div class="top"><div class="titles"><h1>Test data</h1><small>${Object.keys(DATA.fixtures).length} files · Google Drive</small></div></div>
+  <div class="box"><h3>Where they are</h3>On the phone, the restore and import pickers open Drive. Look in <span class="file">${esc(DATA.driveRoot)}</span>
+  <div class="warn">Dates are counted back from the day the files were made, so refresh them before a run: <span class="mono">npm run qa:fixtures</span>. <span class="mono">README.txt</span> in that folder says when and for which build. Restoring a full backup replaces everything on the phone: use a test device or back up first.</div></div>
+  ${[...groups].map(([folder, rows]) => `<div class="sec"><span>${esc(folder)}</span><span>${rows.length}</span></div><div class="list">${rows.map(({ tc, f }) => `<button class="item" data-case="${tc.id}"><span class="name"><span class="id">${tc.id}</span><span class="t mono" style="font-size:.78rem">${esc(f.name)}</span><span class="dim" style="font-size:.76rem">${esc(f.about)}</span></span></button>`).join('')}</div>`).join('')}
+  ${journeyFiles.length ? `<div class="sec"><span>Journeys</span></div><div class="list">${journeyFiles.map(([, f]) => `<div class="item"><span class="name"><span class="t mono" style="font-size:.78rem">${esc(f.folder)}/${esc(f.name)}</span><span class="dim" style="font-size:.76rem">${esc(f.about)}</span></span></div>`).join('')}</div>` : ''}`;
+}
+
+const ICONS = {
+  run: '<path d="M9 5h11M9 12h11M9 19h11M4 5l1 1 2-2M4 12l1 1 2-2M4 19l1 1 2-2"/>',
+  journeys: '<path d="M4 19c4 0 3-7 8-7s4-7 8-7"/><circle cx="4" cy="19" r="1.6"/><circle cx="20" cy="5" r="1.6"/>',
+  release: '<path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 15.6 7.1 18.2l.9-5.5-4-3.9 5.5-.8z"/>',
+  data: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',
+};
+function renderNav() {
+  const due = dueJourneys();
+  const tabs = [['run', 'Run'], ['journeys', 'Journeys'], ['release', 'Release'], ['data', 'Data']];
+  document.getElementById('nav').innerHTML = tabs.map(([id, label]) => `<button data-tab="${id}" ${ui.tab === id ? 'aria-current="page"' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[id]}</svg><span>${label}${id === 'journeys' && due ? `<span class="badge">${due}</span>` : ''}</span></button>`).join('');
+}
+
+function renderSheet() {
+  const root = document.getElementById('sheet-root');
+  if (!ui.sheet) { root.innerHTML = ''; return; }
+  if (ui.sheet === 'report') {
+    const tc = CASE_BY_ID.get(ui.tc);
+    root.innerHTML = `<div class="scrim" data-action="close-sheet"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" data-stop><div class="grab"></div><h2 id="sheet-title">Report a bug</h2><p>Paste this into a new GitHub issue. The first line is the title.</p><textarea class="code" id="report-text" readonly>${esc(bugReport(tc))}</textarea><div class="btns"><button class="btn" data-action="close-sheet">Close</button><button class="btn pri" data-action="copy" id="copy-btn">Copy</button></div></div></div>`;
+  } else if (ui.sheet === 'clear') {
+    const ps = Object.values(state.progress);
+    const ticks = ps.reduce((n, p) => n + (p.steps ?? []).filter(Boolean).length + (p.ux ?? []).filter(Boolean).length, 0);
+    const results = ps.filter((p) => p.result).length;
+    const notes = ps.filter((p) => p.notes).length;
+    root.innerHTML = `<div class="scrim" data-action="close-sheet"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" data-stop><div class="grab"></div><h2 id="sheet-title">Start a fresh run?</h2><p>This clears ${ticks} ticked step${ticks === 1 ? '' : 's'}, ${results} result${results === 1 ? '' : 's'}, ${notes} note${notes === 1 ? '' : 's'}, and the release checklist. Pass and fail history, speed numbers, and journey dates stay.</p>
+    <div class="grid2"><div class="field"><label for="new-build">New run build</label><input id="new-build" inputmode="numeric" value="${esc(DATA.currentBuild)}"></div><div class="field"><label for="new-device">Device</label><input id="new-device" value="${esc(state.run.device)}" placeholder="Phone"></div></div>
+    <div class="btns"><button class="btn" data-action="close-sheet">Cancel</button><button class="btn danger" data-action="clear-confirm">Clear all</button></div></div></div>`;
+  }
+}
+
+function render() {
+  const app = document.getElementById('app');
+  const active = document.activeElement;
+  // Don't rebuild under someone typing; the snapshot is applied on blur.
+  if (active && app.contains(active) && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT')) { pendingRender = true; renderNav(); return; }
+  pendingRender = false;
+  let html;
+  if (ui.tab === 'run') html = ui.tc ? viewCase() : ui.area ? viewArea() : viewRun();
+  else if (ui.tab === 'journeys') html = viewJourneys();
+  else if (ui.tab === 'release') html = viewRelease();
+  else html = ui.tc ? viewCase() : viewData();
+  app.innerHTML = html;
+  renderNav();
+  renderSheet();
+}
+let pendingRender = false;
+document.addEventListener('focusout', () => setTimeout(() => { if (pendingRender) render(); }, 0));
+
+// ---------- events ----------
+document.addEventListener('click', async (e) => {
+  const el = e.target.closest('button, [data-action], .scrim');
+  if (!el) return;
+  // Only a tap on the dimmed backdrop itself closes a sheet.
+  if (el.matches('.scrim') && e.target !== el) return;
+  // iPhone keeps focus in a text box when a button is tapped; let go of it so
+  // the screen can redraw.
+  const focused = document.activeElement;
+  if (focused && focused !== document.body && focused !== el && (focused.tagName === 'TEXTAREA' || focused.tagName === 'INPUT')) focused.blur();
+  const d = el.dataset;
+  if (d.tab) { ui.tab = d.tab; ui.area = null; ui.tc = null; ui.journey = null; store('tab', ui.tab); window.scrollTo(0, 0); return render(); }
+  if (d.filter) { ui.filter = d.filter; store('filter', ui.filter); return render(); }
+  if (d.area) { ui.area = d.area; ui.tier = d.tier === 'premium' ? 'premium' : 'free'; ui.areaConfirm = false; window.scrollTo(0, 0); return render(); }
+  if (d.case) { ui.tc = d.case; if (ui.tab === 'run') { ui.area = CASE_BY_ID.get(d.case).area; ui.tier = isPremiumCase(CASE_BY_ID.get(d.case)) ? 'premium' : 'free'; } window.scrollTo(0, 0); return render(); }
+  if (d.journey) { ui.journey = d.journey; window.scrollTo(0, 0); return render(); }
+  if (d.result) { recordResult(ui.tc, d.result); return render(); }
+  switch (d.action) {
+    case 'back':
+      if (ui.tc) ui.tc = null; else if (ui.area) ui.area = null; else ui.journey = null;
+      window.scrollTo(0, 0); return render();
+    case 'clear-all': ui.sheet = 'clear'; return render();
+    case 'close-sheet': ui.sheet = null; return render();
+    case 'report': ui.sheet = 'report'; return render();
+    case 'area-confirm': ui.areaConfirm = true; return render();
+    case 'area-cancel': ui.areaConfirm = false; return render();
+    case 'area-clear':
+      clearCases(CASES.filter((c) => c.area === ui.area && inTier(c, ui.tier)).map((c) => c.id));
+      ui.areaConfirm = false; return render();
+    case 'clear-confirm': {
+      const build = Number(document.getElementById('new-build').value) || DATA.currentBuild;
+      const device = document.getElementById('new-device').value.trim();
+      store('device', device);
+      clearCases(Object.keys(state.progress));
+      state.release = { checks: {}, taps: {} };
+      setDoc('state/release', state.release);
+      state.run = { ...state.run, build, device, startedAt: null };
+      setDoc('state/run', state.run);
+      ui.sheet = null; ui.area = null; ui.tc = null; return render();
+    }
+    case 'copy': {
+      const text = document.getElementById('report-text');
+      const btn = document.getElementById('copy-btn');
+      try { await navigator.clipboard.writeText(text.value); btn.textContent = 'Copied'; }
+      catch { text.focus(); text.select(); btn.textContent = 'Selected: copy it'; }
+      return;
+    }
+    case 'journey-done': {
+      const j = ui.journey;
+      const s = state.journeys[j] ?? {};
+      const note = { date: new Date().toISOString(), build: Number(state.run.build) || 0, text: (s.draft ?? '').trim() };
+      const next = { lastRun: { date: note.date, build: note.build }, notes: [note, ...(s.notes ?? [])].slice(0, 10), checks: [], draft: '' };
+      state.journeys = { ...state.journeys, [j]: next };
+      setDoc('journeys/' + j, next);
+      ui.journey = null; return render();
+    }
+  }
+});
+
+document.addEventListener('change', (e) => {
+  const t = e.target;
+  const d = t.dataset;
+  if (d.step !== undefined) { const steps = [...progressFor(ui.tc).steps]; steps[d.step] = t.checked; saveProgress(ui.tc, { steps }); }
+  else if (d.ux !== undefined) { const ux = [...progressFor(ui.tc).ux]; ux[d.ux] = t.checked; saveProgress(ui.tc, { ux }); }
+  else if (d.rel) saveRelease({ checks: { ...state.release.checks, [d.rel]: t.checked } });
+  else if (d.jprompt !== undefined) {
+    const s = state.journeys[ui.journey] ?? {};
+    const checks = [...(s.checks ?? [])]; checks[d.jprompt] = t.checked;
+    const next = { ...s, checks };
+    state.journeys = { ...state.journeys, [ui.journey]: next };
+    setDoc('journeys/' + ui.journey, next);
+  } else if (d.run === 'premium') saveRun({ premium: t.value === 'yes' });
+  else return;
+  render();
+});
+
+document.addEventListener('input', (e) => {
+  const t = e.target;
+  const d = t.dataset;
+  if (d.notes !== undefined) saveProgress(ui.tc, { notes: t.value }, true);
+  else if (d.run === 'build') saveRun({ build: Number(t.value) || t.value });
+  else if (d.run === 'device') { saveRun({ device: t.value.trim() }); store('device', t.value.trim()); }
+  else if (d.tap) saveRelease({ taps: { ...state.release.taps, [d.tap]: t.value === '' ? null : Number(t.value) } });
+  else if (d.gym !== undefined) saveRelease({ gymNotes: t.value });
+  else if (d.perf) {
+    const key = `${state.run.build}_${slug(state.run.device)}`;
+    const row = { ...(state.perf[key] ?? { build: Number(state.run.build) || 0, device: state.run.device }), [d.perf]: t.value === '' ? null : Number(t.value), at: new Date().toISOString() };
+    state.perf = { ...state.perf, [key]: row };
+    setDocSoon('perf/' + key, () => state.perf[key]);
+  } else if (d.jnotes !== undefined) {
+    const j = ui.journey;
+    state.journeys = { ...state.journeys, [j]: { ...(state.journeys[j] ?? {}), draft: t.value } };
+    setDocSoon('journeys/' + j, () => state.journeys[j]);
+  }
+});
+
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && ui.sheet) { ui.sheet = null; render(); } });
+
+render();
+connect();
+</script>

@@ -1,0 +1,127 @@
+# Builds the sprint review for the next store release (#606): one video of the clips lanes
+# recorded for each user-facing change since the latest store/v* tag (#605), and a review issue
+# (`Sprint review: v<X.Y.Z> candidate`, labeled sprint-review and awaiting-dean) where the owner
+# accepts, asks for changes, or pulls each one, then emails the link. The owner starts it from
+# the GitHub app (Actions > Sprint review > Run workflow). It records nothing and needs no
+# Claude: it stitches the clips already on the claude/issue-assets branch. /release shows the
+# review's status and doesn't wait on it. See scripts/demo-video/review/README.md > Sprint review.
+name: Sprint review
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: The version under review (e.g. 1.3.0). Empty picks it the way /release does.
+        type: string
+        required: false
+
+concurrency:
+  group: sprint-review
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write # the video goes on the claude/issue-assets branch
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      # The review issue and the clip lines it reads live in the backlog repo (#944).
+      BACKLOG_REPO: ${{ vars.BACKLOG_REPO || 'DeanPhillipsOKC/repbunny' }}
+    steps:
+      - name: Check the branch
+        if: github.ref != 'refs/heads/main'
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          echo "Run Sprint review on main, not ${REF_NAME}." >&2
+          exit 1
+
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Token for the backlog repo
+        id: backlog
+        uses: ./.github/actions/backlog-token
+        with:
+          backlog-repo: ${{ env.BACKLOG_REPO }}
+          github-token: ${{ github.token }}
+          builder-app-id: ${{ secrets.BUILDER_APP_ID }}
+          builder-app-key: ${{ secrets.BUILDER_APP_KEY }}
+
+      - name: Install
+        run: |
+          npm ci --ignore-scripts
+          npx playwright install --with-deps chromium
+          sudo apt-get install -y ffmpeg
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+
+      - name: Collect the changes and their clips
+        id: collect
+        run: |
+          node scripts/demo-video/review/collect.mjs --version "$VERSION" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "changes=$(node -p "require('./logs/demo-video/review/release.json').changes.length")" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.backlog.outputs.token }}
+          VERSION: ${{ inputs.version }}
+
+      - name: Nothing to review
+        if: steps.collect.outputs.changes == '0'
+        run: echo "No release notes since the latest store tag, so there's nothing to review." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Make the video
+        if: steps.collect.outputs.changes != '0'
+        run: node scripts/demo-video/review/sprint-review.mjs
+
+      - uses: actions/upload-artifact@v7
+        if: steps.collect.outputs.changes != '0'
+        with:
+          name: sprint-review
+          path: |
+            logs/demo-video/review/sprint-review.mp4
+            logs/demo-video/review/release.json
+            logs/demo-video/review/sprint-review.json
+
+      - name: File the review issue
+        id: issue
+        if: steps.collect.outputs.changes != '0'
+        run: |
+          html="$RUNNER_TEMP/sprint-review-email.html"
+          subject=$(node scripts/demo-video/review/review-issue.mjs --email "$html" --run-url "$RUN_URL")
+          echo "subject=$subject" >> "$GITHUB_OUTPUT"
+          echo "html=$html" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.backlog.outputs.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      # Same secrets as the release testing email (release-play.yml). Send-Notification.ps1 skips
+      # quietly when they aren't set, and a failed send doesn't fail the review.
+      - name: Email the link
+        if: steps.collect.outputs.changes != '0'
+        continue-on-error: true
+        shell: pwsh
+        # The video goes along as an attachment when it is under 20 MB (review-issue.mjs words
+        # the email to match), since the GitHub app can't play the issue's link on a phone (#663).
+        run: |
+          $video = 'logs/demo-video/review/sprint-review.mp4'
+          if ((Test-Path $video) -and (Get-Item $video).Length -lt 20MB) {
+            ./scripts/Send-Notification.ps1 -Subject $env:SUBJECT -BodyFile $env:HTML -IsHtml -Attachment $video
+          } else {
+            ./scripts/Send-Notification.ps1 -Subject $env:SUBJECT -BodyFile $env:HTML -IsHtml
+          }
+        env:
+          SUBJECT: ${{ steps.issue.outputs.subject }}
+          HTML: ${{ steps.issue.outputs.html }}
+          GMAIL_SENDER_ADDRESS: ${{ secrets.GMAIL_SENDER_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_RECIPIENTS: ${{ secrets.RELEASE_EMAIL_RECIPIENTS }}

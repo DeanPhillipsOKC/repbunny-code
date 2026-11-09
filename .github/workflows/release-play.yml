@@ -1,0 +1,183 @@
+# Builds the store Android app (RepBunny, app.repbunny) as a signed bundle and uploads it to
+# Google Play (#196). Pushing a store/vX.Y.Z tag starts it (#215), the Cut release workflow calls
+# it with the tag it just pushed (#219), or run it by hand from the Actions tab. The build logic is scripts/Build-StoreAndroid.ps1; see docs/architecture.md >
+# Native apps > Releasing and Play releases.
+name: Release to Google Play
+
+on:
+  # store/v*, not v*: the personal Android build's nightly releases already use v1.0.N tags.
+  push:
+    tags: ['store/v*']
+  # Cut release (#219): its GITHUB_TOKEN tag push doesn't start this workflow, so it calls it.
+  workflow_call:
+    inputs:
+      tag:
+        description: The store/vX.Y.Z tag to build
+        type: string
+        required: true
+    # Cut release passes these by name instead of `secrets: inherit` (#678). Keep the list in step
+    # with every `secrets.` this workflow reads and with the `play` job in cut-release.yml.
+    secrets:
+      ANDROID_STORE_KEYSTORE_BASE64: { required: true }
+      ANDROID_STORE_KEYSTORE_PASSWORD: { required: true }
+      VITE_VAPID_PUBLIC_KEY: { required: false }
+      PLAY_SERVICE_ACCOUNT_JSON: { required: true }
+      GMAIL_SENDER_ADDRESS: { required: false }
+      GMAIL_APP_PASSWORD: { required: false }
+      RELEASE_EMAIL_RECIPIENTS: { required: false }
+      # Only once the backlog lives in another repo (#944): a token to read its verify:iphone issues.
+      BUILDER_APP_ID: { required: false }
+      BUILDER_APP_KEY: { required: false }
+  workflow_dispatch:
+    inputs:
+      track:
+        description: Play track to upload to
+        type: choice
+        options: [internal, alpha]
+        default: internal
+      status:
+        description: Release status (Play accepts only draft until the app's first release is reviewed)
+        type: choice
+        options: [draft, completed]
+        default: draft
+      upload:
+        description: Upload to Play (untick to only build the bundle as an artifact)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  issues: read # the testing email lists verify:iphone issues (docs/backlog.md > Owner check)
+
+concurrency:
+  group: release-play
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # The release tag: pushed (github.ref) or passed by Cut release. Empty on a manual run.
+      TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || '' }}
+      # Tag runs have no track or status input and go to testers only, on the closed testing
+      # track (#219). Switch the tag default to completed once Google has reviewed the app's
+      # first release (until then Play accepts only draft).
+      TRACK: ${{ inputs.track || 'alpha' }}
+      STATUS: ${{ inputs.status || 'draft' }}
+      UPLOAD: ${{ (inputs.tag || github.ref_type == 'tag' || inputs.upload) && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || '' }}
+          fetch-depth: 0
+
+      - name: Check the release tag
+        id: version
+        if: env.TAG != ''
+        run: |
+          if ! echo "$TAG" | grep -Eq '^store/v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Tag $TAG isn't store/vMAJOR.MINOR.PATCH." >&2
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "Tag $TAG points at a commit that isn't on main." >&2
+            exit 1
+          fi
+          echo "name=${TAG#store/v}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - run: npm ci --ignore-scripts
+
+      - name: Restore upload key
+        run: echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/repbunny-upload.jks"
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_STORE_KEYSTORE_BASE64 }}
+
+      # #857: the default home-screen icon Cut release wrote into the tag (classic without a tag).
+      - name: Apply the default icon
+        if: env.TAG != ''
+        run: node scripts/apply-default-icon.mjs --tag "$TAG"
+
+      # versionCode is minutes since 2026-01-01 UTC, so it only goes up however the run started.
+      # Not github.run_number: called from Cut release, that's Cut release's own counter, which
+      # started back at 1 and collided with an earlier upload. The concurrency group above keeps
+      # two builds from landing in the same minute.
+      - name: Build signed bundle
+        id: build
+        shell: pwsh
+        # A tag sets the versionName; a manual run keeps the iOS project's MARKETING_VERSION.
+        run: |
+          $code = [int][math]::Floor(([DateTimeOffset]::UtcNow - [DateTimeOffset]::Parse('2026-01-01T00:00:00Z')).TotalMinutes)
+          Write-Host "versionCode $code"
+          $flags = @{ VersionCode = $code }
+          if ($env:VERSION_NAME) { $flags.VersionName = $env:VERSION_NAME }
+          ./scripts/Build-StoreAndroid.ps1 @flags
+        env:
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+          ANDROID_STORE_KEYSTORE: ${{ runner.temp }}/repbunny-upload.jks
+          ANDROID_STORE_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_STORE_KEYSTORE_PASSWORD }}
+          ANDROID_STORE_KEY_ALIAS: repbunny-upload
+          ANDROID_STORE_KEY_PASSWORD: ${{ secrets.ANDROID_STORE_KEYSTORE_PASSWORD }}
+          VITE_VAPID_PUBLIC_KEY: ${{ secrets.VITE_VAPID_PUBLIC_KEY }}
+
+      # Also the way to do Play's first upload, which has to go through Play Console by hand.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: repbunny-play-bundle
+          path: ${{ steps.build.outputs.aab }}
+          retention-days: 30
+
+      # Play's "What's new": release-notes/ entries (#558) since the previous store/v* tag (#216).
+      - name: Write release notes
+        if: env.UPLOAD == 'true'
+        run: node scripts/collect-release-notes.mjs ${TAG:+--tag "$TAG"} --store android --out whatsnew/whatsnew-en-US
+
+      - name: Upload to Google Play
+        if: env.UPLOAD == 'true'
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1.1.5, pinned by SHA (#678)
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: app.repbunny
+          releaseFiles: ${{ steps.build.outputs.aab }}
+          tracks: ${{ env.TRACK }}
+          status: ${{ env.STATUS }}
+          whatsNewDirectory: whatsnew
+
+      - name: Token for the backlog repo
+        id: backlog
+        if: env.TAG != ''
+        continue-on-error: true
+        uses: ./.github/actions/backlog-token
+        with:
+          backlog-repo: ${{ vars.BACKLOG_REPO || 'DeanPhillipsOKC/repbunny' }}
+          github-token: ${{ github.token }}
+          builder-app-id: ${{ secrets.BUILDER_APP_ID }}
+          builder-app-key: ${{ secrets.BUILDER_APP_KEY }}
+
+      # Tells the owner the tag's builds are ready to test (#216). Send-Notification.ps1 skips
+      # quietly when the secrets aren't set, and a failed send doesn't fail the release.
+      - name: Email the testing notice
+        if: env.TAG != ''
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $html = Join-Path $env:RUNNER_TEMP 'release-email.html'
+          $subject = node scripts/collect-release-notes.mjs --tag $env:TAG --email $html --run-url $env:RUN_URL
+          ./scripts/Send-Notification.ps1 -Subject $subject -BodyFile $html -IsHtml
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          GH_TOKEN: ${{ steps.backlog.outputs.token || github.token }}
+          BACKLOG_REPO: ${{ vars.BACKLOG_REPO || 'DeanPhillipsOKC/repbunny' }}
+          GMAIL_SENDER_ADDRESS: ${{ secrets.GMAIL_SENDER_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_RECIPIENTS: ${{ secrets.RELEASE_EMAIL_RECIPIENTS }}

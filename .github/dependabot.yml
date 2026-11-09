@@ -1,0 +1,66 @@
+# Monthly dependency updates (#232). Minor and patch updates arrive as one grouped PR per
+# ecosystem; majors stay separate (except the Vite stack and TypeScript/vue-tsc pairs) so each gets judged alone. Security updates are separate PRs
+# GitHub opens on its own. See docs/architecture.md > "Dependency updates".
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 8
+    # Hold a new release for a week before proposing it: most malicious npm releases are pulled
+    # within days (#697). Security updates ignore the cooldown.
+    cooldown:
+      default-days: 7
+    # vue-tsc can't load TypeScript 7 yet (it resolves typescript/lib/tsc, which 7 no longer
+    # exports), so hold TypeScript below 7 until vue-tsc supports it (tracked in #519, #373 is closed).
+    ignore:
+      - dependency-name: typescript
+        versions: ['>=7']
+    groups:
+      # Capacitor's JS packages and its native side must move together, so they never mix
+      # into the general group.
+      capacitor:
+        patterns: ['@capacitor/*']
+        update-types: [minor, patch]
+      # The Vite stack moves as one major PR; its plugins can't pass alone (#348).
+      vite:
+        patterns: ['vite', '@vitejs/*']
+        update-types: [major]
+      # TypeScript and vue-tsc must move together, so a held pair takes one slot, not two (#348).
+      typescript:
+        patterns: ['typescript', 'vue-tsc']
+      npm-minor-patch:
+        update-types: [minor, patch]
+        exclude-patterns: ['@capacitor/*']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    # Hold a new release for a week before proposing it: most malicious npm releases are pulled
+    # within days (#697). Security updates ignore the cooldown.
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ['*']
+
+  - package-ecosystem: gradle
+    directory: /android
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    # Hold a new release for a week before proposing it: most malicious npm releases are pulled
+    # within days (#697). Security updates ignore the cooldown.
+    cooldown:
+      default-days: 7
+    # Gradle 9.6+ removed an internal API the Android Gradle Plugin 8.x uses, so the wrapper
+    # can't go to 9.x yet. Hold the major until AGP supports it (#512).
+    ignore:
+      - dependency-name: gradle-wrapper
+        update-types: ['version-update:semver-major']
+    groups:
+      gradle-minor-patch:
+        update-types: [minor, patch]

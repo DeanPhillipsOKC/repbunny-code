@@ -1,0 +1,43 @@
+# A reviewed PR merges itself (auto-merge): tier 3 once the owner approves it in GitHub (#681), tier
+# 1 and 2 once CI is green after the Reviewer's approval (#1020). No session is running when it
+# lands, so this starts the Review (Opus) routine to post the close-out from the PR's hand-off
+# comment and clear the review labels. Only PRs labeled `review:owner-approval` or
+# `review:auto-merge` (set by /review-pr when it turns auto-merge on) fire it.
+# Only a same-repo `claude/` or `dependabot/` branch fires it (#945): a fork PR gets no secrets here
+# anyway, and no lane or review ever works one, so it skips instead of failing.
+name: PR merged
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  close-out:
+    if: >-
+      vars.AUTOMATION_PAUSED != 'true' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      (startsWith(github.event.pull_request.head.ref, 'claude/') ||
+       startsWith(github.event.pull_request.head.ref, 'dependabot/')) &&
+      (contains(github.event.pull_request.labels.*.name, 'review:owner-approval') ||
+       contains(github.event.pull_request.labels.*.name, 'review:auto-merge'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Fire review routine
+        run: node scripts/fire-review.mjs --merged "$PR" || case $? in 3|4) ;; *) exit 1 ;; esac
+        env:
+          PR: ${{ github.event.pull_request.number }}
+          REVIEW_ROUTINE_ID: ${{ secrets.REVIEW_ROUTINE_ID }}
+          REVIEW_ROUTINE_TOKEN: ${{ secrets.REVIEW_ROUTINE_TOKEN }}

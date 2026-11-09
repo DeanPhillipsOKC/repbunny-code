@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Guide search mockup (#568)</title>
+<style>
+@font-face { font-family: 'Baloo 2'; font-weight: 500 800; src: url(../../public/fonts/baloo2-latin.woff2) format('woff2'); }
+@font-face { font-family: 'Manrope'; font-weight: 400 800; src: url(../../public/fonts/manrope-latin.woff2) format('woff2'); }
+:root {
+  --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+  --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+  --secondary: #b79cf0; --highlight: #f2c069; --radius: 12px;
+  --font-display: 'Baloo 2', sans-serif; --font-body: 'Manrope', sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 24px; background: #0e0a12; color: var(--text); font-family: var(--font-body); }
+h1.page { font-family: var(--font-display); margin: 0 0 4px; }
+p.note { color: var(--text-dim); margin: 0 0 20px; max-width: 900px; }
+.row { display: flex; gap: 28px; flex-wrap: wrap; }
+.frame-cap { font-weight: 800; color: var(--secondary); font-size: .8rem; letter-spacing: .05em; text-transform: uppercase; margin: 0 0 8px; }
+.phone { width: 375px; height: 740px; background: #0b080e; border-radius: 30px; position: relative; overflow: hidden; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 40px; background: var(--bg); border: 1px solid var(--border); border-bottom: 0; border-radius: 20px 20px 0 0; padding: 10px 16px 18px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.handle { align-self: center; width: 36px; height: 4px; border-radius: 2px; background: var(--border); }
+.head { display: flex; align-items: center; gap: 12px; }
+.head h3 { flex: 1; margin: 0; font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; line-height: 1.15; }
+.ib { width: 44px; height: 44px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); display: grid; place-items: center; flex-shrink: 0; font-size: 1.1rem; }
+.search { height: 46px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; gap: 8px; padding: 0 12px; font-size: .98rem; color: var(--text-dim); }
+.search.typed { color: var(--text); border-color: var(--accent); }
+.search .mag { width: 16px; height: 16px; border: 2px solid var(--text-dim); border-radius: 50%; position: relative; flex-shrink: 0; }
+.search .mag::after { content: ''; position: absolute; width: 7px; height: 2px; background: var(--text-dim); right: -6px; bottom: -3px; transform: rotate(45deg); }
+.search .clear { margin-left: auto; color: var(--text-dim); }
+.label { font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim); margin: 6px 2px 0; }
+.group { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.item { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-top: 1px solid var(--border); }
+.item:first-child { border-top: 0; }
+.item .t { flex: 1; min-width: 0; }
+.item b { display: block; font-size: .95rem; }
+.item span.c { display: block; font-size: .8rem; color: var(--text-dim); margin-top: 2px; line-height: 1.35; }
+.item .chev { color: var(--text-dim); }
+mark { background: color-mix(in srgb, var(--highlight) 30%, transparent); color: var(--text); border-radius: 3px; padding: 0 2px; }
+.count { font-size: .8rem; color: var(--text-dim); margin: 0 2px; }
+.reader h4 { font-family: var(--font-display); font-size: 1.5rem; margin: 2px 0 4px; line-height: 1.1; }
+.reader .lede { color: var(--text-dim); font-size: .9rem; margin: 0 0 4px; line-height: 1.4; }
+.step { display: flex; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 11px 12px; }
+.num { width: 26px; height: 26px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; font-weight: 800; font-size: .8rem; flex-shrink: 0; }
+.step b { display: block; font-size: .92rem; margin-bottom: 2px; }
+.step p { margin: 0; font-size: .82rem; color: var(--text-dim); line-height: 1.4; }
+.step p strong { color: var(--text); }
+.web { text-align: center; color: var(--secondary); font-weight: 800; font-size: .9rem; padding: 10px; }
+.empty { text-align: center; padding: 20px 10px 4px; }
+.empty img { width: 120px; height: 120px; }
+.empty b { display: block; font-size: 1.05rem; margin-top: 6px; }
+.empty p { color: var(--text-dim); font-size: .86rem; margin: 6px 0 0; }
+.btn { display: block; text-align: center; padding: 13px; border-radius: 14px; font-weight: 800; background: var(--accent); color: var(--accent-text); }
+.btn.ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.menu .item b { font-weight: 600; }
+.why { max-width: 900px; color: var(--text-dim); font-size: .9rem; margin-top: 22px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<h1 class="page">#568 Guide search, option A (chosen)</h1>
+<p class="note">Account › About › Help &amp; guides opens a sheet in the app instead of the website. Everything comes from a guide index built into the app at build time; searching makes no network request. Real guide copy, phone width (375px).</p>
+
+<div class="row">
+  <div>
+    <p class="frame-cap">1 · About menu</p>
+    <div class="phone"><div class="sheet menu">
+      <div class="handle"></div>
+      <div class="head"><h3>Account</h3><span class="ib">✕</span></div>
+      <div class="label">About</div>
+      <div class="group">
+        <div class="item"><div class="t"><b>What's new</b></div><span class="chev">›</span></div>
+        <div class="item"><div class="t"><b>Help &amp; guides</b></div><span class="chev">›</span></div>
+        <div class="item"><div class="t"><b>Lifting basics</b></div><span class="chev">›</span></div>
+        <div class="item"><div class="t"><b>Privacy policy</b></div><span class="chev">↗</span></div>
+        <div class="item"><div class="t"><b>Support</b></div><span class="chev">↗</span></div>
+        <div class="item"><div class="t"><b>Report a bug</b></div><span class="chev">›</span></div>
+      </div>
+      <p class="count">Help &amp; guides now opens in the app (›), not the website (↗).</p>
+    </div></div>
+  </div>
+
+  <div>
+    <p class="frame-cap">2 · Opened: search + all guides</p>
+    <div class="phone"><div class="sheet">
+      <div class="handle"></div>
+      <div class="head"><span class="ib">‹</span><h3>Help &amp; guides</h3><span class="ib">✕</span></div>
+      <div class="search"><span class="mag"></span>Search the guides</div>
+      <div class="label">Logging</div>
+      <div class="group">
+        <div class="item"><div class="t"><b>Lifting basics</b><span class="c">New to this? Sets, reps, picking a weight, rest, RPE, and gym words.</span></div><span class="chev">›</span></div>
+        <div class="item"><div class="t"><b>Log a workout</b><span class="c">Start, log your sets, add exercises, and finish.</span></div><span class="chev">›</span></div>
+        <div class="item"><div class="t"><b>Rest timer</b><span class="c">Time your rest between sets, even when you leave the screen.</span></div><span class="chev">›</span></div>
+        <div class="item"><div class="t"><b>Plate calculator</b><span class="c">See which plates go on each side of the bar.</span></div><span class="chev">›</span></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div>
+    <p class="frame-cap">3 · Typing "bakup" (typo)</p>
+    <div class="phone"><div class="sheet">
+      <div class="handle"></div>
+      <div class="head"><span class="ib">‹</span><h3>Help &amp; guides</h3><span class="ib">✕</span></div>
+      <div class="search typed"><span class="mag"></span>bakup<span class="clear">✕</span></div>
+      <p class="count">3 guides</p>
+      <div class="group">
+        <div class="item"><div class="t"><b>Back up just what you need</b><span class="c">…tap <mark>Back up</mark> my data. Save just your routines to share with a friend…</span></div><span class="chev">›</span></div>
+        <div class="item"><div class="t"><b>Bring your workouts from Strong or Hevy</b><span class="c">…export your history, then pick the file. Make a <mark>backup</mark> first…</span></div><span class="chev">›</span></div>
+        <div class="item"><div class="t"><b>Report a bug</b><span class="c">…Your data, <mark>Back up</mark> my data before you…</span></div><span class="chev">›</span></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div>
+    <p class="frame-cap">4 · A guide, in the app</p>
+    <div class="phone"><div class="sheet reader">
+      <div class="handle"></div>
+      <div class="head"><span class="ib">‹</span><h3>Help &amp; guides</h3><span class="ib">✕</span></div>
+      <h4>Back up just what you need</h4>
+      <p class="lede">A backup doesn't have to be everything. Save just your routines to share with a friend, or just your preferences to set up a new phone.</p>
+      <div class="step"><span class="num">1</span><div><b>Open Your data</b><p>Tap the person icon at the top right, then <strong>Your data</strong>, then <strong>Back up my data</strong>.</p></div></div>
+      <div class="step"><span class="num">2</span><div><b>Pick what goes in</b><p>All three start checked, which saves a full backup. Uncheck what you want to leave out.</p></div></div>
+      <div class="step"><span class="num">3</span><div><b>Save the file</b><p>Tap <strong>Save backup</strong>. Keep the file somewhere off your phone.</p></div></div>
+      <div class="web">Open on repbunny.app ↗</div>
+    </div></div>
+  </div>
+
+  <div>
+    <p class="frame-cap">5 · Nothing matches</p>
+    <div class="phone"><div class="sheet">
+      <div class="handle"></div>
+      <div class="head"><span class="ib">‹</span><h3>Help &amp; guides</h3><span class="ib">✕</span></div>
+      <div class="search typed"><span class="mag"></span>apple health sync<span class="clear">✕</span></div>
+      <div class="empty">
+        <img src="../../public/clipboard-bunny.png" alt="" />
+        <b>No guide for that yet</b>
+        <p>Ask us and we'll answer by email. Your question goes from your own email app.</p>
+      </div>
+      <div class="btn">Email support</div>
+    </div></div>
+  </div>
+</div>
+
+<p class="why"><b>Why A:</b> the issue fixes most of the layout (results with an excerpt, the guide's text in the app, a website link at the end, Email support when empty). The only open choice was what shows before typing. Listing every guide by its website topic keeps the sheet useful with no query, and it doubles as the offline guides index. Considered and not drawn: a search box at the top of the Account menu (it would sit above everyone's settings), and an empty sheet until typing (a dead end for someone who doesn't know what to search for).</p>
+</body>
+</html>

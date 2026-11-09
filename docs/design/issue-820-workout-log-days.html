@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Issue #820: Workout log grouped under day headers. One option: the issue
+     specifies the layout (day header, time-only card headings, a gap between
+     days). The rail line now breaks between days so same-day workouts read as
+     one run. Right artboard: 320px at 200% text. -->
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+  --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+  --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+  --font-display: 'Baloo 2', sans-serif; --font-body: 'Manrope', sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #0c080f; font-family: var(--font-body); color: var(--text); display: flex; gap: 24px; padding: 24px; align-items: flex-start; }
+.col { display: flex; flex-direction: column; gap: 8px; }
+.cap { color: #8d7d96; font-size: 13px; font-weight: 700; }
+.phone { position: relative; width: 375px; height: 812px; background: var(--bg); overflow: hidden; padding: 44px 16px 0; font-size: 16px; }
+.phone.big { width: 320px; font-size: 32px; }
+.back { color: var(--accent); font-weight: 700; font-size: 0.9em; }
+h1 { margin: 6px 0 4px; font-family: var(--font-display); font-size: 1.7em; font-weight: 800; line-height: 1.1; }
+.lede { margin: 0 0 12px; color: var(--text-dim); font-size: 0.9em; }
+.ghost { display: inline-block; border: 1px solid var(--border); border-radius: 10px; padding: 6px 12px; color: var(--text-dim); font-weight: 700; font-size: 0.82em; margin-bottom: 16px; }
+.dot-key { display: flex; align-items: center; gap: 8px; margin: -8px 0 16px; color: var(--text-dim); font-size: 0.78em; }
+.dot-key i { width: 8px; height: 8px; border-radius: 50%; background: var(--highlight); box-shadow: 0 0 0 3px color-mix(in srgb, var(--highlight) 18%, transparent); }
+
+/* new: one section per local day */
+.day + .day { margin-top: 28px; }
+.day-header { margin: 0 0 10px; font-size: 0.85em; font-weight: 800; color: var(--text); text-transform: none; letter-spacing: 0; }
+.day-header .count { color: var(--text-dim); font-weight: 600; }
+
+.row { display: flex; gap: 14px; margin-bottom: 10px; }
+.row:last-child { margin-bottom: 0; }
+.rail { width: 2px; flex-shrink: 0; position: relative; }
+.rail .dot { position: absolute; top: 6px; left: -4px; width: 10px; height: 10px; border-radius: 50%; background: color-mix(in srgb, var(--text) 20%, transparent); }
+.rail .dot.pr { background: var(--highlight); box-shadow: 0 0 0 4px color-mix(in srgb, var(--highlight) 18%, transparent); }
+.rail .line { display: block; width: 2px; height: calc(100% + 10px); background: var(--border); }
+.card { flex: 1; min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.card.condensed { opacity: 0.65; }
+.head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+h3 { margin: 0; font-size: 1em; font-weight: 500; color: var(--text-dim); }
+.tag { font-size: 0.72em; font-weight: 700; color: var(--secondary); background: color-mix(in srgb, var(--secondary) 14%, transparent); border-radius: 999px; padding: 2px 8px; }
+.sum { margin: 6px 0 0; color: var(--text-dim); font-size: 0.85em; }
+.card.open h3 { color: var(--text); font-weight: 700; }
+.pencil { color: var(--text-dim); font-size: 0.8em; }
+.set { margin-top: 10px; font-size: 0.88em; }
+.set b { display: block; font-size: 0.95em; }
+.set span { color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<div class="col">
+<div class="cap">Option A (chosen): day headers, time-only cards, rail breaks between days</div>
+<div class="phone">
+  <div class="back">‹ Progress</div>
+  <h1>Workout log</h1>
+  <p class="lede">Tap a workout to review or fix it.</p>
+  <span class="ghost">+ Log a past workout</span>
+  <p class="dot-key"><i></i>Set a record</p>
+
+  <section class="day">
+    <h2 class="day-header">Today <span class="count">· 2 workouts</span></h2>
+    <div class="row">
+      <div class="rail"><span class="dot pr"></span><span class="line"></span></div>
+      <div class="card open">
+        <div class="head"><h3>5:26 PM <span class="pencil">✎</span> <span style="color:var(--text-dim);font-weight:500">· 12 min</span></h3><span class="tag">Upper Body Day</span></div>
+        <div class="set"><b>Dumbbell Shoulder Press</b><span>3 sets · 10 × 25 lb</span></div>
+        <div class="set"><b>Lat Pulldown</b><span>3 sets · 12 × 70 lb</span></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rail"><span class="dot"></span></div>
+      <div class="card condensed">
+        <div class="head"><h3>4:35 PM · 48 min</h3></div>
+        <p class="sum">Goblet Squat, Romanian Deadlift +2 more</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="day">
+    <h2 class="day-header">Yesterday</h2>
+    <div class="row">
+      <div class="rail"><span class="dot"></span></div>
+      <div class="card condensed">
+        <div class="head"><h3>6:02 AM · 1 h 5 min</h3><span class="tag">Legs</span></div>
+        <p class="sum">Back Squat, Leg Press, Walking Lunge</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="day">
+    <h2 class="day-header">Fri, Oct 16</h2>
+    <div class="row">
+      <div class="rail"><span class="dot"></span></div>
+      <div class="card condensed">
+        <div class="head"><h3>7:40 PM · 52 min</h3></div>
+        <p class="sum">Bench Press, Incline Dumbbell Press</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="day">
+    <h2 class="day-header">Tue, Dec 30, 2025</h2>
+    <div class="row">
+      <div class="rail"><span class="dot"></span></div>
+      <div class="card condensed">
+        <div class="head"><h3>12:15 PM</h3></div>
+        <p class="sum">Deadlift</p>
+      </div>
+    </div>
+  </section>
+</div>
+</div>
+
+<div class="col">
+<div class="cap">320px at 200% text</div>
+<div class="phone big">
+  <section class="day">
+    <h2 class="day-header">Today <span class="count">· 2 workouts</span></h2>
+    <div class="row">
+      <div class="rail"><span class="dot pr"></span><span class="line"></span></div>
+      <div class="card condensed">
+        <div class="head"><h3>5:26 PM · 12 min</h3><span class="tag">Upper Body Day</span></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rail"><span class="dot"></span></div>
+      <div class="card condensed">
+        <div class="head"><h3>4:35 PM · 48 min</h3></div>
+      </div>
+    </div>
+  </section>
+  <section class="day">
+    <h2 class="day-header">Tue, Dec 30, 2025</h2>
+    <div class="row">
+      <div class="rail"><span class="dot"></span></div>
+      <div class="card condensed">
+        <div class="head"><h3>12:15 PM</h3></div>
+      </div>
+    </div>
+  </section>
+</div>
+</div>
+
+</body>
+</html>

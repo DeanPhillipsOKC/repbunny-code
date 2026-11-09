@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Issue 313: Smoother first workout</title>
+<style>
+  @font-face { font-family: 'Baloo 2'; font-weight: 500 800; src: url(../../public/fonts/baloo2-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 400 800; src: url(../../public/fonts/manrope-latin.woff2) format('woff2'); }
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d;
+    --chest: #f2879c; --legs: #b79cf0;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .page { display: flex; flex-wrap: wrap; gap: 26px; padding: 26px; align-items: flex-start; width: 1260px; }
+  .col { width: 375px; }
+  .tag { display: inline-block; margin-bottom: 8px; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .tag-now { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+  .tag-new { background: rgba(242,192,105,0.16); color: var(--highlight); }
+  .col-title { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; margin: 0 0 2px; }
+  .col-note { color: var(--text-dim); font-size: 0.8rem; margin: 0 0 12px; line-height: 1.45; min-height: 76px; }
+  .phone { position: relative; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 16px 16px 20px; height: 520px; }
+
+  /* Workout header row */
+  .hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .hdr-title { flex: 1; min-width: 0; font-size: 1.05rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .elapsed { flex-shrink: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+  .icon-btn { flex-shrink: 0; width: 44px; height: 44px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text); }
+  .add-pill { flex-shrink: 0; height: 44px; padding: 0 14px 0 11px; border-radius: 12px; display: flex; align-items: center; gap: 5px; font-weight: 800; font-size: 0.9rem; background: color-mix(in srgb, var(--accent) 14%, var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border)); color: var(--accent); }
+  .add-row { display: flex; align-items: center; justify-content: center; gap: 6px; height: 48px; margin-top: 12px; border: 1.5px dashed color-mix(in srgb, var(--accent) 55%, var(--border)); border-radius: 14px; color: var(--accent); font-weight: 800; font-size: 0.92rem; }
+
+  .dots { display: flex; justify-content: center; gap: 7px; margin-bottom: 10px; }
+  .dot { width: 8px; height: 8px; border-radius: 99px; background: var(--border); }
+  .dot.on { width: 22px; background: var(--accent); }
+  .card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 18px; padding: 12px 16px; margin-bottom: 12px; }
+  .name { font-family: 'Baloo 2', sans-serif; font-size: 1.3rem; font-weight: 800; line-height: 1.1; }
+  .card-sub { font-size: 0.85rem; color: var(--text-dim); margin-top: 4px; }
+  .set-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px; display: flex; gap: 8px; align-items: center; }
+  .num { width: 22px; color: var(--text-dim); font-weight: 800; }
+  .field { flex: 1; height: 52px; border-radius: 10px; border: 2px solid var(--accent); display: grid; place-items: center; font-weight: 800; color: var(--accent); font-size: 1.2rem; }
+  .field.dim { border-color: var(--border); color: var(--text-dim); }
+  .logbtn { width: 56px; height: 52px; border-radius: 10px; background: var(--accent); color: var(--accent-text); display: grid; place-items: center; font-weight: 800; font-size: 0.85rem; }
+
+  /* Sheet */
+  .shade { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; height: 470px; background: var(--bg); border-top: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 10px; }
+  .handle { align-self: center; width: 36px; height: 4px; border-radius: 2px; background: var(--border); }
+  .sheet-hdr { display: flex; align-items: center; justify-content: space-between; }
+  .sheet-hdr h3 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; }
+  .x { width: 34px; height: 34px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); font-size: 0.9rem; }
+  .search { height: 42px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); padding: 0 12px; display: flex; align-items: center; color: var(--text-dim); font-size: 0.9rem; }
+  .hint { display: flex; gap: 10px; align-items: center; font-size: 0.82rem; color: var(--text-dim); }
+  .mascot { width: 34px; height: 34px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; }
+  .mascot img { width: 30px; }
+  .label { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-dim); }
+  .lrow { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .lrow.added { border-color: color-mix(in srgb, var(--success) 60%, var(--border)); background: color-mix(in srgb, var(--success) 10%, var(--surface-2)); }
+  .badge { width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0; }
+  .lrow-text { flex: 1; min-width: 0; }
+  .lrow-name { font-weight: 700; font-size: 0.93rem; }
+  .lrow-sub { font-size: 0.72rem; color: var(--text-dim); }
+  .lrow.added .lrow-sub { color: var(--success); }
+  .pill { padding: 6px 11px; border-radius: 999px; background: var(--accent); color: var(--accent-text); font-size: 0.78rem; font-weight: 800; }
+  .list { display: flex; flex-direction: column; gap: 7px; flex: 1; overflow: hidden; }
+  .pick-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 8px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); }
+  .pick-count { font-weight: 800; color: var(--success); }
+  .done { padding: 10px 22px; border-radius: 12px; background: var(--accent); color: var(--accent-text); font-weight: 800; }
+
+  .back { color: var(--accent); font-weight: 700; font-size: 0.92rem; }
+  .det-head { display: flex; gap: 10px; align-items: center; }
+  .det-name { font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; font-weight: 800; line-height: 1.1; }
+  .det-sub { font-size: 0.8rem; color: var(--text-dim); }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .fact { padding: 9px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .fact-k { font-size: 0.6rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--text-dim); }
+  .fact-v { font-size: 0.88rem; font-weight: 700; margin-top: 2px; }
+  .howto { font-size: 0.82rem; color: var(--text-dim); line-height: 1.45; margin: 0; padding-left: 18px; flex: 1; }
+  .cta { height: 48px; border-radius: 12px; background: var(--accent); color: var(--accent-text); font-weight: 800; display: grid; place-items: center; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="col">
+    <span class="tag tag-now">Now</span>
+    <p class="col-title">An unlabeled "+"</p>
+    <p class="col-note">The header's square "+" is the only way to add another exercise mid-workout. It reads as generic, and testers couldn't tell what it adds.</p>
+    <div class="phone">
+      <div class="hdr"><span class="hdr-title">Upper Body Hypertrophy</span><span class="elapsed">12:48</span><span class="icon-btn">＋</span><span class="icon-btn">◯</span></div>
+      <div class="dots"><i class="dot on"></i><i class="dot"></i></div>
+      <div class="card"><div class="name">Barbell Bench Press</div><div class="card-sub">1 of 3 sets logged · History</div></div>
+      <div class="set-card"><span class="num">2</span><span class="field">60 kg</span><span class="field dim">8</span><span class="logbtn">Log</span></div>
+    </div>
+  </div>
+
+  <div class="col">
+    <span class="tag tag-new">Option A (chosen)</span>
+    <p class="col-title">"+ Exercise" in the header</p>
+    <p class="col-note">Same spot, now a labeled pink-tinted pill. It never scrolls away, and the long routine name still truncates cleanly before it.</p>
+    <div class="phone">
+      <div class="hdr"><span class="hdr-title">Upper Body Hypertrophy</span><span class="elapsed">12:48</span><span class="add-pill">＋ Exercise</span><span class="icon-btn">◯</span></div>
+      <div class="dots"><i class="dot on"></i><i class="dot"></i></div>
+      <div class="card"><div class="name">Barbell Bench Press</div><div class="card-sub">1 of 3 sets logged · History</div></div>
+      <div class="set-card"><span class="num">2</span><span class="field">60 kg</span><span class="field dim">8</span><span class="logbtn">Log</span></div>
+    </div>
+  </div>
+
+  <div class="col">
+    <span class="tag tag-new">Option B</span>
+    <p class="col-title">Dashed row under the sets</p>
+    <p class="col-note">Keeps the icon and adds a full-width "+ Add exercise" row after the set card. Clearer copy, but it moves down the page as sets pile up and can end up below the fold.</p>
+    <div class="phone">
+      <div class="hdr"><span class="hdr-title">Upper Body Hypertrophy</span><span class="elapsed">12:48</span><span class="icon-btn">＋</span><span class="icon-btn">◯</span></div>
+      <div class="dots"><i class="dot on"></i><i class="dot"></i></div>
+      <div class="card"><div class="name">Barbell Bench Press</div><div class="card-sub">1 of 3 sets logged · History</div></div>
+      <div class="set-card"><span class="num">2</span><span class="field">60 kg</span><span class="field dim">8</span><span class="logbtn">Log</span></div>
+      <div class="add-row">＋ Add exercise</div>
+    </div>
+  </div>
+
+  <div class="col">
+    <span class="tag tag-new">First workout</span>
+    <p class="col-title">Add keeps the sheet open</p>
+    <p class="col-note">The first pick no longer closes the sheet. Every "+ Add" joins the workout and stays listed as "✓ Added"; Done closes the sheet, like every later workout.</p>
+    <div class="phone">
+      <div class="shade"></div>
+      <div class="sheet">
+        <div class="handle"></div>
+        <div class="sheet-hdr"><h3>Add exercise</h3><span class="x">✕</span></div>
+        <div class="search">Search exercises</div>
+        <div class="list">
+          <span class="label">Your exercises</span>
+          <div class="lrow added"><span class="badge" style="background:var(--chest)"></span><span class="lrow-text"><div class="lrow-name">Barbell Bench Press</div><div class="lrow-sub">✓ Added</div></span></div>
+          <div class="lrow added"><span class="badge" style="background:var(--legs)"></span><span class="lrow-text"><div class="lrow-name">Back Squat</div><div class="lrow-sub">✓ Added</div></span></div>
+          <span class="label">From the library</span>
+          <div class="lrow"><span class="badge" style="background:var(--secondary)"></span><span class="lrow-text"><div class="lrow-name">Barbell Row</div><div class="lrow-sub">Back · Barbell</div></span><span class="pill">+ Add</span></div>
+          <div class="lrow"><span class="badge" style="background:var(--highlight)"></span><span class="lrow-text"><div class="lrow-name">Overhead Press</div><div class="lrow-sub">Shoulders · Barbell</div></span><span class="pill">+ Add</span></div>
+        </div>
+        <div class="pick-bar"><span class="pick-count">✓ 2 added</span><span class="done">Done</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <span class="tag tag-new">Library detail</span>
+    <p class="col-title">Opens inside the sheet</p>
+    <p class="col-note">Tapping a library row shows its details in the sheet instead of leaving for another screen. "‹ Add exercise" goes back to the list as it was; "Add to workout" picks it and goes back too, with everything else still selected.</p>
+    <div class="phone">
+      <div class="shade"></div>
+      <div class="sheet">
+        <div class="handle"></div>
+        <span class="back">‹ Add exercise</span>
+        <div class="det-head"><span class="badge" style="background:var(--secondary);width:40px;height:40px"></span><div><div class="det-name">Barbell Row</div><div class="det-sub">Back · also works Biceps</div></div></div>
+        <div class="facts"><div class="fact"><div class="fact-k">Equipment</div><div class="fact-v">Barbell</div></div><div class="fact"><div class="fact-k">Tracked as</div><div class="fact-v">Weight × reps</div></div></div>
+        <span class="label">How to</span>
+        <ol class="howto"><li>Hinge at the hips with a flat back, bar hanging at arm's length.</li><li>Pull the bar to your lower ribs, elbows close.</li><li>Lower under control.</li></ol>
+        <div class="cta">Add to workout</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

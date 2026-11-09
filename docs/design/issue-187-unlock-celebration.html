@@ -1,0 +1,290 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Unlock Celebration</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-pressed: #ed6b85; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --shade: #000;
+  }
+  /* Cotton Candy, the light theme check */
+  .cotton {
+    --bg: #fff7f4; --surface: #ffffff; --surface-2: #fdeef0; --border: #f0d4da;
+    --text: #2b1d2a; --text-dim: #6e5868; --accent: #bf3a65; --accent-pressed: #a8305a; --accent-text: #ffffff;
+    --secondary: #7650c4; --highlight: #8f5c08; --success: #2e7a3d; --shade: #b07a8a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: #f5edf2; font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1240px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: #b9a8c2; font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; }
+  .note b { color: #f5edf2; }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; }
+  .opt-title { font-family: 'Baloo 2', sans-serif; color: #f2879c; font-size: 1.2rem; margin: 0 0 2px 4px; }
+  .cap { color: #f2c069; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: #b9a8c2; font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 58px; }
+  .capnote b { color: #f5edf2; }
+  .phone { position: relative; width: 377px; height: 780px; border: 1px solid #3a2b40; border-radius: 28px; overflow: hidden; color: var(--text);
+    background: radial-gradient(circle at 50% 30%, var(--surface-2) 0%, var(--bg) 62%, color-mix(in srgb, var(--bg) 88%, var(--shade)) 100%); }
+
+  /* Shared bits, after RecordCelebration.vue */
+  .burst { position: absolute; left: 50%; top: 26%; width: 560px; height: 560px; transform: translate(-50%, -50%); opacity: 0.12; pointer-events: none; }
+  .piece { position: absolute; width: 9px; height: 13px; border-radius: 2px; }
+  .piece.dot { width: 8px; height: 8px; border-radius: 50%; }
+  .badge { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--highlight); }
+  .badge svg { width: 14px; height: 14px; fill: var(--highlight); }
+  .mascot { display: block; object-fit: contain; filter: drop-shadow(0 10px 24px color-mix(in srgb, var(--shade) 45%, transparent)); }
+  .headline { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.7rem; line-height: 1.1; text-align: center; }
+  .sub { margin: 0; font-size: 0.9rem; color: var(--text-dim); text-align: center; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 52px; border-radius: 14px; font: inherit; font-size: 1rem; font-weight: 800; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-text); }
+  .btn.ghost { background: none; border-color: transparent; color: var(--accent); font-weight: 700; min-height: 44px; font-size: 0.95rem; }
+  .btn.small { width: auto; min-height: 40px; padding: 0 14px; font-size: 0.85rem; border-radius: 12px; flex-shrink: 0; }
+  .btn.small.done { background: none; border-color: var(--border); color: var(--success); }
+  .btn.small.done svg { stroke: var(--success); }
+
+  .kind { font-size: 0.66rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--secondary); }
+  .rname { font-size: 1.05rem; font-weight: 800; line-height: 1.2; }
+  .milestone { font-size: 0.75rem; color: var(--text-dim); font-weight: 600; }
+
+  /* Previews */
+  .play { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--secondary) 18%, transparent); border: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent); flex-shrink: 0; }
+  .play svg { width: 16px; height: 16px; fill: var(--secondary); margin-left: 2px; }
+  .play.big { width: 64px; height: 64px; }
+  .play.big svg { width: 22px; height: 22px; }
+  .week { display: flex; justify-content: space-between; padding: 8px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; }
+  .wd { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.6rem; font-weight: 700; color: var(--text-dim); }
+  .wdot { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--text) 9%, transparent); }
+  .wdot.done { background: none; }
+  .wdot svg { width: 18px; height: 18px; fill: var(--highlight); }
+  .fall { position: relative; height: 64px; overflow: hidden; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; }
+  .fall i { position: absolute; width: 12px; height: 12px; display: block; }
+  .quote { margin: 0; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; font-size: 0.86rem; font-weight: 700; line-height: 1.4; }
+  .mini { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--bg); border: 1px solid var(--border); flex-shrink: 0; position: relative; overflow: hidden; }
+  .mini svg { width: 20px; height: 20px; }
+
+  /* Option A: centered takeover */
+  .a-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 24px 20px; }
+  .a-card { width: 100%; background: var(--surface-2); border: 1px solid var(--border); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .a-card-head { display: flex; align-items: center; gap: 12px; }
+  .a-card-head > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .a-actions { width: 100%; display: flex; flex-direction: column; gap: 2px; }
+  .a-list { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+  .a-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; }
+  .a-row > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .a-row .rname { font-size: 0.92rem; }
+
+  /* Option B: hero on top, reward cards below, pinned actions */
+  .b-top { position: absolute; left: 0; right: 0; top: 0; padding: 26px 20px 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .b-body { position: absolute; left: 0; right: 0; top: 300px; bottom: 112px; padding: 0 16px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+  .b-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .b-card.ticket { border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+  .b-head { display: flex; align-items: center; gap: 12px; }
+  .b-head > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .b-foot { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 16px; background: linear-gradient(to top, var(--bg) 70%, transparent); display: flex; flex-direction: column; gap: 2px; }
+  .fade-more { position: absolute; left: 0; right: 0; bottom: 112px; height: 30px; background: linear-gradient(to top, var(--bg), transparent); }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#187 · Unlock celebration</h1>
+  <p class="note">Shows after <b>Finish</b>, before the recap, when the workout crossed a milestone that unlocks an Extra. <b>Premium only</b> (free users earn trial passes, which keep their offer on the recap). Hidden when Preferences &gt; Milestone moments is off. Minimal mascot drops the bunny, rays and confetti; reduced motion stills them.</p>
+  <p class="note"><b>Use it now</b> sets that Extra as the current pick. With one unlock, either button goes on to the recap. With several, each row has its own Use it now and the bottom button goes on. The recap's milestone card still lists the tiers as today.</p>
+</div>
+
+<div class="page">
+  <!-- ============ OPTION A ============ -->
+  <div class="col">
+    <p class="cap">Option A · one unlock</p>
+    <h2 class="opt-title">Centered takeover</h2>
+    <p class="capnote">Same family as the <b>New record</b> screen: badge, bunny, headline, one reward card with its preview, buttons under it. Sound kinds get a big play button.</p>
+    <div class="phone">
+      <svg class="burst" viewBox="0 0 400 400" aria-hidden="true"><g stroke="var(--highlight)" stroke-width="3" stroke-linecap="round"><line x1="200" y1="200" x2="200" y2="20"/><line x1="200" y1="200" x2="330" y2="70"/><line x1="200" y1="200" x2="380" y2="200"/><line x1="200" y1="200" x2="330" y2="330"/><line x1="200" y1="200" x2="200" y2="380"/><line x1="200" y1="200" x2="70" y2="330"/><line x1="200" y1="200" x2="20" y2="200"/><line x1="200" y1="200" x2="70" y2="70"/></g></svg>
+      <i class="piece" style="left:9%;top:60px;background:var(--accent);transform:rotate(20deg)"></i>
+      <i class="piece dot" style="left:22%;top:130px;background:var(--highlight)"></i>
+      <i class="piece" style="left:80%;top:90px;background:var(--success);transform:rotate(-30deg)"></i>
+      <i class="piece dot" style="left:90%;top:170px;background:var(--secondary)"></i>
+      <i class="piece" style="left:66%;top:40px;background:var(--highlight);transform:rotate(50deg)"></i>
+      <div class="a-wrap">
+        <div class="badge"><svg viewBox="0 0 24 24"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>Extra unlocked<svg viewBox="0 0 24 24"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg></div>
+        <img class="mascot" src="../../public/celebration-bunny.png" alt="" style="width:160px;height:160px" />
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <p class="headline">Your first record!</p>
+          <p class="sub">That earned you something new.</p>
+        </div>
+        <div class="a-card">
+          <div class="a-card-head">
+            <div>
+              <span class="kind">Record fanfare</span>
+              <span class="rname">Air horn</span>
+              <span class="milestone">Plays when you set a record</span>
+            </div>
+            <span class="play big"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+          </div>
+        </div>
+        <div class="a-actions">
+          <button class="btn">Use it now</button>
+          <button class="btn ghost">Not now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">Option A · several unlocks</p>
+    <h2 class="opt-title">Compact rows</h2>
+    <p class="capnote">Smaller bunny, then one row per Extra with a mini preview (tap to play or replay) and its own <b>Use it now</b>, which turns into <b>In use</b>. The bottom button goes on.</p>
+    <div class="phone">
+      <svg class="burst" viewBox="0 0 400 400" aria-hidden="true" style="top:18%"><g stroke="var(--highlight)" stroke-width="3" stroke-linecap="round"><line x1="200" y1="200" x2="200" y2="20"/><line x1="200" y1="200" x2="330" y2="70"/><line x1="200" y1="200" x2="380" y2="200"/><line x1="200" y1="200" x2="330" y2="330"/><line x1="200" y1="200" x2="200" y2="380"/><line x1="200" y1="200" x2="70" y2="330"/><line x1="200" y1="200" x2="20" y2="200"/><line x1="200" y1="200" x2="70" y2="70"/></g></svg>
+      <i class="piece" style="left:12%;top:50px;background:var(--accent);transform:rotate(20deg)"></i>
+      <i class="piece dot" style="left:84%;top:110px;background:var(--secondary)"></i>
+      <i class="piece" style="left:72%;top:30px;background:var(--highlight);transform:rotate(50deg)"></i>
+      <div class="a-wrap" style="gap:14px">
+        <div class="badge"><svg viewBox="0 0 24 24"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>3 Extras unlocked<svg viewBox="0 0 24 24"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg></div>
+        <img class="mascot" src="../../public/celebration-bunny.png" alt="" style="width:120px;height:120px" />
+        <p class="headline" style="font-size:1.5rem">Big day. Three at once!</p>
+        <div class="a-list">
+          <div class="a-row">
+            <span class="play"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+            <div><span class="kind">Rest chime</span><span class="rname">Cartoon boing</span><span class="milestone">10 workouts</span></div>
+            <button class="btn small done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>In use</button>
+          </div>
+          <div class="a-row">
+            <span class="mini"><svg viewBox="0 0 24 24" style="fill:var(--secondary)"><path d="M7 7h10v2H7zM7 11h7v2H7zM4 4h16v12H8l-4 4z" opacity=".9"/></svg></span>
+            <div><span class="kind">Bunny lines</span><span class="rname">Gym puns</span><span class="milestone">“That set was un-bench-lievable.”</span></div>
+            <button class="btn small">Use it now</button>
+          </div>
+          <div class="a-row">
+            <span class="mini"><i style="position:absolute;left:8px;top:8px;width:11px;height:11px;background:var(--highlight);-webkit-mask:var(--m-star) center/contain no-repeat;mask:var(--m-star) center/contain no-repeat"></i><i style="position:absolute;left:22px;top:18px;width:12px;height:12px;background:var(--accent);-webkit-mask:var(--m-star) center/contain no-repeat;mask:var(--m-star) center/contain no-repeat"></i><i style="position:absolute;left:10px;top:26px;width:9px;height:9px;background:var(--secondary);-webkit-mask:var(--m-star) center/contain no-repeat;mask:var(--m-star) center/contain no-repeat"></i></span>
+            <div><span class="kind">Confetti</span><span class="rname">Stars</span><span class="milestone">10 records</span></div>
+            <button class="btn small">Use it now</button>
+          </div>
+        </div>
+        <div class="a-actions">
+          <button class="btn">See my recap</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ OPTION B ============ -->
+  <div class="col">
+    <p class="cap">Option B · one unlock</p>
+    <h2 class="opt-title">Hero + reward card</h2>
+    <p class="capnote">The milestone owns the top; the reward is a card below with a <b>full preview</b> (here, a week strip with the new mark). Buttons pinned to the bottom so they never move between one and several.</p>
+    <div class="phone">
+      <svg class="burst" viewBox="0 0 400 400" aria-hidden="true" style="top:17%"><g stroke="var(--highlight)" stroke-width="3" stroke-linecap="round"><line x1="200" y1="200" x2="200" y2="20"/><line x1="200" y1="200" x2="330" y2="70"/><line x1="200" y1="200" x2="380" y2="200"/><line x1="200" y1="200" x2="330" y2="330"/><line x1="200" y1="200" x2="200" y2="380"/><line x1="200" y1="200" x2="70" y2="330"/><line x1="200" y1="200" x2="20" y2="200"/><line x1="200" y1="200" x2="70" y2="70"/></g></svg>
+      <i class="piece" style="left:10%;top:70px;background:var(--accent);transform:rotate(20deg)"></i>
+      <i class="piece dot" style="left:86%;top:60px;background:var(--highlight)"></i>
+      <div class="b-top">
+        <div class="badge"><svg viewBox="0 0 24 24"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>Milestone<svg viewBox="0 0 24 24"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg></div>
+        <img class="mascot" src="../../public/celebration-bunny.png" alt="" style="width:150px;height:150px" />
+        <p class="headline">Your first workout!</p>
+        <p class="sub">You unlocked a new Extra.</p>
+      </div>
+      <div class="b-body">
+        <div class="b-card ticket">
+          <div class="b-head">
+            <div><span class="kind">Week mark</span><span class="rname">Stars</span><span class="milestone">Each day you train on Home's This week</span></div>
+          </div>
+          <div class="week">
+            <span class="wd"><span class="wdot done"><svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg></span>S</span>
+            <span class="wd"><span class="wdot"></span>M</span>
+            <span class="wd"><span class="wdot done"><svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg></span>T</span>
+            <span class="wd"><span class="wdot done"><svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg></span>W</span>
+            <span class="wd"><span class="wdot"></span>T</span>
+            <span class="wd"><span class="wdot done"><svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg></span>F</span>
+            <span class="wd"><span class="wdot"></span>S</span>
+          </div>
+        </div>
+      </div>
+      <div class="b-foot">
+        <button class="btn">Use it now</button>
+        <button class="btn ghost">Not now</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">Option B · several unlocks</p>
+    <h2 class="opt-title">Stacked cards</h2>
+    <p class="capnote">Headline names the count; each Extra is its own card with a full preview and a <b>Use it now</b> inside it. Scrolls when there are more than fit. Bottom button goes on.</p>
+    <div class="phone">
+      <svg class="burst" viewBox="0 0 400 400" aria-hidden="true" style="top:14%"><g stroke="var(--highlight)" stroke-width="3" stroke-linecap="round"><line x1="200" y1="200" x2="200" y2="20"/><line x1="200" y1="200" x2="330" y2="70"/><line x1="200" y1="200" x2="380" y2="200"/><line x1="200" y1="200" x2="330" y2="330"/><line x1="200" y1="200" x2="200" y2="380"/><line x1="200" y1="200" x2="70" y2="330"/><line x1="200" y1="200" x2="20" y2="200"/><line x1="200" y1="200" x2="70" y2="70"/></g></svg>
+      <div class="b-top" style="gap:8px">
+        <div class="badge"><svg viewBox="0 0 24 24"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>2 milestones<svg viewBox="0 0 24 24"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg></div>
+        <img class="mascot" src="../../public/celebration-bunny.png" alt="" style="width:120px;height:120px" />
+        <p class="headline">5 workouts and your first record!</p>
+        <p class="sub">Two new Extras are yours.</p>
+      </div>
+      <div class="b-body" style="top:282px">
+        <div class="b-card ticket">
+          <div class="b-head">
+            <div><span class="kind">Confetti</span><span class="rname">Hearts</span><span class="milestone">Falls when you set a record</span></div>
+            <button class="btn small done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>In use</button>
+          </div>
+          <div class="fall">
+            <i style="left:8%;top:6px;background:var(--accent);-webkit-mask:var(--m-heart) center/contain no-repeat;mask:var(--m-heart) center/contain no-repeat;transform:rotate(-15deg)"></i>
+            <i style="left:24%;top:30px;background:var(--highlight);-webkit-mask:var(--m-heart) center/contain no-repeat;mask:var(--m-heart) center/contain no-repeat"></i>
+            <i style="left:40%;top:12px;background:var(--secondary);-webkit-mask:var(--m-heart) center/contain no-repeat;mask:var(--m-heart) center/contain no-repeat;transform:rotate(20deg)"></i>
+            <i style="left:56%;top:40px;background:var(--success);-webkit-mask:var(--m-heart) center/contain no-repeat;mask:var(--m-heart) center/contain no-repeat"></i>
+            <i style="left:70%;top:4px;background:var(--accent);-webkit-mask:var(--m-heart) center/contain no-repeat;mask:var(--m-heart) center/contain no-repeat;transform:rotate(10deg)"></i>
+            <i style="left:85%;top:26px;background:var(--secondary);-webkit-mask:var(--m-heart) center/contain no-repeat;mask:var(--m-heart) center/contain no-repeat;transform:rotate(-25deg)"></i>
+          </div>
+        </div>
+        <div class="b-card ticket">
+          <div class="b-head">
+            <span class="play"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+            <div><span class="kind">Record fanfare</span><span class="rname">Air horn</span><span class="milestone">Tap play to hear it</span></div>
+            <button class="btn small">Use it now</button>
+          </div>
+        </div>
+      </div>
+      <div class="b-foot">
+        <button class="btn">See my recap</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Light check + minimal -->
+  <div class="col cotton">
+    <p class="cap">Light theme + Minimal mascot</p>
+    <h2 class="opt-title">Option A, Cotton Candy</h2>
+    <p class="capnote">Minimal drops the bunny, rays and confetti (like the record screen); the badge, headline and reward still say what happened. Bunny lines preview shows a sample line.</p>
+    <div class="phone">
+      <div class="a-wrap">
+        <div class="badge"><svg viewBox="0 0 24 24"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>Extra unlocked<svg viewBox="0 0 24 24"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg></div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <p class="headline">4 strong weeks!</p>
+          <p class="sub">That earned you something new.</p>
+        </div>
+        <div class="a-card">
+          <div class="a-card-head">
+            <div>
+              <span class="kind">Bunny lines</span>
+              <span class="rname">Gym puns</span>
+              <span class="milestone">On the rest timer and the recap</span>
+            </div>
+          </div>
+          <p class="quote">“That set was un-bench-lievable.”</p>
+          <p class="quote">“Rest is a weigh of life.”</p>
+        </div>
+        <div class="a-actions">
+          <button class="btn">Use it now</button>
+          <button class="btn ghost">Not now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  :root {
+    --m-heart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-8.5-5.3-8.5-11.2C3.5 6.6 5.9 4.5 8.4 4.5c1.6 0 2.9.8 3.6 2 .7-1.2 2-2 3.6-2 2.5 0 4.9 2.1 4.9 5.3C20.5 15.7 12 21 12 21z'/%3E%3C/svg%3E");
+    --m-star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.2l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z'/%3E%3C/svg%3E");
+  }
+</style>
+</body>
+</html>

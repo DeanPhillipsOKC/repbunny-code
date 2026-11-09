@@ -1,0 +1,163 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Easter Theme Options</title>
+<style>@font-face { font-family: "Baloo 2"; font-weight: 500 800; src: url(../../public/fonts/baloo2-latin.woff2) format("woff2"); } @font-face { font-family: "Manrope"; font-weight: 400 800; src: url(../../public/fonts/manrope-latin.woff2) format("woff2"); }</style>
+<style>
+  /* Issue #970: the Easter theme. A pastel light scheme and a twilight
+     lavender dark scheme, each drawn as Log home, the rest timer, and a record
+     celebration at 375px. Cotton Candy, Sunrise, and Carrot Patch sit beside
+     them, since they're the nearest themes. The carrot is the week mark and
+     confetti (the existing carrot slot, #128). */
+  :root {
+    color-scheme: dark;
+    --page: #0f0b10; --ink: #f5edf2; --ink-dim: #b9a8c2; --note: #f3c96b;
+    --display: 'Baloo 2', 'Trebuchet MS', sans-serif;
+    --body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+    --cane: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='translate(10.1 12.5) rotate(30) scale(1.14) translate(-12 -12)'%3E%3Cpath d='M11.4 8.6C9.3 6.9 7.6 4.6 7.6 2.2C9.8 3.2 11.4 5.6 11.9 8.4Z' fill='%234e9a35'/%3E%3Cpath d='M12.6 8.4C13.1 5.6 14.7 3.2 16.9 2.2C16.9 4.6 15.2 6.9 13.1 8.6Z' fill='%234e9a35'/%3E%3Cpath d='M12 8.6C10.6 6.3 10.6 3.4 12 0.8C13.4 3.4 13.4 6.3 12 8.6Z' fill='%237fc456'/%3E%3Cpath d='M8.1 9.6C8.1 7.6 15.9 7.6 15.9 9.6C15.9 13.6 13.2 20.2 12 23.2C10.8 20.2 8.1 13.6 8.1 9.6Z' fill='%23f28c3a'/%3E%3Cpath d='M9.3 10.2C9.4 13.4 11 18 11.9 20.6' stroke='%23f9b06e' stroke-width='.9' stroke-linecap='round' fill='none' opacity='.8'/%3E%3Cpath d='M12.6 12.2H15.2M11.9 16.1H13.9' stroke='%23c7611c' stroke-width='.9' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .sunrise { color-scheme: light; --bg: #fff8f0; --surface: #ffffff; --surface-2: #fff0e2; --border: #f2dcc6; --text: #2a1e16; --text-dim: #6e5a4a; --accent: #b8501c; --accent-text: #ffffff; --secondary: #3f6fb0; --highlight: #8a6400; --success: #2e7a3d; }
+  .carrotp { --bg: #121710; --surface: #1b2318; --surface-2: #222c1e; --border: #34432e; --text: #eef3e6; --text-dim: #aebaa2; --accent: #f28c3a; --accent-text: #1a130c; --secondary: #9ccf7a; --highlight: #f2d36b; --success: #7fd6b4; }
+  .cotton { color-scheme: light; --bg: #fff7f4; --surface: #ffffff; --surface-2: #fdeef0; --border: #f0d4da; --text: #2b1d2a; --text-dim: #6e5868; --accent: #bf3a65; --accent-text: #ffffff; --secondary: #7650c4; --highlight: #8f5c08; --success: #2e7a3d; }
+  .xa { color-scheme: light; --bg: #fffaee; --surface: #ffffff; --surface-2: #f3eefc; --border: #e3d9f2; --text: #2a2238; --text-dim: #615873; --accent: #7048c0; --accent-text: #ffffff; --secondary: #1f6f86; --highlight: #8a6400; --success: #2e7a3d; }
+  .xb { --bg: #1d1830; --surface: #272040; --surface-2: #2e2649; --border: #463c66; --text: #fbf6ea; --text-dim: #c4bad8; --accent: #c3a8f5; --accent-text: #1d1830; --secondary: #9ee0c8; --highlight: #f6dc7a; --success: #a8dd8e; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--body); }
+  .wrap { padding: 28px 16px 48px; max-width: 1240px; margin: 0 auto; }
+  h1 { font-family: var(--display); font-size: 1.9rem; margin: 0 0 6px; }
+  .intro { color: var(--ink-dim); line-height: 1.55; max-width: 74ch; margin: 0 0 6px; }
+  .label { color: var(--note); font-size: .74rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 800; margin: 28px 0 4px; }
+  .label .pickme { background: var(--note); color: #241a2c; border-radius: 999px; padding: 2px 8px; margin-left: 6px; }
+  h2 { font-family: var(--display); font-size: 1.3rem; margin: 0; }
+  .why { color: var(--ink-dim); font-size: .88rem; line-height: 1.5; margin: 4px 0 14px; max-width: 80ch; }
+  .row { display: flex; flex-wrap: wrap; gap: 20px; }
+
+  .phone { width: 375px; box-shadow: 0 1px 0 rgba(0,0,0,.04); max-width: 100%; height: 520px; position: relative; overflow: hidden; background: var(--bg); color: var(--text); border-radius: 30px; border: 1px solid var(--border); padding: 18px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .top b { font-family: var(--display); font-size: 1.5rem; }
+  .pill { border-radius: 999px; background: var(--accent); color: var(--accent-text); font-weight: 800; padding: 12px 16px; text-align: center; }
+  .pill.ghost { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 12px 14px; }
+  .card h3 { margin: 0 0 8px; font-size: .9rem; }
+  .dim { color: var(--text-dim); font-size: .8rem; }
+  .week { display: flex; justify-content: space-between; }
+  .day { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: .7rem; color: var(--text-dim); }
+  .slot { width: 30px; height: 30px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; }
+  .slot.done { border-color: var(--accent); }
+  .slot.done i { width: 20px; height: 20px; background: var(--cane) no-repeat center / contain; }
+  .stats { display: flex; gap: 10px; }
+  .stats .card { flex: 1; }
+  .stats b { font-size: 1.15rem; display: block; }
+  .pr { color: var(--success); font-weight: 700; font-size: .72rem; }
+  .sec { color: var(--secondary); font-weight: 700; }
+  .gold { color: var(--highlight); font-weight: 700; }
+  .rest { align-items: center; text-align: center; }
+  .rest img { width: 220px; height: 220px; object-fit: contain; }
+  .timer { font-family: var(--display); font-size: 3.2rem; line-height: 1; }
+  .bar { width: 100%; height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 62%; background: var(--accent); }
+  .cele { align-items: center; text-align: center; justify-content: center; }
+  .cele img { width: 230px; height: 230px; object-fit: contain; }
+  .cele h4 { font-family: var(--display); font-size: 1.5rem; margin: 0; }
+  .conf { position: absolute; width: 18px; height: 18px; background: var(--cane) no-repeat center / contain; }
+  .sunrise .conf, .carrotp .conf, .cotton .conf { display: none; }
+  .mini { width: 175px; height: 270px; }
+  .mini img { width: 110px; height: 110px; object-fit: contain; align-self: center; }
+</style>
+<div class="wrap">
+  <h1>Easter theme (#970)</h1>
+  <p class="intro">Two ways to do a secular spring theme from the art: eggs, baskets, carrots, and flowers. Both reuse the carrot for the week tracker and record confetti, so no new decor is needed.</p>
+
+  <p class="label">Option A <span class="pickme">Chosen</span></p>
+  <h2>Pastel light scheme, lavender lead</h2>
+  <p class="why">A cream page with white cards and lavender tinted panels, like the gingham in the basket. A deep lavender leads, robin&rsquo;s egg teal is the secondary, butter gold the highlight, carrot orange the errors. The only pastel light theme, and the pink bunny pops on cream the way it does in the art.</p>
+  <div class="row xa">
+    <div class="phone">
+      <div class="top"><b>Log</b><span class="dim">Sun, Mar 28</span></div>
+      <div class="pill">Start workout</div>
+      <div class="pill ghost">Freeform</div>
+      <div class="card"><h3>This week</h3>
+        <div class="week">
+          <div class="day"><span class="slot done"><i></i></span>S</div>
+          <div class="day"><span class="slot"></span>M</div>
+          <div class="day"><span class="slot done"><i></i></span>T</div>
+          <div class="day"><span class="slot"></span>W</div>
+          <div class="day"><span class="slot done"><i></i></span>T</div>
+          <div class="day"><span class="slot"></span>F</div>
+          <div class="day"><span class="slot"></span>S</div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="card"><span class="dim">Last workout</span><b>Push Day</b><span class="sec">Barbell Bench Press</span></div>
+        <div class="card"><span class="dim">Heaviest</span><b>185 lb</b><span class="pr">New record</span></div>
+      </div>
+      <div class="card"><span class="gold">Next time</span> <span class="dim">Incline Dumbbell Press, 3 sets of 10 at 55 lb</span></div>
+    </div>
+    <div class="phone rest">
+      <span class="dim">Rest</span>
+      <img src="../../public/themes/easter/rest-bunny.webp" alt="">
+      <div class="timer">1:14</div>
+      <div class="bar"><i></i></div>
+      <span class="dim">Next: Barbell Bench Press, set 3 of 4</span>
+      <div class="pill" style="width:100%">Skip Rest</div>
+    </div>
+    <div class="phone cele">
+      <i class="conf" style="left:8%;top:6%;transform:rotate(-20deg)"></i><i class="conf" style="left:30%;top:14%;transform:rotate(35deg)"></i><i class="conf" style="left:76%;top:5%;transform:rotate(15deg)"></i><i class="conf" style="left:88%;top:22%;transform:rotate(-40deg)"></i><i class="conf" style="left:6%;top:34%;transform:rotate(60deg)"></i><i class="conf" style="left:64%;top:16%;transform:rotate(-60deg)"></i>
+      <img src="../../public/themes/easter/celebration-bunny.webp" alt="">
+      <h4>New record!</h4>
+      <span class="dim">Barbell Bench Press, 8 times 185 lb</span>
+      <div class="pill" style="width:60%">Nice!</div>
+    </div>
+  </div>
+
+  <p class="label">Option B</p>
+  <h2>Twilight lavender, a dark scheme</h2>
+  <p class="why">A deep lavender night with a soft lilac lead, mint secondary, and butter yellow highlight. It keeps the dark default, but pastels read washed out on a dark page, and it sits near Classic&rsquo;s plum.</p>
+  <div class="row xb">
+    <div class="phone">
+      <div class="top"><b>Log</b><span class="dim">Sun, Mar 28</span></div>
+      <div class="pill">Start workout</div>
+      <div class="pill ghost">Freeform</div>
+      <div class="card"><h3>This week</h3>
+        <div class="week">
+          <div class="day"><span class="slot done"><i></i></span>S</div>
+          <div class="day"><span class="slot"></span>M</div>
+          <div class="day"><span class="slot done"><i></i></span>T</div>
+          <div class="day"><span class="slot"></span>W</div>
+          <div class="day"><span class="slot done"><i></i></span>T</div>
+          <div class="day"><span class="slot"></span>F</div>
+          <div class="day"><span class="slot"></span>S</div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="card"><span class="dim">Last workout</span><b>Push Day</b><span class="sec">Barbell Bench Press</span></div>
+        <div class="card"><span class="dim">Heaviest</span><b>185 lb</b><span class="pr">New record</span></div>
+      </div>
+      <div class="card"><span class="gold">Next time</span> <span class="dim">Incline Dumbbell Press, 3 sets of 10 at 55 lb</span></div>
+    </div>
+    <div class="phone rest">
+      <span class="dim">Rest</span>
+      <img src="../../public/themes/easter/rest-bunny.webp" alt="">
+      <div class="timer">1:14</div>
+      <div class="bar"><i></i></div>
+      <span class="dim">Next: Barbell Bench Press, set 3 of 4</span>
+      <div class="pill" style="width:100%">Skip Rest</div>
+    </div>
+    <div class="phone cele">
+      <i class="conf" style="left:8%;top:6%;transform:rotate(-20deg)"></i><i class="conf" style="left:30%;top:14%;transform:rotate(35deg)"></i><i class="conf" style="left:76%;top:5%;transform:rotate(15deg)"></i><i class="conf" style="left:88%;top:22%;transform:rotate(-40deg)"></i><i class="conf" style="left:6%;top:34%;transform:rotate(60deg)"></i><i class="conf" style="left:64%;top:16%;transform:rotate(-60deg)"></i>
+      <img src="../../public/themes/easter/celebration-bunny.webp" alt="">
+      <h4>New record!</h4>
+      <span class="dim">Barbell Bench Press, 8 times 185 lb</span>
+      <div class="pill" style="width:60%">Nice!</div>
+    </div>
+  </div>
+
+  <p class="label">For comparison</p>
+  <div class="row">
+    <div class="phone mini cotton"><b>Cotton Candy</b><img src="../../public/celebration-bunny.png" alt=""><div class="pill">Start workout</div></div>
+    <div class="phone mini sunrise"><b>Sunrise</b><img src="../../public/celebration-bunny.png" alt=""><div class="pill">Start workout</div></div>
+    <div class="phone mini carrotp"><b>Carrot Patch</b><img src="../../public/celebration-bunny.png" alt=""><div class="pill">Start workout</div></div>
+    <div class="phone mini xa"><b>Easter A</b><img src="../../public/themes/easter/celebration-bunny.webp" alt=""><div class="pill">Start workout</div></div>
+  </div>
+</div>

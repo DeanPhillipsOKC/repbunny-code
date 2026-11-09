@@ -1,0 +1,290 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>First Run</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --cardio: #f4a07a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1300px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; display: flex; flex-direction: column; gap: 10px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 0 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 0 4px; line-height: 1.45; min-height: 72px; }
+  .capnote b { color: var(--text); }
+  .phone { width: 377px; height: 760px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 20px 16px 0; position: relative; }
+
+  .hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.45rem; margin: 0; line-height: 1.2; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); flex-shrink: 0; }
+  .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; font-size: 0.7rem; color: var(--text-dim); font-weight: 700; }
+  .nav .on { color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .mascot { border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; flex-shrink: 0; }
+  .mascot img { border-radius: 12px; }
+  .mascot-lg { width: 80px; height: 80px; } .mascot-lg img { width: 54px; height: 54px; }
+  .mascot-sm { width: 40px; height: 40px; } .mascot-sm img { width: 28px; height: 28px; border-radius: 6px; }
+
+  /* welcome */
+  .welcome { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 26px 20px 20px; box-shadow: 0 16px 40px rgba(0,0,0,.35); }
+  .w-title { margin: 0; font-size: 1.35rem; font-weight: 700; }
+  .w-copy { margin: 0; font-size: 0.93rem; line-height: 1.5; color: var(--text-dim); }
+  .btn { width: 100%; min-height: 52px; border-radius: 12px; font: 700 0.98rem Manrope, sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-accent { background: var(--accent); color: var(--accent-text); border: 1px solid var(--accent); }
+  .btn-outline { background: transparent; color: var(--secondary); border: 1.5px solid color-mix(in srgb, var(--secondary) 70%, transparent); }
+  .btn-sub { display: block; font-size: 0.74rem; font-weight: 600; opacity: .8; margin-top: 1px; }
+  .btn-stack { display: flex; flex-direction: column; text-align: left; }
+  .or { display: flex; align-items: center; gap: 10px; width: 100%; color: var(--text-dim); font-size: 0.76rem; font-weight: 700; margin: 4px 0 -2px; }
+  .or::before, .or::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .prog-row { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 12px 14px; background: var(--surface-2); border: 1px dashed var(--border); border-radius: 12px; }
+  .prog-ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--highlight) 16%, transparent); color: var(--highlight); flex-shrink: 0; }
+  .row-title { font-weight: 700; font-size: 0.95rem; }
+  .row-sub { font-size: 0.78rem; color: var(--text-dim); line-height: 1.35; }
+  .chev { color: var(--text-dim); flex-shrink: 0; margin-left: auto; }
+
+  /* option B choice rows */
+  .choice { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 14px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); }
+  .choice.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  .choice.primary .row-sub { color: color-mix(in srgb, var(--accent-text) 78%, transparent); }
+  .choice.primary .chev { color: var(--accent-text); }
+  .c-ico { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; flex-shrink: 0; }
+  .choice.primary .c-ico { background: color-mix(in srgb, var(--accent-text) 14%, transparent); }
+  .c-ico.lav { background: color-mix(in srgb, var(--secondary) 18%, transparent); color: var(--secondary); }
+  .c-ico.gold { background: color-mix(in srgb, var(--highlight) 16%, transparent); color: var(--highlight); }
+  .b-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .b-head .w-title { font-size: 1.25rem; }
+  .b-head .w-copy { font-size: 0.86rem; text-align: left; }
+  .b-list { display: flex; flex-direction: column; gap: 10px; }
+  .b-label { font-size: 0.72rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--text-dim); margin: 6px 0 -2px 2px; }
+
+  /* sheets */
+  .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.5); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 8px 16px 16px; }
+  .handle { width: 40px; height: 4px; border-radius: 4px; background: var(--border); margin: 0 auto 10px; }
+  .sheet-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .sheet-h h3 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; }
+  .search { height: 44px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); font-size: 0.92rem; display: flex; align-items: center; padding: 0 14px; margin-bottom: 10px; }
+  .chips { display: flex; gap: 6px; overflow: hidden; margin-bottom: 12px; }
+  .chip { flex-shrink: 0; padding: 6px 11px; border-radius: 999px; border: 1px solid var(--border); font-size: 0.78rem; font-weight: 700; color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
+  .chip.sel { border-color: var(--text-dim); color: var(--text); background: var(--surface-2); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .hint { margin: 0 0 10px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--secondary) 12%, transparent); color: var(--text); font-size: 0.84rem; line-height: 1.4; display: flex; gap: 10px; align-items: center; }
+  .new-ex { height: 46px; border-radius: 12px; border: 1px dashed var(--border); color: var(--accent); font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; padding: 0 14px; margin-bottom: 12px; }
+  .sec { font-size: 0.72rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--text-dim); margin: 0 0 6px 2px; }
+  .lib { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent); }
+  .badge { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 0.7rem; font-weight: 800; flex-shrink: 0; }
+  .lib-name { font-weight: 700; font-size: 0.9rem; }
+  .lib-sub { font-size: 0.74rem; color: var(--text-dim); }
+  .add { margin-left: auto; padding: 6px 12px; border-radius: 10px; font-size: 0.8rem; font-weight: 800; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); flex-shrink: 0; }
+  .tap { position: relative; }
+  .tap::after { content: attr(data-tap); position: absolute; right: -8px; top: -10px; background: var(--highlight); color: var(--accent-text); font-size: 0.66rem; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
+  .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 40px; background: linear-gradient(transparent, var(--surface)); }
+
+  /* workout header */
+  .whdr { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .whdr h2 { font-size: 1.25rem; }
+  .elapsed { font-size: 0.8rem; color: var(--text-dim); font-weight: 700; margin-right: auto; }
+
+  /* templates screen */
+  .add-tpl { height: 48px; border-radius: 12px; background: var(--accent); color: var(--accent-text); font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+  .muted-c { text-align: center; color: var(--text-dim); font-size: 0.8rem; margin: 0 0 12px; }
+  .st-title { font-family: 'Baloo 2', sans-serif; font-size: 1.1rem; margin: 0; }
+  .grp { font-size: 0.72rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--secondary); margin: 12px 0 2px; }
+  .prow { display: flex; align-items: center; padding: 11px 14px; border: 1px dashed var(--border); border-radius: 12px; background: var(--surface); margin-top: 8px; }
+  .glow { box-shadow: 0 0 0 2px color-mix(in srgb, var(--highlight) 55%, transparent); }
+
+  /* recap */
+  .eyebrow { font-size: 0.72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--secondary); margin: 0; }
+  .recap-title { font-family: 'Baloo 2', sans-serif; font-size: 1.5rem; margin: 2px 0 0; }
+  .recap-meta { font-size: 0.84rem; color: var(--text-dim); margin: 0 0 12px; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+  .tile-l { font-size: 0.7rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--text-dim); }
+  .tile-v { font-family: 'Baloo 2', sans-serif; font-size: 1.4rem; }
+  .save-offer { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+  .so-top { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+  .so-title { font-weight: 800; font-size: 1rem; margin: 0; }
+  .so-copy { font-size: 0.82rem; color: var(--text-dim); margin: 2px 0 0; line-height: 1.4; }
+  label.f { font-size: 0.78rem; font-weight: 700; color: var(--text-dim); display: block; margin-bottom: 4px; }
+  .input { height: 44px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; padding: 0 12px; font-size: 0.95rem; margin-bottom: 10px; }
+  .so-actions { display: flex; gap: 8px; }
+  .so-actions .btn { min-height: 44px; font-size: 0.9rem; }
+  .ghost { background: transparent; border: 1px solid var(--border); color: var(--text-dim); width: auto; padding: 0 16px; flex-shrink: 0; }
+  .done { margin-top: 12px; }
+  .list-row { display: flex; justify-content: space-between; font-size: 0.86rem; padding: 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent); }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#207 First-run onboarding</h1>
+  <p class="note">A brand-new account (no exercises, no templates) lands on Home. Today it says "Add your first exercise" and sends you to the Exercises tab. Instead, the welcome card offers <b>three ways in</b>, and the workout tiles show even with zero exercises. Pick <b>A or B</b> for the welcome card; the other screens are the same either way.</p>
+  <p class="note">Uses the current word <b>template</b>; #206 renames it to routine when it ships. Gold numbers mark the taps from Home to a logged set: <b>Start a workout, + Add, Log set</b>. To fit 3 taps, the <b>first</b> pick in a workout with no exercises yet closes the sheet and opens that exercise; after that the sheet works as now (pick several, then Done).</p>
+</div>
+<div class="page">
+
+  <!-- A -->
+  <div class="col">
+    <p class="cap">A · Welcome, stacked buttons</p>
+    <p class="capnote">Same card and mascot as today. <b>Start a workout</b> is the pink primary, <b>Build a template</b> the lavender outline. A divider then the program row, dashed like the Starter programs rows, so it reads as a real third choice.</p>
+    <div class="phone">
+      <div class="hdr"><h2>Log a workout</h2><span class="icon-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></div>
+      <div class="card welcome">
+        <div class="mascot mascot-lg"><img src="../../public/icon-512.png" alt=""></div>
+        <p class="w-title">Welcome to RepBunny</p>
+        <p class="w-copy">Let's get your first set on the board. Jump straight into a workout, or plan one you'll repeat.</p>
+        <span class="btn btn-accent tap" data-tap="1"><span class="btn-stack">Start a workout<span class="btn-sub">Pick exercises as you go</span></span></span>
+        <span class="btn btn-outline"><span class="btn-stack">Build a template<span class="btn-sub">Plan a workout to repeat</span></span></span>
+        <div class="or">Not sure what to train?</div>
+        <div class="prog-row">
+          <span class="prog-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></span>
+          <span><span class="row-title">Start from a program</span><br><span class="row-sub">Ready-made plans for 3 to 6 days a week</span></span>
+          <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <div class="nav"><span class="on">Home</span><span>Progress</span><span>Templates</span><span>Exercises</span></div>
+    </div>
+  </div>
+
+  <!-- B -->
+  <div class="col">
+    <p class="cap">B · Welcome, three choice rows (chosen)</p>
+    <p class="capnote">Smaller header (mascot beside the greeting), then three full-width rows with icons, the same weight in size. Start a workout is filled pink so it still leads. More scannable; less of a "card".</p>
+    <div class="phone">
+      <div class="hdr"><h2>Log a workout</h2><span class="icon-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></div>
+      <div class="card">
+        <div class="b-head">
+          <div class="mascot mascot-lg"><img src="../../public/icon-512.png" alt=""></div>
+          <div><p class="w-title">Welcome to RepBunny</p><p class="w-copy">How do you want to start?</p></div>
+        </div>
+        <div class="b-list">
+          <div class="choice primary tap" data-tap="1">
+            <span class="c-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 5v14l11-7z"/></svg></span>
+            <span><span class="row-title">Start a workout</span><br><span class="row-sub">Pick exercises as you go</span></span>
+            <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="choice">
+            <span class="c-ico lav"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4h6M8 4h8v3H8zM6 6h12v14H6z"/><path d="M9 12h6M9 16h4"/></svg></span>
+            <span><span class="row-title">Build a template</span><br><span class="row-sub">Plan a workout you'll repeat</span></span>
+            <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <p class="b-label">Not sure what to train?</p>
+          <div class="choice">
+            <span class="c-ico gold"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></span>
+            <span><span class="row-title">Start from a program</span><br><span class="row-sub">Ready-made plans for 3 to 6 days a week</span></span>
+            <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="nav"><span class="on">Home</span><span>Progress</span><span>Templates</span><span>Exercises</span></div>
+    </div>
+  </div>
+
+  <!-- Start a workout -->
+  <div class="col">
+    <p class="cap">Start a workout: the Add exercise sheet</p>
+    <p class="capnote">Starts a Freeform workout with the sheet already open. The odd "All your exercises are already in this workout" line becomes a friendly hint. The library list and <b>+ New exercise</b> are the existing ones. Tapping <b>+ Add</b> closes the sheet on that exercise, ready for <b>Log set</b> (tap 3).</p>
+    <div class="phone">
+      <div class="whdr"><h2>Freeform workout</h2><span class="elapsed">0:04</span><span class="icon-btn">+</span><span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></div>
+      <div class="scrim"></div>
+      <div class="sheet" style="height: 680px;">
+        <div class="handle"></div>
+        <div class="sheet-h"><h3>Add exercise</h3><span class="icon-btn" style="width:30px;height:30px">✕</span></div>
+        <div class="search">Search exercises</div>
+        <div class="chips"><span class="chip sel">All</span><span class="chip"><span class="dot" style="background:#f2879c"></span>Chest</span><span class="chip"><span class="dot" style="background:#b79cf0"></span>Back</span><span class="chip"><span class="dot" style="background:#f2c069"></span>Legs</span><span class="chip"><span class="dot" style="background:#a9cb8d"></span>Shoulders</span></div>
+        <p class="hint"><span class="mascot mascot-sm"><img src="../../public/icon-512.png" alt=""></span>Pick your first exercise from the library, or make your own.</p>
+        <div class="new-ex">+ New exercise</div>
+        <p class="sec">From the library</p>
+        <div class="lib"><span class="badge" style="background:color-mix(in srgb,#b79cf0 18%,transparent);color:#b79cf0">BK</span><span><span class="lib-name">Barbell Row</span><br><span class="lib-sub">Back · Barbell</span></span><span class="add">+ Add</span></div>
+        <div class="lib"><span class="badge" style="background:color-mix(in srgb,#f2879c 18%,transparent);color:#f2879c">CH</span><span><span class="lib-name">Bench Press</span><br><span class="lib-sub">Chest · Barbell</span></span><span class="add tap" data-tap="2">+ Add</span></div>
+        <div class="lib"><span class="badge" style="background:color-mix(in srgb,#f2c069 18%,transparent);color:#f2c069">LG</span><span><span class="lib-name">Bulgarian Split Squat</span><br><span class="lib-sub">Legs · Dumbbell</span></span><span class="add">+ Add</span></div>
+        <div class="lib"><span class="badge" style="background:color-mix(in srgb,#f4a07a 18%,transparent);color:#f4a07a">CA</span><span><span class="lib-name">Cable Crossover</span><br><span class="lib-sub">Chest · Cable</span></span><span class="add">+ Add</span></div>
+        <div class="lib"><span class="badge" style="background:color-mix(in srgb,#f2c069 18%,transparent);color:#f2c069">LG</span><span><span class="lib-name">Deadlift</span><br><span class="lib-sub">Legs · Barbell</span></span><span class="add">+ Add</span></div>
+        <div class="lib"><span class="badge" style="background:color-mix(in srgb,#a9cb8d 18%,transparent);color:#a9cb8d">SH</span><span><span class="lib-name">Dumbbell Shoulder Press</span><br><span class="lib-sub">Shoulders · Dumbbell</span></span><span class="add">+ Add</span></div>
+        <div class="fade"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Build a template -->
+  <div class="col">
+    <p class="cap">Build a template: name it, then add</p>
+    <p class="capnote">Opens the existing "New template" name sheet right over Home (no tab jump). <b>Next</b> goes to the template editor with the same Add exercise sheet open, which already lists the library and + New exercise, so zero exercises is fine. Past the free limit, the Premium sheet opens as it does today.</p>
+    <div class="phone">
+      <div class="hdr"><h2>Log a workout</h2><span class="icon-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></div>
+      <div class="card welcome" style="opacity:.6">
+        <div class="mascot mascot-lg"><img src="../../public/icon-512.png" alt=""></div>
+        <p class="w-title">Welcome to RepBunny</p>
+      </div>
+      <div class="scrim"></div>
+      <div class="card" style="position:absolute;left:16px;right:16px;bottom:100px;">
+        <h3 style="margin:0 0 12px;font-family:'Baloo 2',sans-serif;font-size:1.2rem">New template</h3>
+        <label class="f">Name</label>
+        <div class="input" style="color:var(--text-dim)">e.g. Push Day</div>
+        <div class="so-actions"><span class="btn btn-accent">Next</span><span class="btn ghost">Cancel</span></div>
+      </div>
+      <div class="nav"><span class="on">Home</span><span>Progress</span><span>Templates</span><span>Exercises</span></div>
+    </div>
+  </div>
+
+  <!-- Programs -->
+  <div class="col">
+    <p class="cap">Start from a program</p>
+    <p class="capnote">Goes to the Templates tab, scrolled to <b>Starter programs</b> (the top program glows briefly). Tap one to see its week and lifts, then add it. Programs turn free for everyone in #209; until that ships, the PWA already has them, and a free native user sees the usual Premium preview only after opening a program, never on the first tap.</p>
+    <div class="phone">
+      <div class="hdr"><h2>Templates</h2><span class="icon-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></div>
+      <div class="add-tpl">+ Add template</div>
+      <p class="muted-c">0 of 3 free templates</p>
+      <p class="muted-c" style="font-size:.86rem">No templates yet. Add one above, or start from a program below.</p>
+      <p class="st-title">Starter programs</p>
+      <p class="row-sub" style="margin:2px 0 0">Optional starting points. Add one, then change anything.</p>
+      <p class="grp">Machines</p>
+      <div class="prow glow"><span><span class="row-title">Machine push / pull / legs</span><br><span class="row-sub">3 days a week · 3 templates</span></span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="prow"><span><span class="row-title">Machine 6-day split</span><br><span class="row-sub">6 days a week · 5 templates</span></span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <p class="grp">Free weights</p>
+      <div class="prow"><span><span class="row-title">Beginner full body</span><br><span class="row-sub">3 days a week · 2 templates</span></span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="prow"><span><span class="row-title">Upper / lower</span><br><span class="row-sub">4 days a week · 2 templates</span></span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="nav"><span>Home</span><span>Progress</span><span class="on">Templates</span><span>Exercises</span></div>
+    </div>
+  </div>
+
+  <!-- Save offer -->
+  <div class="col">
+    <p class="cap">After the first freeform workout</p>
+    <p class="capnote">Replaces Home's old "Create a template" hint. Shows in the finish recap after a <b>freeform</b> workout while you have <b>no templates</b>. The name is prefilled from the muscle groups trained: all chest/shoulders <b>Upper body push</b>, all back <b>Upper body pull</b>, other upper <b>Upper body</b>, legs/glutes <b>Lower body</b>, <b>Core</b>, <b>Cardio</b>, a mix <b>Full body</b>, unknown the date. Arms go with push or pull. History's Save as template uses the same name. <b>Not now</b> hides it for good on this device.</p>
+    <div class="phone">
+      <p class="eyebrow">Workout saved</p>
+      <p class="recap-title">Freeform workout</p>
+      <p class="recap-meta">Thu, Oct 9 · 38 min · 3 exercises</p>
+      <div class="card save-offer">
+        <div class="so-top"><span class="mascot mascot-sm"><img src="../../public/icon-512.png" alt=""></span><div><p class="so-title">Do this again?</p><p class="so-copy">Save it as a template and start it with one tap next time.</p></div></div>
+        <label class="f">Template name</label>
+        <div class="input">Full body</div>
+        <div class="so-actions"><span class="btn btn-accent">Save as template</span><span class="btn ghost">Not now</span></div>
+      </div>
+      <div class="tiles" style="margin-top:12px">
+        <div class="tile"><div class="tile-l">Sets</div><div class="tile-v">9</div></div>
+        <div class="tile"><div class="tile-l">Volume</div><div class="tile-v">6,840 lb</div></div>
+      </div>
+      <div class="card">
+        <p class="sec">All new today</p>
+        <div class="list-row"><span>Bench Press</span><span style="color:var(--text-dim)">3 × 8 · 135 lb</span></div>
+        <div class="list-row"><span>Barbell Row</span><span style="color:var(--text-dim)">3 × 10 · 95 lb</span></div>
+        <div class="list-row" style="border:0"><span>Bulgarian Split Squat</span><span style="color:var(--text-dim)">3 × 10 · 25 kg</span></div>
+      </div>
+      <span class="btn btn-accent done">Done</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

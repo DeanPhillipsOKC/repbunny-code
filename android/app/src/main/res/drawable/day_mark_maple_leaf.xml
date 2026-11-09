@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Issue #144: Autumn's maple leaf (style.css, decor-maple-leaf). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M12,13.6V21.8"
+        android:strokeColor="#c45a35"
+        android:strokeWidth="1.4"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M12,0.9L13.5,3.9L15.3,3.1L14.7,7.6L17.3,5.5L18.1,7.1L21.8,5.9L20.4,9.7L22.6,10.8L17.7,13.4L18.6,15.8L12.7,14.5L11.3,14.5L5.4,15.8L6.3,13.4L1.4,10.8L3.6,9.7L2.2,5.9L5.9,7.1L6.7,5.5L9.3,7.6L8.7,3.1L10.5,3.9Z"
+        android:strokeWidth="0.8"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="12" android:startY="0.9" android:endX="12" android:endY="15.8">
+                <item android:offset="0" android:color="#f5c14b" />
+                <item android:offset="1" android:color="#d9663f" />
+            </gradient>
+        </aapt:attr>
+        <aapt:attr name="android:strokeColor">
+            <gradient android:type="linear" android:startX="12" android:startY="0.9" android:endX="12" android:endY="15.8">
+                <item android:offset="0" android:color="#f5c14b" />
+                <item android:offset="1" android:color="#d9663f" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:pathData="M12,4.4V13.4"
+        android:strokeAlpha="0.85"
+        android:strokeColor="#fbe2a4"
+        android:strokeWidth="0.9"
+        android:strokeLineCap="round" />
+</vector>

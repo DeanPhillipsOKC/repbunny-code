@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Issue #430: Auto Backup (Android 11 and older) keeps everything except
+     the restore points database, which would push a long-time user past the
+     25 MB cap (#117). The app's own database, repbunnySQLite.db, stays in.
+     Android 12 and newer read data_extraction_rules.xml instead; keep the
+     two in step. -->
+<full-backup-content>
+    <exclude domain="database" path="repbunny-restore-pointsSQLite.db" />
+    <exclude domain="database" path="repbunny-restore-pointsSQLite.db-journal" />
+    <exclude domain="database" path="repbunny-restore-pointsSQLite.db-wal" />
+    <exclude domain="database" path="repbunny-restore-pointsSQLite.db-shm" />
+    <!-- Issue #639: the SQLite plugin's secrets file is locked with an
+         Android Keystore key, which a backup never carries, so a restored
+         copy can't be read. The app doesn't use it (encryption is off). -->
+    <exclude domain="sharedpref" path="sqlite_encrypted_shared_prefs.xml" />
+</full-backup-content>

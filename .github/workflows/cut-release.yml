@@ -1,0 +1,109 @@
+# Cuts a store release from the phone (#219): tags main's HEAD as the next store/vX.Y.Z and
+# starts the tester builds. Run it from the GitHub app (Actions > Cut release > Run workflow).
+# Only the owner starts it, here or by typing /release in a Claude session (#221,
+# .claude/skills/release/SKILL.md); agents never cut releases on their own. See
+# docs/architecture.md > Native apps > Releasing.
+name: Cut release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Which part of the version to bump
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+      version:
+        description: Or an exact version (e.g. 1.2.0), which overrides the bump
+        type: string
+        required: false
+      # #857: the store builds' default home-screen icon. A seasonal one is silent on both
+      # platforms, unlike an in-app switch. It's written into the tag's annotation, and both store
+      # builds apply it with scripts/apply-default-icon.mjs. Every release sets it, so pick the
+      # season's icon each time (schedule: docs/architecture/native-releases.md > Releasing).
+      default_icon:
+        description: Default app icon for this release's store builds
+        type: choice
+        options: [classic, season-autumn, season-halloween, season-snow-globe, season-christmas]
+        default: classic
+
+concurrency:
+  group: cut-release
+  cancel-in-progress: false
+
+jobs:
+  # #677: a clean full e2e run on a hosted runner gates every store release. It tests the exact
+  # commit this run would tag, and a red run means no tag and no tester builds. The report is
+  # attached to the failed run.
+  e2e:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/e2e.yml
+    with:
+      ref: ${{ github.sha }}
+
+  tag:
+    needs: e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.next.outputs.tag }}
+    steps:
+      - name: Check the branch
+        if: github.ref != 'refs/heads/main'
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          echo "Run Cut release on main, not ${REF_NAME}." >&2
+          exit 1
+
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Pick the version
+        id: next
+        run: echo "tag=$(node scripts/next-store-version.mjs --bump "$BUMP" --version "$VERSION")" >> "$GITHUB_OUTPUT"
+        env:
+          BUMP: ${{ inputs.bump }}
+          VERSION: ${{ inputs.version }}
+
+      # A tag pushed with GITHUB_TOKEN doesn't start other workflows, so the Play job below calls
+      # release-play.yml directly. Codemagic still starts from the tag through its GitHub webhook.
+      # An annotated tag, so the default icon (#857) travels with it to Codemagic too.
+      - name: Tag main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" "$GITHUB_SHA" -m "RepBunny $TAG" -m "default_icon: $DEFAULT_ICON"
+          git push origin "refs/tags/$TAG"
+          echo "Tagged $GITHUB_SHA as $TAG (default icon: $DEFAULT_ICON)." >> "$GITHUB_STEP_SUMMARY"
+        env:
+          TAG: ${{ steps.next.outputs.tag }}
+          DEFAULT_ICON: ${{ inputs.default_icon || 'classic' }}
+
+  play:
+    needs: tag
+    permissions:
+      contents: read
+      issues: read # release-play.yml's testing email lists verify:iphone issues
+    uses: ./.github/workflows/release-play.yml
+    with:
+      tag: ${{ needs.tag.outputs.tag }}
+    # Only the secrets release-play.yml reads, not `inherit` (least privilege, #678).
+    secrets:
+      ANDROID_STORE_KEYSTORE_BASE64: ${{ secrets.ANDROID_STORE_KEYSTORE_BASE64 }}
+      ANDROID_STORE_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_STORE_KEYSTORE_PASSWORD }}
+      VITE_VAPID_PUBLIC_KEY: ${{ secrets.VITE_VAPID_PUBLIC_KEY }}
+      PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+      GMAIL_SENDER_ADDRESS: ${{ secrets.GMAIL_SENDER_ADDRESS }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      RELEASE_EMAIL_RECIPIENTS: ${{ secrets.RELEASE_EMAIL_RECIPIENTS }}
+      BUILDER_APP_ID: ${{ secrets.BUILDER_APP_ID }}
+      BUILDER_APP_KEY: ${{ secrets.BUILDER_APP_KEY }}

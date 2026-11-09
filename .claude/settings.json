@@ -1,0 +1,47 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "Bash(npm run build)",
+      "Bash(npm run test:e2e)",
+      "Bash(npm run typecheck)",
+      "Bash(npx playwright test *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git log *)",
+      "Bash(git reset --hard HEAD)",
+      "Bash(git push)",
+      "Bash(date *)",
+      "Bash(node scripts/next-issue.mjs *)",
+      "Bash(node scripts/next-issue.mjs)",
+      "Bash(node scripts/run-cost.mjs)",
+      "Bash(node scripts/delivery-metrics.mjs)",
+      "Bash(node scripts/delivery-metrics.mjs *)",
+      "Bash(gh issue view *)",
+      "Bash(gh issue list *)",
+      "Bash(gh issue comment *)",
+      "Bash(gh issue edit *)",
+      "Bash(gh issue close *)",
+      "Bash(gh issue create *)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/cloud-session-start.mjs\"",
+            "timeout": 600
+          }
+        ]
+      }
+    ]
+  }
+}

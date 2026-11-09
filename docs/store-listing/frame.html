@@ -1,0 +1,49 @@
+<!doctype html>
+<!-- One captioned store screenshot (#725, option A of docs/design/issue-725-store-screenshots.html):
+     a caption band on top with one pink word, the app screen below in a dark phone frame that runs
+     off the bottom edge. capture.ts opens it with the screen and the caption in the query string and
+     screenshots it at the store's size, so the layout scales with the window. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: 'Baloo 2'; src: url('../../site/fonts/baloo2-latin.woff2') format('woff2'); font-weight: 400 800; }
+  @font-face { font-family: 'Manrope'; src: url('../../site/fonts/manrope-latin.woff2') format('woff2'); font-weight: 200 800; }
+  * { box-sizing: border-box; margin: 0; }
+  /* 1vw is 1% of the canvas width, so every store size keeps the same proportions. */
+  html, body { width: 100vw; height: 100vh; }
+  body {
+    position: relative; overflow: hidden; font-family: 'Manrope', sans-serif; color: #f5edf2;
+    display: flex; flex-direction: column; align-items: center;
+    background:
+      radial-gradient(70vw 55vw at 88% 4%, rgba(242,135,156,.30), transparent 70%),
+      radial-gradient(70vw 62vw at 0% 100%, rgba(183,156,240,.22), transparent 70%),
+      #17111c;
+  }
+  .cap { padding: 9.5vw 7vw 0; text-align: center; }
+  h1 { font: 800 8.6vw/1.05 'Baloo 2', sans-serif; letter-spacing: -.08vw; }
+  h1 span { color: #f2879c; }
+  p { margin-top: 2.2vw; font-size: 3.9vw; font-weight: 600; color: #cdbfca; }
+  .screen { flex: 1; width: 81vw; margin-top: 7vw; margin-bottom: -9vw; padding: 1.7vw; border-radius: 9.5vw; background: #0d0910; border: .55vw solid #4a3a56; box-shadow: 0 6.5vw 14vw -4.5vw rgba(0,0,0,.8); }
+  .screen img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 7.8vw; display: block; }
+</style>
+</head>
+<body>
+  <div class="cap"><h1></h1><p></p></div>
+  <div class="screen"><img alt=""></div>
+  <script>
+    // ?img=<file URL>&title=<text with *one pink phrase*>&sub=<subcaption>
+    const q = new URLSearchParams(location.search)
+    const [before, accent, after] = (q.get('title') ?? '').split('*')
+    const h1 = document.querySelector('h1')
+    h1.append(before ?? '')
+    if (accent) {
+      const span = document.createElement('span')
+      span.textContent = accent
+      h1.append(span, after ?? '')
+    }
+    document.querySelector('p').textContent = q.get('sub') ?? ''
+    document.querySelector('img').src = q.get('img') ?? ''
+  </script>
+</body>
+</html>

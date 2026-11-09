@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Issue 874: automatic copy on by default</title>
+<style>
+  @font-face { font-family: 'Baloo 2'; font-weight: 500 800; src: url(../../public/fonts/baloo2-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 400 800; src: url(../../public/fonts/manrope-latin.woff2) format('woff2'); }
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40; --text: #f5edf2; --text-dim: #b9a8c2;
+    --accent: #f2879c; --accent-text: #241a2c; --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --danger: #e0687a;
+    --radius: 12px; --font-display: 'Baloo 2', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px; background: #0d0a10; color: var(--text); font-family: Manrope, system-ui, sans-serif; }
+  h1 { font-family: var(--font-display); margin: 0 0 4px; }
+  .note { color: var(--text-dim); margin: 0 0 20px; max-width: 1200px; font-size: 14px; }
+  .row { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
+  .board { width: 375px; }
+  .board > h2 { font-size: 13px; color: var(--text-dim); font-weight: 700; margin: 0 0 8px; letter-spacing: .02em; }
+  .phone { width: 375px; height: 760px; border-radius: 32px; overflow: hidden; background: var(--bg); border: 1px solid var(--border); position: relative; display: flex; flex-direction: column; }
+  .screen { flex: 1; display: flex; flex-direction: column; padding: 46px 20px 24px; }
+  .top { display: flex; align-items: center; justify-content: space-between; }
+  .back { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; color: var(--text-dim); }
+  .dots { display: flex; gap: 6px; } .dots i { width: 8px; height: 8px; border-radius: 4px; background: var(--border); } .dots i.on { width: 22px; background: var(--accent); } .dots i.done { background: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+  .skip { color: var(--text-dim); font-weight: 700; font-size: 14px; }
+  .step { margin: 18px 0 4px; color: var(--text-dim); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .title { font-family: var(--font-display); font-size: 28px; line-height: 1.1; margin: 0 0 8px; }
+  .lede { margin: 0 0 16px; font-size: 15px; line-height: 1.45; }
+  .lede b { color: var(--text); }
+  .folder { display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: 16px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--success) 45%, transparent); }
+  .folder.local { border-color: color-mix(in srgb, var(--highlight) 45%, transparent); }
+  .ficon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); flex-shrink: 0; }
+  .local .ficon { background: color-mix(in srgb, var(--highlight) 18%, transparent); color: var(--highlight); }
+  .fname { font-weight: 800; font-size: 15px; }
+  .fcap { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+  .facts { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--text-dim); }
+  .facts li { display: flex; gap: 10px; } .facts .tick { color: var(--success); font-weight: 800; }
+  .warn { margin-top: 14px; font-size: 13.5px; line-height: 1.45; padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--highlight) 10%, var(--surface)); color: var(--text); }
+  .quiet { display: flex; justify-content: center; gap: 22px; margin-top: 14px; }
+  .quiet span { color: var(--accent); font-weight: 800; font-size: 14px; padding: 12px 0; }
+  .spacer { flex: 1; }
+  .cta { height: 54px; border-radius: 16px; background: var(--accent); color: var(--accent-text); font-weight: 800; font-size: 16px; display: grid; place-items: center; }
+  .ghost { height: 48px; display: grid; place-items: center; color: var(--text-dim); font-weight: 700; }
+  .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.55); display: flex; align-items: center; padding: 20px; }
+  .dialog { background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .dialog h3 { font-family: var(--font-display); font-size: 22px; margin: 0; line-height: 1.15; }
+  .dialog p { margin: 0; font-size: 14.5px; line-height: 1.45; color: var(--text-dim); }
+  .btn { height: 50px; border-radius: 14px; display: grid; place-items: center; font-weight: 800; }
+  .btn.acc { background: var(--accent); color: var(--accent-text); }
+  .btn.q { background: var(--surface); border: 1px solid var(--border); color: var(--danger); }
+  .welcome { background: radial-gradient(120% 60% at 50% 10%, color-mix(in srgb, var(--secondary) 16%, var(--bg)) 0%, var(--bg) 62%); align-items: stretch; }
+  .hello { text-align: center; padding-top: 30px; }
+  .bunny { width: 120px; height: 120px; margin: 0 auto; border-radius: 60px; background: color-mix(in srgb, var(--accent) 25%, var(--surface)); }
+  .wordmark { font-family: var(--font-display); font-size: 40px; margin: 10px 0 0; color: var(--accent); }
+  .tagline { margin: 0; color: var(--text-dim); }
+  .found { margin-top: 24px; padding: 16px; border-radius: 20px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--secondary) 45%, transparent); display: flex; flex-direction: column; gap: 10px; }
+  .found h3 { font-family: var(--font-display); font-size: 21px; margin: 0; line-height: 1.15; }
+  .found p { margin: 0; font-size: 14px; color: var(--text-dim); line-height: 1.4; }
+  .link { text-align: center; color: var(--accent); font-weight: 800; font-size: 14px; padding: 12px 0 0; }
+  .sheetwrap { position: absolute; inset: 0; background: rgba(0,0,0,.5); display: flex; align-items: flex-end; }
+  .sheet { width: 100%; background: var(--bg); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 10px 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .handle { align-self: center; width: 36px; height: 4px; border-radius: 2px; background: var(--border); }
+  .sh { display: flex; align-items: center; gap: 10px; }
+  .sh .t { flex: 1; font-family: var(--font-display); font-size: 21px; font-weight: 700; }
+  .ib { width: 44px; height: 44px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); }
+  .slede { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--text-dim); }
+  .slede b { color: var(--text); }
+  .points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .point { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .point .pt { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .point b { font-size: 15px; } .point span { font-size: 13px; color: var(--text-dim); }
+  .chev { color: var(--text-dim); font-size: 20px; }
+  .status { padding: 12px 14px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--success) 45%, transparent); border-radius: var(--radius); display: flex; flex-direction: column; gap: 4px; }
+  .status b { font-size: 15px; } .status span { font-size: 13px; color: var(--text-dim); }
+  .act { min-height: 48px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; background: var(--surface); border: 1px solid var(--border); }
+  .act.acc { background: var(--accent); color: var(--accent-text); border: none; }
+  .bg-list { padding: 46px 16px; display: flex; flex-direction: column; gap: 8px; opacity: .5; }
+  .bg-list div { height: 60px; border-radius: 12px; background: var(--surface); }
+</style>
+</head>
+<body>
+<h1>Issue 874: automatic copy on by default</h1>
+<p class="note">One option, since the issue fixes the layout. A new setup step (local mode only, so 4 steps on the phone and 3 in the PWA) tells the person where the copy goes. No decision is needed: Next moves on. The quiet links change the folder or turn the copy off behind an honest warning. A new install that finds copies offers them on the welcome screen. Account › Your data gets a Your copies list next to Automatic copy, built like Restore points. The after-workout offer on the finish recap is gone.</p>
+
+<div class="row">
+  <div class="board">
+    <h2>A · Setup step, iPhone with iCloud</h2>
+    <div class="phone"><div class="screen">
+      <div class="top"><span class="back">‹</span><span class="dots"><i class="done"></i><i class="done"></i><i class="on"></i><i></i></span><span class="skip">Skip</span></div>
+      <p class="step">Step 3 of 4</p>
+      <h2 class="title">Your workouts, kept safe</h2>
+      <p class="lede">RepBunny saves a copy of your workouts to <b>iCloud Drive › RepBunny</b> after every workout, so a lost phone doesn't mean lost workouts.</p>
+      <div class="folder"><span class="ficon">☁</span><span><div class="fname">iCloud Drive › RepBunny</div><div class="fcap">Safe even if you lose this phone</div></span></div>
+      <ul class="facts">
+        <li><span class="tick">✓</span>Nothing to set up. It just happens.</li>
+        <li><span class="tick">✓</span>It goes to your own storage, never to us.</li>
+        <li><span class="tick">✓</span>On a new phone, RepBunny finds it for you.</li>
+      </ul>
+      <div class="quiet"><span>Change folder</span><span>Don't keep a copy</span></div>
+      <div class="spacer"></div>
+      <div class="cta">Next</div>
+    </div></div>
+  </div>
+
+  <div class="board">
+    <h2>B · Setup step, Android (phone-only default)</h2>
+    <div class="phone"><div class="screen">
+      <div class="top"><span class="back">‹</span><span class="dots"><i class="done"></i><i class="done"></i><i class="on"></i><i></i></span><span class="skip">Skip</span></div>
+      <p class="step">Step 3 of 4</p>
+      <h2 class="title">Your workouts, kept safe</h2>
+      <p class="lede">RepBunny saves a copy of your workouts to <b>Documents › RepBunny</b> after every workout, so a lost phone doesn't mean lost workouts.</p>
+      <div class="folder local"><span class="ficon">▣</span><span><div class="fname">Documents › RepBunny</div><div class="fcap">On this phone. Survives deleting the app</div></span></div>
+      <p class="warn">This copy stays on this phone. Pick a cloud folder in Account › Your data to protect against losing it.</p>
+      <div class="quiet"><span>Change folder</span><span>Don't keep a copy</span></div>
+      <div class="spacer"></div>
+      <div class="cta">Next</div>
+    </div></div>
+  </div>
+
+  <div class="board">
+    <h2>C · Don't keep a copy (confirm)</h2>
+    <div class="phone"><div class="screen" style="opacity:.35">
+      <p class="step">Step 3 of 4</p>
+      <h2 class="title">Your workouts, kept safe</h2>
+    </div>
+      <div class="scrim"><div class="dialog" role="dialog">
+        <h3>Turn off the copy?</h3>
+        <p>Everything is stored only on this phone. If it's lost, reset, or the app is deleted, your workouts are gone for good, and we can't get them back.</p>
+        <div class="btn acc">Keep a copy</div>
+        <div class="btn q">Turn it off</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="row" style="margin-top:28px">
+  <div class="board">
+    <h2>D · Welcome on a new iPhone install, copies found</h2>
+    <div class="phone"><div class="screen welcome">
+      <div class="hello"><div class="bunny"></div><div class="wordmark">RepBunny</div><p class="tagline">Small wins. Stronger every set.</p></div>
+      <div class="found">
+        <h3>Restore your workouts from Oct 26, 2026?</h3>
+        <p>RepBunny found your copy in iCloud Drive › RepBunny. 142 workouts.</p>
+        <div class="btn acc">Restore my workouts</div>
+        <div class="link" style="padding:4px 0 0">See all copies</div>
+      </div>
+      <div class="spacer"></div>
+      <div class="cta">Set up in 30 seconds</div>
+      <div class="ghost">Skip setup</div>
+    </div></div>
+  </div>
+
+  <div class="board">
+    <h2>E · Welcome on Android: Find my copies</h2>
+    <div class="phone"><div class="screen welcome">
+      <div class="hello"><div class="bunny"></div><div class="wordmark">RepBunny</div><p class="tagline">Small wins. Stronger every set.</p></div>
+      <div class="spacer"></div>
+      <div class="cta">Set up in 30 seconds</div>
+      <div class="ghost">Skip setup</div>
+      <div class="link">Had RepBunny before? Find my copies</div>
+      <div class="link" style="padding-top:2px">Restoring from a backup?</div>
+    </div></div>
+  </div>
+
+  <div class="board">
+    <h2>F · Account › Your data › Your copies</h2>
+    <div class="phone">
+      <div class="bg-list"><div></div><div></div><div></div><div></div></div>
+      <div class="sheetwrap"><div class="sheet">
+        <div class="handle"></div>
+        <div class="sh"><span class="ib">‹</span><span class="t">Your copies</span><span class="ib">✕</span></div>
+        <p class="slede">Saved to <b>iCloud Drive › RepBunny</b> after every workout, plus one a week. Pick one to see what's in it before anything changes.</p>
+        <ul class="points">
+          <li class="point"><span class="pt"><b>Latest copy</b><span>Oct 26, 2026 · 6:42 PM · 142 workouts</span></span><span class="chev">›</span></li>
+          <li class="point"><span class="pt"><b>Weekly copy</b><span>Oct 21, 2026 · 140 workouts</span></span><span class="chev">›</span></li>
+          <li class="point"><span class="pt"><b>Weekly copy</b><span>Oct 14, 2026 · 137 workouts</span></span><span class="chev">›</span></li>
+          <li class="point"><span class="pt"><b>Weekly copy</b><span>Oct 7, 2026 · 133 workouts</span></span><span class="chev">›</span></li>
+          <li class="point"><span class="pt"><b>Kept copy</b><span>Sep 30, 2026 · 130 workouts</span></span><span class="chev">›</span></li>
+        </ul>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="board">
+    <h2>G · Automatic copy sheet (on by default)</h2>
+    <div class="phone">
+      <div class="bg-list"><div></div><div></div><div></div></div>
+      <div class="sheetwrap"><div class="sheet">
+        <div class="handle"></div>
+        <div class="sh"><span class="ib">‹</span><span class="t">Automatic copy</span><span class="ib">✕</span></div>
+        <p class="slede">After every workout RepBunny saves a copy of your data, plus a dated copy once a week (it keeps the last 4). It goes to your own storage, never to us.</p>
+        <div class="status"><b>Saving to iCloud Drive › RepBunny, last saved today at 6:42 PM</b><span>Safe even if you lose this phone.</span></div>
+        <div class="act acc">Change folder</div>
+        <div class="act">Save a copy now</div>
+        <div class="act" style="color:var(--danger)">Turn it off</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

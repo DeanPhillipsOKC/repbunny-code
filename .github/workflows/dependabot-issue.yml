@@ -1,0 +1,130 @@
+# Files one backlog issue per Dependabot PR (#258) so a lane run, which only ever picks issues,
+# gates and merges it. Minor/patch groups are effort 1 and eligible at once; a major (any
+# "from X to Y" bump whose major number changes) is effort 3 and `status:needs-review` so the
+# owner reads the changelog line first. docs/architecture.md > Dependency updates.
+#
+# `pull_request_target` gives Dependabot's run a token that can write issues. The job checks out
+# only `main` (for the backlog-token action, pinned with `ref:` rather than left to the event's
+# default) and never the PR's code; the PR title and branch are only read as data through env, never
+# put into a `run:` line with `${{ }}`. Both jobs also require a same-repo head: Dependabot's
+# branches live in this repo, so a fork PR (#945), even one titled like a bump, never gets the
+# Builder's secrets. Issues go to the backlog repo (#944); once that's another repo, the
+# Builder app's secrets must also be Dependabot secrets, since Dependabot's runs only get those.
+name: Dependabot issue
+
+on:
+  pull_request_target:
+    types: [opened, closed]
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  BACKLOG_REPO: ${{ vars.BACKLOG_REPO || 'DeanPhillipsOKC/repbunny' }}
+
+jobs:
+  file:
+    if: >-
+      github.event.action == 'opened' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Token for the backlog repo
+        id: backlog
+        uses: ./.github/actions/backlog-token
+        with:
+          backlog-repo: ${{ env.BACKLOG_REPO }}
+          github-token: ${{ github.token }}
+          builder-app-id: ${{ secrets.BUILDER_APP_ID }}
+          builder-app-key: ${{ secrets.BUILDER_APP_KEY }}
+      - name: File the backlog issue
+        env:
+          GH_TOKEN: ${{ steps.backlog.outputs.token }}
+          GH_REPO: ${{ env.BACKLOG_REPO }}
+          PR: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          title="Gate and merge Dependabot PR #$PR"
+          if gh issue list --state all --search "\"$title\" in:title" --json title --jq '.[].title' | grep -qxF "$title"; then
+            echo "Issue for PR #$PR already exists."
+            exit 0
+          fi
+
+          major=false
+          if [[ "$PR_TITLE" =~ from\ v?([0-9]+)[^\ ]*\ to\ v?([0-9]+) && "${BASH_REMATCH[1]}" != "${BASH_REMATCH[2]}" ]]; then
+            major=true
+          fi
+
+          labels=(--label tooling --label value:2)
+          if [ "$major" = true ]; then
+            labels+=(--label effort:3 --label status:needs-review)
+            kind="A major bump. Read the changelog line first; remove \`status:needs-review\` to release it to the runner."
+          else
+            labels+=(--label effort:1)
+            kind="A minor/patch update."
+          fi
+
+          cat > body.md <<BODY
+          Dependabot opened $PR_URL (\`$PR_BRANCH\`): $PR_TITLE
+
+          $kind
+
+          ## What to do
+          Branch mode only. Check out the PR's head branch, run \`npm run build\` and the full \`npm run test:e2e\` (plus the native build check if the PR touches \`android/\` or Capacitor), and:
+          - **Green:** squash-merge the PR into \`main\` (match the head sha), then close this issue.
+          - **Red, and the fix is in the PR's own lines:** push nothing to Dependabot's branch. Comment the failing spec and close the PR, and file a normal backlog issue for the code change the bump needs.
+          - **Red after 4 attempts:** label this issue \`status:blocked\` with the failing spec.
+
+          See docs/architecture.md > Dependency updates.
+
+          Filed automatically by .github/workflows/dependabot-issue.yml.
+          BODY
+          gh issue create --title "$title" --body-file body.md "${labels[@]}"
+
+  close-orphan:
+    # A PR closed without merging (superseded, ignored, or closed by the owner) leaves its
+    # "Gate and merge" issue orphaned; close it so no lane gates a PR that no longer exists (#544).
+    if: >-
+      github.event.action == 'closed' &&
+      !github.event.pull_request.merged &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Token for the backlog repo
+        id: backlog
+        uses: ./.github/actions/backlog-token
+        with:
+          backlog-repo: ${{ env.BACKLOG_REPO }}
+          github-token: ${{ github.token }}
+          builder-app-id: ${{ secrets.BUILDER_APP_ID }}
+          builder-app-key: ${{ secrets.BUILDER_APP_KEY }}
+      - name: Close the backlog issue
+        env:
+          GH_TOKEN: ${{ steps.backlog.outputs.token }}
+          GH_REPO: ${{ env.BACKLOG_REPO }}
+          PR: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          title="Gate and merge Dependabot PR #$PR"
+          n=$(gh api "repos/$GH_REPO/issues?state=open&per_page=100" --jq ".[] | select(.pull_request == null and .title == \"$title\") | .number" | head -n1)
+          if [ -z "$n" ]; then
+            echo "No open issue for PR #$PR."
+            exit 0
+          fi
+          gh api -X POST "repos/$GH_REPO/issues/$n/comments" -f body="$PR_URL closed without merging, so there is nothing left to gate. Closing as not planned. (.github/workflows/dependabot-issue.yml)"
+          gh api -X PATCH "repos/$GH_REPO/issues/$n" -f state=closed -f state_reason=not_planned

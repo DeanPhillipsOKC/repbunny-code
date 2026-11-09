@@ -1,0 +1,99 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace = "app.repbunny"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "app.repbunny"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        // Release scripts pass these; local and debug builds use the defaults.
+        versionCode((project.findProperty('versionCode') ?: '1') as int)
+        versionName((project.findProperty('versionName') ?: '1.0') as String)
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    // Personal signing key, from the environment only (scripts/Release-PersonalAndroid.ps1
+    // loads it from .env.local). Without it, personal release builds come out unsigned.
+    def personalKeystore = System.getenv('ANDROID_PERSONAL_KEYSTORE')
+    // Play upload key (#196), the same way (scripts/Build-StoreAndroid.ps1). Play App Signing
+    // re-signs with Google's key; without this, store release builds come out unsigned.
+    def storeKeystore = System.getenv('ANDROID_STORE_KEYSTORE')
+    signingConfigs {
+        if (storeKeystore) {
+            upload {
+                storeFile file(storeKeystore)
+                storePassword System.getenv('ANDROID_STORE_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_STORE_KEY_ALIAS')
+                keyPassword System.getenv('ANDROID_STORE_KEY_PASSWORD')
+            }
+        }
+        if (personalKeystore) {
+            personal {
+                storeFile file(personalKeystore)
+                storePassword System.getenv('ANDROID_PERSONAL_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_PERSONAL_KEY_ALIAS')
+                keyPassword System.getenv('ANDROID_PERSONAL_KEY_PASSWORD')
+            }
+        }
+    }
+    // store: the App Store / Play Store app. personal: the owner's sideloaded
+    // Obtainium build (#68), with its own app ID so the two install side by side.
+    // Its name and DEV-badged icons live in src/personal/res. Debug builds of
+    // either flavor keep the debug key.
+    flavorDimensions = ["channel"]
+    productFlavors {
+        store {
+            dimension "channel"
+            if (storeKeystore) {
+                signingConfig signingConfigs.upload
+            }
+        }
+        personal {
+            dimension "channel"
+            applicationIdSuffix ".personal"
+            if (personalKeystore) {
+                signingConfig signingConfigs.personal
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

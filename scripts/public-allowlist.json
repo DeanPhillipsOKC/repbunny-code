@@ -1,0 +1,27 @@
+[
+  {
+    "path": "site/index.html",
+    "rule": "tester-name",
+    "reason": "The About section on repbunny.app, written by the owner, names the people behind the app on purpose (#213)."
+  },
+  {
+    "path": "site/img/about-dean-christa.webp",
+    "rule": "tester-name",
+    "reason": "The About section's photo (#213); its name is already public on repbunny.app."
+  },
+  {
+    "path": "docs/design/art/about-dean-christa.png",
+    "rule": "tester-name",
+    "reason": "Source art for the About section's photo (#213)."
+  },
+  {
+    "path": "docs/architecture/site-and-tools.md",
+    "rule": "tester-name",
+    "reason": "Describes the public About section and names its image files (#213)."
+  },
+  {
+    "path": "scripts/support-evidence.mjs",
+    "rule": "gmail-link",
+    "reason": "The link format the script validates, and a made-up thread id in its self-test (owner@example.test)."
+  }
+]

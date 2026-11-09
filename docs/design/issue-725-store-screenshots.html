@@ -1,0 +1,78 @@
+<!doctype html>
+<!-- Issue #725: caption band for the store screenshots. Each artboard is a 1080x1920 Play
+     screenshot drawn at a third of its size (360x640). The app shots are the site's existing
+     captures, standing in for the fresh ones docs/store-listing/capture.ts takes. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Store screenshot captions</title>
+<style>
+  @font-face { font-family: 'Baloo 2'; src: url('../../site/fonts/baloo2-latin.woff2') format('woff2'); font-weight: 400 800; }
+  @font-face { font-family: 'Manrope'; src: url('../../site/fonts/manrope-latin.woff2') format('woff2'); font-weight: 200 800; }
+  :root { --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --accent: #f2879c; --secondary: #b79cf0; --highlight: #f2c069; --text: #f5edf2; --text-dim: #cdbfca; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0d0a10; color: var(--text); font-family: 'Manrope', sans-serif; padding: 32px; }
+  h1 { font: 800 28px/1.1 'Baloo 2', sans-serif; margin-bottom: 6px; }
+  .intro { color: var(--text-dim); font-size: 14px; margin-bottom: 28px; max-width: 900px; }
+  .option { margin-bottom: 40px; }
+  .option h2 { font: 800 20px/1.2 'Baloo 2', sans-serif; margin-bottom: 4px; }
+  .option p { color: var(--text-dim); font-size: 13px; margin-bottom: 14px; max-width: 900px; }
+  .row { display: flex; gap: 24px; flex-wrap: wrap; }
+
+  .shot { position: relative; width: 360px; height: 640px; overflow: hidden; border-radius: 4px; }
+
+  /* A: caption band on top, the phone screen below in a rounded frame that runs off the bottom. */
+  .a { background: radial-gradient(260px 200px at 85% 8%, rgba(242,135,156,.30), transparent 70%), radial-gradient(240px 220px at 0% 100%, rgba(183,156,240,.22), transparent 70%), var(--bg); }
+  .a .cap { position: absolute; left: 24px; right: 24px; top: 34px; text-align: center; }
+  .a .cap b { display: block; font: 800 31px/1.05 'Baloo 2', sans-serif; letter-spacing: -.3px; }
+  .a .cap b span { color: var(--accent); }
+  .a .cap small { display: block; margin-top: 8px; font-size: 14px; font-weight: 600; color: var(--text-dim); }
+  .a .screen { position: absolute; left: 34px; right: 34px; top: 150px; bottom: -30px; padding: 6px; border-radius: 34px; background: #0d0910; border: 2px solid #4a3a56; box-shadow: 0 24px 50px -16px rgba(0,0,0,.8); }
+  .a .screen img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 28px; display: block; }
+
+  /* B: full-bleed screen with a solid caption strip along the bottom. */
+  .b img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+  .b .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 22px 26px; background: var(--accent); color: #2a1420; text-align: center; }
+  .b .cap b { display: block; font: 800 26px/1.05 'Baloo 2', sans-serif; }
+  .b .cap small { display: block; margin-top: 4px; font-size: 13px; font-weight: 700; }
+</style>
+</head>
+<body>
+  <h1>Store screenshots: caption band</h1>
+  <p class="intro">Play phone screenshots, 1080 by 1920, shown at a third of their size. Store search results show only the top of the first two or three shots, so the caption has to carry the point on its own.</p>
+
+  <section class="option">
+    <h2>Option A: caption on top, phone below (chosen)</h2>
+    <p>Headline in Baloo 2 with one pink word, a dim one-line subcaption, then the real screen in a dark phone frame that runs off the bottom edge. The caption reads first in search results, and the plum backdrop matches the app and the feature graphic.</p>
+    <div class="row">
+      <div class="shot a">
+        <div class="cap"><b>Log a set in <span>two taps</span></b><small>Last time's numbers are already filled in.</small></div>
+        <div class="screen"><img src="../../site/img/shot-logging.webp" alt=""></div>
+      </div>
+      <div class="shot a">
+        <div class="cap"><b>See every lift get <span>stronger</span></b><small>Charts from your own sets, nothing else.</small></div>
+        <div class="screen"><img src="../../site/img/shot-progress-chart.webp" alt=""></div>
+      </div>
+      <div class="shot a">
+        <div class="cap"><b>Rest, then <span>go again</span></b><small>A timer that starts on its own.</small></div>
+        <div class="screen"><img src="../../site/img/shot-rest-timer.webp" alt=""></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="option">
+    <h2>Option B: full-bleed screen, pink strip at the bottom</h2>
+    <p>Shows more of the screen, but the caption sits where search results cut it off, and a wall of pink goes against "pink is an accent, not a fill" in the brand guide.</p>
+    <div class="row">
+      <div class="shot b">
+        <img src="../../site/img/shot-logging.webp" alt="">
+        <div class="cap"><b>Log a set in two taps</b><small>Last time's numbers are already filled in.</small></div>
+      </div>
+      <div class="shot b">
+        <img src="../../site/img/shot-progress-chart.webp" alt="">
+        <div class="cap"><b>See every lift get stronger</b><small>Charts from your own sets, nothing else.</small></div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

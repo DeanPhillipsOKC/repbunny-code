@@ -1,0 +1,84 @@
+# Opens a lane's pull request as the RepBunny Builder bot (#679), so the PR isn't authored by the
+# owner and the owner can give the tier 3 approval the ruleset requires (GitHub refuses approving
+# your own PR). Started by `node scripts/bot-dispatch.mjs open-pr` from a session; cloud sessions
+# can't act as the bot themselves (their proxy swaps the token). Runs main's copy of the scripts and
+# never checks out the PR branch, so the branch's code never sees the app key.
+#
+# Anyone with Actions write can start this, so it only opens PRs: from a `claude/` branch, into
+# main, with the given title and body. See docs/architecture/commit-policy.md > Agent identities.
+name: Open PR as Builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      head:
+        description: Branch to open the PR from (must start with claude/)
+        type: string
+        required: true
+      title:
+        description: PR title
+        type: string
+        required: true
+      body:
+        description: PR body (markdown)
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: open-pr-${{ inputs.head }}
+  cancel-in-progress: false
+
+jobs:
+  open:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          sparse-checkout: scripts
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Check the branch name
+        env:
+          HEAD_REF: ${{ inputs.head }}
+        run: |
+          if ! printf '%s' "$HEAD_REF" | grep -Eq '^claude/[A-Za-z0-9._/-]{1,200}$'; then
+            echo "Only claude/ branches can be opened by the Builder, not '$HEAD_REF'." >&2
+            exit 1
+          fi
+
+      - name: Mint a Builder token
+        id: token
+        env:
+          BUILDER_APP_ID: ${{ secrets.BUILDER_APP_ID }}
+          BUILDER_APP_KEY: ${{ secrets.BUILDER_APP_KEY }}
+        run: |
+          token="$(node scripts/gh-app-token.mjs --app builder)"
+          echo "::add-mask::$token"
+          echo "token=$token" >> "$GITHUB_OUTPUT"
+
+      - name: Open the PR (or report the open one)
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+          HEAD_REF: ${{ inputs.head }}
+          PR_TITLE: ${{ inputs.title }}
+          PR_BODY: ${{ inputs.body }}
+        run: |
+          existing="$(gh pr list --head "$HEAD_REF" --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            echo "PR #$existing is already open for $HEAD_REF." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          printf '%s' "$PR_BODY" > "$RUNNER_TEMP/body.md"
+          url="$(gh pr create --base main --head "$HEAD_REF" --title "$PR_TITLE" --body-file "$RUNNER_TEMP/body.md")"
+          echo "Opened $url as the Builder." | tee -a "$GITHUB_STEP_SUMMARY"

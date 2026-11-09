@@ -1,0 +1,513 @@
+/* Global design tokens + base element styling.
+   Dark theme matches theme_color/background_color in vite.config.ts —
+   this is a phone app used mid-workout, not a marketing page.
+   Palette is RepBunny's brand system (docs/backlog-archive.md item 40, design
+   source: canvas "Style" artboard). Bunny Pink is the dominant accent;
+   Lavender/Carrot Gold are sparing secondary accents, not yet consumed by any
+   component. --success (Sprout) is used by the Log home screen's "recent PR"
+   stat tile (WorkoutLogger.vue). Text on any of these fills must be
+   --accent-text (Night) — white fails contrast on all of them.
+   Issue #118: these are the Classic theme, for the moment before main.ts
+   runs. src/lib/theme.ts sets every color token inline on <html> for the
+   active theme (some are light), so components use tokens or color-mix()
+   on tokens, never a hard-coded palette color. */
+
+/* Self-hosted so launching the app never contacts Google (#269). */
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 500 800;
+  font-display: swap;
+  src: url(/fonts/baloo2-latin.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(/fonts/manrope-latin.woff2) format('woff2');
+}
+
+
+:root {
+  color-scheme: dark;
+  --bg: #17111c;
+  --surface: #211829;
+  --surface-2: #241a2c;
+  --border: #3a2b40;
+  --text: #f5edf2;
+  --text-dim: #b9a8c2;
+  --accent: #f2879c;
+  --accent-pressed: #ed6b85;
+  --accent-text: #241a2c;
+  --secondary: #b79cf0;
+  --highlight: #f2c069;
+  --success: #a9cb8d;
+  --danger: #e0687a;
+  /* Cardio category tint (item 111): a soft coral, deliberately not --danger. */
+  --cardio: #f4a07a;
+  /* Issue #122: what shadows and vignettes darken toward. Black on dark
+     themes; a light theme sets a soft mauve so its shadows don't go gray
+     (lib/theme.ts SHADE). Use it as color-mix(in srgb, var(--shade) N%,
+     transparent), never a hard-coded black. */
+  --shade: #000000;
+  --radius: 12px;
+  /* Fixed height of BottomNav's tab row (excluding the safe-area inset), so
+     the active workout's pinned Finish dock and the rest mini-bar can sit
+     exactly on top of it. */
+  --bottom-nav-height: 72px;
+  /* Widest the page column, its docks, and the nav row get (#880). */
+  --page-max: 480px;
+  /* Height of the status bar the app draws under: the native apps are edge
+     to edge. On Android, Capacitor's SystemBars also sets
+     --safe-area-inset-top, for WebViews whose env() reports 0. */
+  --safe-top: max(env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px));
+  /* Issue #124: theme decoration shapes, shared by the live decorations
+     below and the Theme screen's previews (#119). */
+  --decor-web: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cpath d='M60 0L2.0 0.0M60 0L6.4 22.2M60 0L19.0 41.0M60 0L37.8 53.6M60 0L60.0 58.0M47.0 0.0Q49.0 2.2 48.0 5.0M48.0 5.0Q50.7 6.2 50.8 9.2M50.8 9.2Q53.8 9.3 55.0 12.0M55.0 12.0Q57.8 11.0 60.0 13.0M35.0 0.0Q38.9 4.2 36.9 9.6M36.9 9.6Q42.1 11.9 42.3 17.7M42.3 17.7Q48.1 17.9 50.4 23.1M50.4 23.1Q55.8 21.1 60.0 25.0M23.0 0.0Q28.8 6.2 25.8 14.2M25.8 14.2Q33.5 17.7 33.8 26.2M33.8 26.2Q42.3 26.5 45.8 34.2M45.8 34.2Q53.8 31.2 60.0 37.0M11.0 0.0Q18.7 8.2 14.7 18.8M14.7 18.8Q25.0 23.4 25.4 34.6M25.4 34.6Q36.6 35.0 41.2 45.3M41.2 45.3Q51.8 41.3 60.0 49.0' stroke='black' stroke-width='1.1' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  --decor-web-spider: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cpath d='M60 0L2.0 0.0M60 0L6.4 22.2M60 0L19.0 41.0M60 0L37.8 53.6M60 0L60.0 58.0M47.0 0.0Q49.0 2.2 48.0 5.0M48.0 5.0Q50.7 6.2 50.8 9.2M50.8 9.2Q53.8 9.3 55.0 12.0M55.0 12.0Q57.8 11.0 60.0 13.0M35.0 0.0Q38.9 4.2 36.9 9.6M36.9 9.6Q42.1 11.9 42.3 17.7M42.3 17.7Q48.1 17.9 50.4 23.1M50.4 23.1Q55.8 21.1 60.0 25.0M23.0 0.0Q28.8 6.2 25.8 14.2M25.8 14.2Q33.5 17.7 33.8 26.2M33.8 26.2Q42.3 26.5 45.8 34.2M45.8 34.2Q53.8 31.2 60.0 37.0M11.0 0.0Q18.7 8.2 14.7 18.8M14.7 18.8Q25.0 23.4 25.4 34.6M25.4 34.6Q36.6 35.0 41.2 45.3M41.2 45.3Q51.8 41.3 60.0 49.0' stroke='black' stroke-width='1.1' fill='none' stroke-linecap='round'/%3E%3Cpath d='M36 22V43' stroke='black' stroke-width='.9'/%3E%3Ccircle cx='36' cy='47' r='4.2'/%3E%3Ccircle cx='36' cy='42.2' r='2.6'/%3E%3Cpath d='M32.5 45.5l-4-3M32 47.5h-4.5M32.5 49.5l-4 3M33.5 51l-2.5 3.5M39.5 45.5l4-3M40 47.5h4.5M39.5 49.5l4 3M38.5 51l2.5 3.5' stroke='black' stroke-width='1.1' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+  --decor-candy-corn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3CclipPath id='c'%3E%3Cpath d='M12 2.2c1.3 0 8.6 14.2 8.4 17.2-.3 2.9-16.5 2.9-16.8 0C3.4 16.4 10.7 2.2 12 2.2z'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path='url(%23c)'%3E%3Crect width='24' height='24' fill='%23ffd166'/%3E%3Crect width='24' height='15.5' fill='%23ff9a3c'/%3E%3Crect width='24' height='8.5' fill='%23f6efe6'/%3E%3C/g%3E%3C/svg%3E");
+  /* Issue #129: Autumn. A maple leaf (week tracker and confetti), birch and
+     oak leaves (confetti), and the corner sprig: a twig with two maple
+     leaves and an acorn, plus a drifting leaf on the featured panel. */
+  --decor-maple-leaf: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23f5c14b'/%3E%3Cstop offset='1' stop-color='%23d9663f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 13.6V21.8' stroke='%23c45a35' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M12 0.9L13.5 3.9L15.3 3.1L14.7 7.6L17.3 5.5L18.1 7.1L21.8 5.9L20.4 9.7L22.6 10.8L17.7 13.4L18.6 15.8L12.7 14.5L11.3 14.5L5.4 15.8L6.3 13.4L1.4 10.8L3.6 9.7L2.2 5.9L5.9 7.1L6.7 5.5L9.3 7.6L8.7 3.1L10.5 3.9Z' fill='url(%23g)' stroke='url(%23g)' stroke-width='.8' stroke-linejoin='round'/%3E%3Cpath d='M12 4.4V13.4' stroke='%23fbe2a4' stroke-width='.9' stroke-linecap='round' opacity='.85'/%3E%3C/svg%3E");
+  --decor-birch-leaf: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 17.5V22.5' stroke='%23c99a2e' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M12 1.8C16.6 5.6 17.6 12.6 12 18.2C6.4 12.6 7.4 5.6 12 1.8Z' fill='%23f2c14e'/%3E%3Cpath d='M12 4.5V16.5' stroke='%23fbe2a4' stroke-width='.8' stroke-linecap='round' opacity='.8'/%3E%3C/svg%3E");
+  --decor-oak-leaf: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 16.5V22.5' stroke='%238f3324' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M12 1.6C14.2 1.6 14.8 3.6 14.2 4.9C16.4 4.4 17.2 6.6 15.5 7.9C17.9 7.9 18.2 10.5 15.9 11.2C18.2 11.8 17.9 14.4 15.6 14.5C16.6 16.3 14.8 17.9 12.8 17.2H11.2C9.2 17.9 7.4 16.3 8.4 14.5C6.1 14.4 5.8 11.8 8.1 11.2C5.8 10.5 6.1 7.9 8.5 7.9C6.8 6.6 7.6 4.4 9.8 4.9C9.2 3.6 9.8 1.6 12 1.6Z' fill='%23b8432f'/%3E%3Cpath d='M12 4.2V15.8' stroke='%23e07a5c' stroke-width='.8' stroke-linecap='round' opacity='.8'/%3E%3C/svg%3E");
+  --decor-sprig: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cpath d='M59 3Q44 7 35 17Q29 24 25.5 31' stroke='black' stroke-width='1.7' fill='none' stroke-linecap='round'/%3E%3Cpath d='M45.5 9.2Q48 12.6 47.4 15.6' stroke='black' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3Cpath d='M12 0.9L13.5 3.9L15.3 3.1L14.7 7.6L17.3 5.5L18.1 7.1L21.8 5.9L20.4 9.7L22.6 10.8L17.7 13.4L18.6 15.8L12.7 14.5L11.3 14.5L5.4 15.8L6.3 13.4L1.4 10.8L3.6 9.7L2.2 5.9L5.9 7.1L6.7 5.5L9.3 7.6L8.7 3.1L10.5 3.9Z' stroke='black' stroke-width='.6' stroke-linejoin='round' transform='translate(39.5 12.6) rotate(-42) scale(0.68) translate(-12 -14.5)'/%3E%3Cpath d='M12 0.9L13.5 3.9L15.3 3.1L14.7 7.6L17.3 5.5L18.1 7.1L21.8 5.9L20.4 9.7L22.6 10.8L17.7 13.4L18.6 15.8L12.7 14.5L11.3 14.5L5.4 15.8L6.3 13.4L1.4 10.8L3.6 9.7L2.2 5.9L5.9 7.1L6.7 5.5L9.3 7.6L8.7 3.1L10.5 3.9Z' stroke='black' stroke-width='.6' stroke-linejoin='round' transform='translate(26 30.5) rotate(-128) scale(0.78) translate(-12 -14.5)'/%3E%3Cpath d='M43.9 18.6Q47.4 14.2 50.9 18.6Q47.4 19.9 43.9 18.6Z'/%3E%3Cpath d='M44.5 19.6Q47.4 20.7 50.3 19.6Q50.6 24.2 47.4 25.9Q44.2 24.2 44.5 19.6Z'/%3E%3C/svg%3E");
+  --decor-sprig-drift: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cpath d='M59 3Q44 7 35 17Q29 24 25.5 31' stroke='black' stroke-width='1.7' fill='none' stroke-linecap='round'/%3E%3Cpath d='M45.5 9.2Q48 12.6 47.4 15.6' stroke='black' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3Cpath d='M12 0.9L13.5 3.9L15.3 3.1L14.7 7.6L17.3 5.5L18.1 7.1L21.8 5.9L20.4 9.7L22.6 10.8L17.7 13.4L18.6 15.8L12.7 14.5L11.3 14.5L5.4 15.8L6.3 13.4L1.4 10.8L3.6 9.7L2.2 5.9L5.9 7.1L6.7 5.5L9.3 7.6L8.7 3.1L10.5 3.9Z' stroke='black' stroke-width='.6' stroke-linejoin='round' transform='translate(39.5 12.6) rotate(-42) scale(0.68) translate(-12 -14.5)'/%3E%3Cpath d='M12 0.9L13.5 3.9L15.3 3.1L14.7 7.6L17.3 5.5L18.1 7.1L21.8 5.9L20.4 9.7L22.6 10.8L17.7 13.4L18.6 15.8L12.7 14.5L11.3 14.5L5.4 15.8L6.3 13.4L1.4 10.8L3.6 9.7L2.2 5.9L5.9 7.1L6.7 5.5L9.3 7.6L8.7 3.1L10.5 3.9Z' stroke='black' stroke-width='.6' stroke-linejoin='round' transform='translate(26 30.5) rotate(-128) scale(0.78) translate(-12 -14.5)'/%3E%3Cpath d='M43.9 18.6Q47.4 14.2 50.9 18.6Q47.4 19.9 43.9 18.6Z'/%3E%3Cpath d='M44.5 19.6Q47.4 20.7 50.3 19.6Q50.6 24.2 47.4 25.9Q44.2 24.2 44.5 19.6Z'/%3E%3Cpath d='M12 0.9L13.5 3.9L15.3 3.1L14.7 7.6L17.3 5.5L18.1 7.1L21.8 5.9L20.4 9.7L22.6 10.8L17.7 13.4L18.6 15.8L12.7 14.5L11.3 14.5L5.4 15.8L6.3 13.4L1.4 10.8L3.6 9.7L2.2 5.9L5.9 7.1L6.7 5.5L9.3 7.6L8.7 3.1L10.5 3.9Z' stroke='black' stroke-width='.6' stroke-linejoin='round' transform='translate(42 47) rotate(28) scale(0.5) translate(-12 -14.5)'/%3E%3C/svg%3E");
+  /* Issue #128: Carrot Patch. A carrot, tipped to the side, with three leaf
+     tufts and two ridge lines (week tracker and confetti). */
+  --decor-carrot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='translate(10.1 12.5) rotate(30) scale(1.14) translate(-12 -12)'%3E%3Cpath d='M11.4 8.6C9.3 6.9 7.6 4.6 7.6 2.2C9.8 3.2 11.4 5.6 11.9 8.4Z' fill='%234e9a35'/%3E%3Cpath d='M12.6 8.4C13.1 5.6 14.7 3.2 16.9 2.2C16.9 4.6 15.2 6.9 13.1 8.6Z' fill='%234e9a35'/%3E%3Cpath d='M12 8.6C10.6 6.3 10.6 3.4 12 0.8C13.4 3.4 13.4 6.3 12 8.6Z' fill='%237fc456'/%3E%3Cpath d='M8.1 9.6C8.1 7.6 15.9 7.6 15.9 9.6C15.9 13.6 13.2 20.2 12 23.2C10.8 20.2 8.1 13.6 8.1 9.6Z' fill='%23f28c3a'/%3E%3Cpath d='M9.3 10.2C9.4 13.4 11 18 11.9 20.6' stroke='%23f9b06e' stroke-width='.9' stroke-linecap='round' fill='none' opacity='.8'/%3E%3Cpath d='M12.6 12.2H15.2M11.9 16.1H13.9' stroke='%23c7611c' stroke-width='.9' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
+  /* Issue #968: Christmas. A cream candy cane with cranberry stripes (week
+     tracker and confetti). */
+  --decor-candy-cane: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='translate(-1.5 -1.3)'%3E%3Cpath d='M10 21.5V8.5A3.5 3.5 0 0 1 17 8.5V10.5' fill='none' stroke='%23fbf1e6' stroke-width='4.4' stroke-linecap='round'/%3E%3Cpath d='M10 19.5V18M10 16V14.5M10 12.5V11M10.47 6.75A3.5 3.5 0 0 1 11.49 5.63M13.2 5.01A3.5 3.5 0 0 1 14.7 5.21M16.18 6.25A3.5 3.5 0 0 1 16.88 7.59' fill='none' stroke='%23e8334f' stroke-width='4.4'/%3E%3C/g%3E%3C/svg%3E");
+  /* Issue #969: Valentine's Day. A hot pink candy heart with a blush rim and
+     a shine (week tracker and confetti). */
+  --decor-candy-heart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.2s-8.7-5.4-8.7-11.4C3.3 6.5 5.7 4.3 8.3 4.3c1.6 0 3 .8 3.7 2.1.7-1.3 2.1-2.1 3.7-2.1 2.6 0 5 2.2 5 5.5 0 6-8.7 11.4-8.7 11.4z' fill='%23ff4f86' stroke='%23ffd6e1' stroke-width='1.3' stroke-linejoin='round'/%3E%3Cellipse cx='8.2' cy='8.6' rx='1.9' ry='1.2' transform='rotate(-35 8.2 8.6)' fill='%23fff' opacity='.75'/%3E%3C/svg%3E");
+  --font-display: 'Baloo 2', sans-serif;
+  --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+/* Issue #825: a double tap never zooms. */
+html {
+  touch-action: manipulation;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px; /* iOS zooms in on inputs below this */
+  line-height: 1.45;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* #67: while any modal sheet or dialog is open, the page behind it must not
+   scroll, and reaching the end of a sheet's own scroll must not chain into
+   the page. Every modal in src/ is v-if rendered with role="dialog" +
+   aria-modal="true", so their presence alone is the "a sheet is open" signal.
+   overscroll-behavior goes only on the elements that actually scroll: the
+   dialog here, plus any inner scroll container next to its own overflow-y.
+   Putting it on every descendant (#96) stopped a drag that started on a
+   button from scrolling the sheet on Android Chrome. */
+html:has([role='dialog'][aria-modal='true']),
+html:has([role='dialog'][aria-modal='true']) body {
+  overflow: hidden;
+}
+
+[role='dialog'][aria-modal='true'] {
+  overscroll-behavior: contain;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+/* #880: a phone turned sideways. Short and wide, so the nav shrinks to a slim
+   bar, the column gets wider, and the notch and home indicator side insets are
+   kept clear. A tablet or desktop window is taller than 500px and is unaffected. */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root {
+    --bottom-nav-height: 48px;
+    --page-max: 680px;
+  }
+
+  /* The setup wizard's first screen (SetupWizard.vue is at its file-size cap, so
+     these live here; #app wins over the component's scoped rules). */
+  #app .hello {
+    padding: 8px 0;
+  }
+
+  #app .hello-art {
+    width: 96px;
+    height: 96px;
+  }
+
+  #app .wordmark {
+    margin-top: 6px;
+    font-size: 1.8rem;
+  }
+}
+
+/* Issue #107: the Minimal mascot setting (src/lib/theme.ts). Large mascot
+   art carries .mascot-art and celebration motion .mascot-motion; the small
+   bunny-and-dumbbell mark (icon-512.png) has neither and always shows. */
+:root[data-mascot='minimal'] .mascot-art {
+  display: none !important;
+}
+
+:root[data-mascot='minimal'] .mascot-motion {
+  animation: none !important;
+}
+
+/* Issue #124: theme decorations (src/lib/theme.ts `decor`). A theme with
+   corner: 'web' gets a faint web in the top-right corner of the few panels
+   that carry .theme-corner (.theme-corner-feature adds a hanging spider).
+   Only panels whose top-right corner is empty get the class, so a web never
+   covers text, a chevron, or a chart, and pointer-events: none keeps every
+   tap working. Minimal hides it with the rest of the art. Each corner value
+   (#129 added 'leaves', Autumn's sprig) brings its own two shapes. */
+:root[data-corner]:not([data-mascot='minimal']) .theme-corner {
+  position: relative;
+}
+
+:root[data-corner]:not([data-mascot='minimal']) .theme-corner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 58px;
+  height: 58px;
+  border-top-right-radius: inherit;
+  background: color-mix(in srgb, var(--text) 17%, transparent);
+  -webkit-mask: var(--decor-corner) no-repeat top right / contain;
+  mask: var(--decor-corner) no-repeat top right / contain;
+  pointer-events: none;
+}
+
+:root[data-corner]:not([data-mascot='minimal']) .theme-corner-feature::after {
+  -webkit-mask-image: var(--decor-corner-feature);
+  mask-image: var(--decor-corner-feature);
+}
+
+:root[data-corner='web'] {
+  --decor-corner: var(--decor-web);
+  --decor-corner-feature: var(--decor-web-spider);
+}
+
+:root[data-corner='leaves'] {
+  --decor-corner: var(--decor-sprig);
+  --decor-corner-feature: var(--decor-sprig-drift);
+}
+
+/* A theme with confetti: 'candy-corn' drops candy corns on the record
+   celebration instead of squares and dots. */
+:root[data-confetti='candy-corn'] .confetti {
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 0 !important;
+  background: var(--decor-candy-corn) no-repeat center / contain !important;
+}
+
+/* Issue #128: confetti: 'carrot' drops carrots, like the candy corn. */
+:root[data-confetti='carrot'] .confetti {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 0 !important;
+  background: var(--decor-carrot) no-repeat center / contain !important;
+}
+
+/* Issue #968: confetti: 'candy-cane' drops candy canes, like the carrot. */
+:root[data-confetti='candy-heart'] .confetti {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 0 !important;
+  background: var(--decor-candy-heart) no-repeat center / contain !important;
+}
+
+/* Issue #969: Valentine's Day drops candy hearts the same way (above). */
+:root[data-confetti='candy-cane'] .confetti {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 0 !important;
+  background: var(--decor-candy-cane) no-repeat center / contain !important;
+}
+
+/* Issue #129: confetti: 'leaves' drops maple, birch, and oak leaves (each
+   piece's data-leaf, picked at random in RecordCelebration.vue). They keep
+   each piece's duration and delay, so the celebration runs just as long, but
+   fall a shorter way, so slower, swaying side to side. With reduced motion
+   they fall straight. */
+:root[data-confetti='leaves'] .confetti {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 0 !important;
+  background: var(--decor-maple-leaf) no-repeat center / contain !important;
+  animation-name: leaf-fall !important;
+  animation-timing-function: ease-in-out !important;
+}
+
+:root[data-confetti='leaves'] .confetti[data-leaf='birch'] {
+  background-image: var(--decor-birch-leaf) !important;
+}
+
+:root[data-confetti='leaves'] .confetti[data-leaf='oak'] {
+  background-image: var(--decor-oak-leaf) !important;
+}
+
+/* Issue #154: Extras confetti (hearts, stars, plates) overrides the theme's.
+   Each shape is a mask, so every piece keeps its own token color and they
+   work in light themes too. */
+:root {
+  --extra-heart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-8.5-5.3-8.5-11.2C3.5 6.6 5.9 4.5 8.4 4.5c1.6 0 2.9.8 3.6 2 .7-1.2 2-2 3.6-2 2.5 0 4.9 2.1 4.9 5.3C20.5 15.7 12 21 12 21z'/%3E%3C/svg%3E");
+  --extra-star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.2l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z'/%3E%3C/svg%3E");
+  --extra-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a10 10 0 110 20 10 10 0 010-20zm0 7.2a2.8 2.8 0 100 5.6 2.8 2.8 0 000-5.6z'/%3E%3C/svg%3E");
+}
+
+:root[data-confetti='hearts'] .confetti,
+:root[data-confetti='stars'] .confetti,
+:root[data-confetti='plates'] .confetti {
+  width: 15px !important;
+  height: 15px !important;
+  border-radius: 0 !important;
+  -webkit-mask: var(--extra-shape) no-repeat center / contain;
+  mask: var(--extra-shape) no-repeat center / contain;
+}
+
+:root[data-confetti='hearts'] .confetti {
+  --extra-shape: var(--extra-heart);
+}
+
+:root[data-confetti='stars'] .confetti {
+  --extra-shape: var(--extra-star);
+}
+
+:root[data-confetti='plates'] .confetti {
+  --extra-shape: var(--extra-plate);
+}
+
+@keyframes leaf-fall {
+  0% {
+    transform: translate(0, -30px) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  25% {
+    transform: translate(16px, 110px) rotate(35deg);
+  }
+  50% {
+    transform: translate(-14px, 250px) rotate(-25deg);
+  }
+  75% {
+    transform: translate(14px, 390px) rotate(30deg);
+  }
+  100% {
+    transform: translate(-6px, 540px) rotate(-15deg);
+    opacity: 0;
+  }
+}
+
+@keyframes leaf-fall-straight {
+  0% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(540px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-confetti='leaves'] .confetti {
+    animation-name: leaf-fall-straight !important;
+    animation-timing-function: linear !important;
+  }
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+h3 {
+  font-size: 1rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+/* Issue #65: every top-level screen's title (PageHeader.vue). The plain h2
+   style above stays for small uppercase section labels. */
+/* Issue #492: stops growing at 12vw (far above the normal size on any
+   phone), so a one-word title like "Progress" still fits its line at the
+   largest Android font size instead of breaking mid-word. */
+.page-title {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: min(1.7rem, 12vw);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+p {
+  margin: 0 0 12px;
+  color: var(--text-dim);
+}
+
+a {
+  color: var(--accent);
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: var(--text);
+}
+
+input,
+select,
+textarea {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  appearance: none;
+}
+
+textarea {
+  padding: 10px 14px;
+  font: inherit;
+  color: var(--text);
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin: 12px 0 4px;
+}
+
+label:first-of-type {
+  margin-top: 0;
+}
+
+button {
+  min-height: 48px;
+  padding: 0 18px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button[type='submit'],
+.btn-accent {
+  width: 100%;
+  margin-top: 16px;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+button[type='submit']:active,
+.btn-accent:active {
+  background: var(--accent-pressed);
+  border-color: var(--accent-pressed);
+}
+
+ul,
+ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Issue #44: "‹ Progress" above the Workout log, Lift progress, and Body
+   headings. */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  margin-bottom: 2px;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Issue #276: a back link that goes back in history (TemplateEditor,
+   LibraryExerciseDetail) is a button; strip the button chrome so it matches. */
+button.back-link {
+  align-self: flex-start;
+  min-height: 36px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.back-link span {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.lede {
+  margin: -6px 0 16px;
+  color: var(--text-dim);
+  font-size: 0.84rem;
+}

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Issue #144: the This week widget: the week tracker from Home, with the theme's day marks. Colors and text are set from the
+     app's snapshot (HomeWidgets.java); the ones here are Classic's, for the
+     widget picker's preview. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_bg"
+        android:tint="#211829"
+        android:importantForAccessibility="no" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="14dp">
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="This week"
+            android:textColor="#b9a8c2"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:baselineAligned="true"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3"
+                android:textColor="#f2879c"
+                android:textSize="34sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/count_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="workouts"
+                android:textColor="#f5edf2"
+                android:textSize="13sp" />
+        </LinearLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/mark0"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/widget_dot"
+                android:tint="#3a2b40"
+                android:importantForAccessibility="no" />
+            <TextView
+                android:id="@+id/letter0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="S"
+                android:textColor="#b9a8c2"
+                android:textSize="10sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/mark1"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/widget_dot"
+                android:tint="#3a2b40"
+                android:importantForAccessibility="no" />
+            <TextView
+                android:id="@+id/letter1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="M"
+                android:textColor="#b9a8c2"
+                android:textSize="10sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/mark2"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/widget_dot"
+                android:tint="#3a2b40"
+                android:importantForAccessibility="no" />
+            <TextView
+                android:id="@+id/letter2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="T"
+                android:textColor="#b9a8c2"
+                android:textSize="10sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/mark3"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/widget_dot"
+                android:tint="#3a2b40"
+                android:importantForAccessibility="no" />
+            <TextView
+                android:id="@+id/letter3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="W"
+                android:textColor="#b9a8c2"
+                android:textSize="10sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/mark4"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/widget_dot"
+                android:tint="#3a2b40"
+                android:importantForAccessibility="no" />
+            <TextView
+                android:id="@+id/letter4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="T"
+                android:textColor="#b9a8c2"
+                android:textSize="10sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/mark5"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/widget_dot"
+                android:tint="#3a2b40"
+                android:importantForAccessibility="no" />
+            <TextView
+                android:id="@+id/letter5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="F"
+                android:textColor="#b9a8c2"
+                android:textSize="10sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/mark6"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/widget_dot"
+                android:tint="#3a2b40"
+                android:importantForAccessibility="no" />
+            <TextView
+                android:id="@+id/letter6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="S"
+                android:textColor="#b9a8c2"
+                android:textSize="10sp" />
+        </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Rep Max Table</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1000px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 10px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 32px; padding: 24px 32px 40px; align-items: flex-start; }
+  .col { width: 390px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 74px; }
+  .phone { width: 390px; height: 800px; background: #0c0910; border: 1px solid var(--border); border-radius: 28px; position: relative; overflow: hidden; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 70px; background: var(--bg); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 20px 16px; overflow: hidden; }
+  .hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .hdr h3 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; flex: 1; line-height: 1.1; }
+  .iconbtn { width: 36px; height: 36px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); font-size: 0.9rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 14px 12px; margin-bottom: 16px; }
+  .chart-peek { opacity: 0.55; }
+  .k { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); }
+  .big { font-family: 'Baloo 2', sans-serif; font-size: 2rem; color: var(--accent); line-height: 1.1; }
+  .big small { font-size: 1rem; }
+  svg.chart { width: 100%; height: 34px; display: block; margin-top: 4px; }
+  .phone { height: 860px; }
+  .sheet { top: 40px; }
+
+  .rm-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+  .rm-head h4 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; }
+  .rm-head span { font-size: 0.72rem; color: var(--text-dim); font-weight: 700; }
+  .rm-sub { font-size: 0.74rem; color: var(--text-dim); margin: 0 0 10px; line-height: 1.4; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+  th { font-size: 0.64rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); text-align: left; padding: 0 0 6px; }
+  th.r, td.r { text-align: right; }
+  td { height: 32px; padding: 0; border-top: 1px solid var(--border); vertical-align: middle; }
+  td.plot { width: 84px; padding: 0 8px; border-top: none; vertical-align: top; }
+  td.plot svg { display: block; width: 100%; }
+  .key { display: flex; gap: 14px; font-size: 0.7rem; color: var(--text-dim); margin-top: 10px; align-items: center; }
+  .key svg { vertical-align: middle; margin-right: 4px; }
+  td.reps { font-weight: 800; width: 48px; color: var(--text-dim); }
+  td.act b { font-weight: 800; }
+  td.act small { color: var(--text-dim); font-size: 0.72rem; font-weight: 700; margin-left: 4px; }
+  td.date { color: var(--text-dim); font-size: 0.74rem; }
+  td.est { color: var(--secondary); font-weight: 700; }
+  td.none { color: var(--text-dim); }
+  tr.top td.act b { color: var(--accent); }
+  .legend { display: flex; gap: 14px; font-size: 0.7rem; color: var(--text-dim); margin-top: 8px; }
+  .legend i { font-style: normal; color: var(--secondary); font-weight: 800; }
+  .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: linear-gradient(transparent, var(--bg)); }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#45 Rep-max table in exercise history (defaults approved 2026-09-29)</h1>
+  <p class="note">A "Rep maxes" card right under the progress chart in the exercise history sheet, <b>Weight exercises only</b>, always visible. <b>Actual</b> = the heaviest weight you've lifted for <b>at least</b> that many reps (so an 8-rep set also counts as your 1RM through 7RM if nothing heavier beats it), with the date and a small "×N" when it came from a bigger set. <b>Est.</b> = what your best est. 1RM predicts for that rep count (Epley, same as the chart). Mixed lb/kg sets are converted to the chart's unit. <b>Plot column</b> (user's idea): each row gets a point for both, so you can see where you're ahead of or behind the estimate without doing the math: solid pink for actual, dashed lavender for est., further right = heavier.</p>
+</div>
+<div class="page">
+  <div class="col">
+    <p class="cap">1. An exercise with plenty of history</p>
+    <p class="capnote">The 1RM row's actual weight is pink (your heaviest ever). "×3" on the 2RM row means that weight came from a 3-rep set. Est. is in lavender so it reads as a prediction, not a record.</p>
+    <div class="phone">
+      <div class="sheet">
+        <div class="hdr"><h3>Barbell Bench Press</h3><div class="iconbtn">✕</div></div>
+        <div class="card chart-peek"><div class="k">Est. 1RM</div><div class="big">234 <small>lb</small></div><svg class="chart" id="c1" viewBox="0 0 326 70" preserveAspectRatio="none"></svg></div>
+        <div class="card">
+          <div class="rm-head"><h4>Rep maxes</h4><span>lb</span></div>
+          <p class="rm-sub">Heaviest weight you've lifted for at least that many reps.</p>
+          <table>
+            <thead><tr><th>Reps</th><th>Actual</th><th></th><th></th><th class="r">Est.</th></tr></thead>
+            <tbody id="t1"></tbody>
+          </table>
+          <div class="key"><span><svg width="22" height="8"><line x1="1" y1="4" x2="21" y2="4" stroke="#f2879c" stroke-width="2"/><circle cx="11" cy="4" r="3" fill="#f2879c"/></svg>Actual</span><span><svg width="22" height="8"><line x1="1" y1="4" x2="21" y2="4" stroke="#b79cf0" stroke-width="1.6" stroke-dasharray="4 3"/></svg>Est.</span><span>Pink right of lavender = beating the estimate</span></div>
+        </div>
+        <div class="fade"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">2. A newer exercise with gaps</p>
+    <p class="capnote">Never done more than 5 reps, so 6RM to 10RM have no actual yet ("–") and only the estimate. Non-weight exercises (bodyweight, assisted, level, timed) don't show this card at all.</p>
+    <div class="phone">
+      <div class="sheet">
+        <div class="hdr"><h3>Overhead Press</h3><div class="iconbtn">✕</div></div>
+        <div class="card chart-peek"><div class="k">Est. 1RM</div><div class="big">117 <small>lb</small></div><svg class="chart" id="c2" viewBox="0 0 326 70" preserveAspectRatio="none"></svg></div>
+        <div class="card">
+          <div class="rm-head"><h4>Rep maxes</h4><span>lb</span></div>
+          <p class="rm-sub">Heaviest weight you've lifted for at least that many reps.</p>
+          <table>
+            <thead><tr><th>Reps</th><th>Actual</th><th></th><th></th><th class="r">Est.</th></tr></thead>
+            <tbody id="t2"></tbody>
+          </table>
+          <div class="key"><span><svg width="22" height="8"><line x1="1" y1="4" x2="21" y2="4" stroke="#f2879c" stroke-width="2"/><circle cx="11" cy="4" r="3" fill="#f2879c"/></svg>Actual</span><span><svg width="22" height="8"><line x1="1" y1="4" x2="21" y2="4" stroke="#b79cf0" stroke-width="1.6" stroke-dasharray="4 3"/></svg>Est.</span><span>Pink right of lavender = beating the estimate</span></div>
+        </div>
+        <div class="fade"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // Epley: est N-rep max = e1RM / (1 + N/30); 1RM row = e1RM itself.
+  function est(e1, n) { return n === 1 ? e1 : Math.round(e1 / (1 + n / 30)) }
+  // The plot column: one point per row, x = weight. Actual is a solid pink
+  // line with dots (broken where there's no actual), Est. a dashed lavender line.
+  function plot(e1, actual) {
+    const ests = Array.from({ length: 10 }, (_, i) => est(e1, i + 1))
+    const acts = Array.from({ length: 10 }, (_, i) => actual[i + 1]?.[0] ?? null)
+    const vals = [...ests, ...acts.filter((v) => v !== null)]
+    const mn = Math.min(...vals), mx = Math.max(...vals), W = 68, pad = 5
+    const x = (v) => pad + ((v - mn) / (mx - mn || 1)) * (W - 2 * pad)
+    const y = (i) => 16 + i * 32
+    const estPts = ests.map((v, i) => `${x(v)},${y(i)}`).join(' ')
+    let out = `<polyline points="${estPts}" fill="none" stroke="#b79cf0" stroke-width="1.6" stroke-dasharray="4 3"/>`
+    out += ests.map((v, i) => `<circle cx="${x(v)}" cy="${y(i)}" r="2" fill="#b79cf0"/>`).join('')
+    const actPts = acts.map((v, i) => (v === null ? null : `${x(v)},${y(i)}`)).filter(Boolean).join(' ')
+    out += `<polyline points="${actPts}" fill="none" stroke="#f2879c" stroke-width="2"/>`
+    out += acts.map((v, i) => (v === null ? '' : `<circle cx="${x(v)}" cy="${y(i)}" r="3.2" fill="#f2879c"/>`)).join('')
+    return `<svg viewBox="0 0 ${W} 320" height="320">${out}</svg>`
+  }
+  function table(id, e1, actual) {
+    document.getElementById(id).innerHTML = Array.from({ length: 10 }, (_, i) => {
+      const n = i + 1, a = actual[n]
+      const act = a ? `<b>${a[0]} lb</b>${a[2] !== n ? `<small>×${a[2]}</small>` : ''}` : '–'
+      const plotCell = i === 0 ? `<td class="plot" rowspan="10">${plot(e1, actual)}</td>` : ''
+      return `<tr class="${n === 1 ? 'top' : ''}"><td class="reps">${n}RM</td><td class="act ${a ? '' : 'none'}">${act}</td><td class="date">${a ? a[1] : ''}</td>${plotCell}<td class="r est">${est(e1, n)}</td></tr>`
+    }).join('')
+  }
+  table('t1', 234, { 1: [205, 'Aug 2', 1], 2: [195, 'Sep 12', 3], 3: [195, 'Sep 12', 3], 4: [190, 'Sep 19', 5], 5: [190, 'Sep 19', 5], 6: [185, 'Sep 26', 8], 7: [185, 'Sep 26', 8], 8: [185, 'Sep 26', 8], 9: [155, 'Sep 26', 10], 10: [155, 'Sep 26', 10] })
+  table('t2', 117, { 1: [105, 'Sep 24', 3], 2: [105, 'Sep 24', 3], 3: [105, 'Sep 24', 3], 4: [100, 'Sep 20', 5], 5: [100, 'Sep 20', 5] })
+  function spark(id, vals) {
+    const svg = document.getElementById(id), W = 326, H = 70, p = 4, mn = Math.min(...vals), r = Math.max(...vals) - mn || 1
+    const pts = vals.map((v, i) => `${p + (i / (vals.length - 1)) * (W - 2 * p)},${H - p - ((v - mn) / r) * (H - 2 * p)}`).join(' ')
+    svg.innerHTML = `<polyline points="${pts}" fill="none" stroke="#f2879c" stroke-width="2" vector-effect="non-scaling-stroke"/>`
+  }
+  spark('c1', [205, 212, 210, 219, 224, 228, 234])
+  spark('c2', [105, 108, 112, 117])
+</script>
+</body>
+</html>

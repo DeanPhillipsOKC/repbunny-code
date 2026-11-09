@@ -1,0 +1,264 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Exercise Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1100px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; margin: 0 0 4px; }
+  .note { color: var(--text-dim); font-size: 0.85rem; margin: 0 0 14px; line-height: 1.5; }
+  .page { display: flex; flex-wrap: wrap; gap: 32px; padding: 24px 32px 40px; align-items: flex-start; }
+  .col { width: 390px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; }
+  .phone { width: 390px; min-height: 780px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; padding: 18px 16px; position: relative; overflow: hidden; }
+
+  /* icon set */
+  .set { display: grid; grid-template-columns: repeat(4, 120px); gap: 12px; }
+  .big { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px 8px 12px; text-align: center; }
+  .big svg { width: 60px; height: 60px; }
+  .big .lbl { margin-top: 6px; font-weight: 700; font-size: 0.9rem; color: var(--text); }
+  .big .why { color: var(--text-dim); font-size: 0.68rem; margin-top: 2px; line-height: 1.35; }
+
+  .badge { flex-shrink: 0; width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); }
+  .badge svg { width: 30px; height: 30px; }
+
+  /* shared bits */
+  .hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .hdr h3 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.25rem; flex: 1; }
+  .iconbtn { width: 34px; height: 34px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); font-size: 0.9rem; }
+  .search { height: 44px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; padding: 0 14px; color: var(--text-dim); font-size: 0.92rem; margin-bottom: 12px; }
+  .chips { display: flex; gap: 6px; overflow: hidden; margin-bottom: 14px; }
+  .chip { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; padding: 6px 11px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); font-size: 0.8rem; font-weight: 700; color: var(--text-dim); }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+  .chip.sel { background: color-mix(in srgb, var(--c) 22%, var(--surface)); border-color: var(--c); color: var(--text); }
+  .label { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.07em; color: var(--text-dim); text-transform: uppercase; margin: 4px 2px 8px; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; }
+  .row.lib { background: var(--surface); }
+  .row .name { font-weight: 700; font-size: 0.95rem; }
+  .row .sub { font-size: 0.74rem; color: var(--text-dim); margin-top: 1px; }
+  .row .grow { flex: 1; min-width: 0; }
+  .add { font-size: 0.78rem; font-weight: 800; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent); border-radius: 999px; padding: 5px 10px; }
+  .btn { display: block; width: 100%; text-align: center; padding: 13px; border-radius: var(--radius); font-weight: 800; font-size: 0.95rem; }
+  .btn.primary { background: var(--accent); color: var(--accent-text); }
+  .btn.create { background: color-mix(in srgb, var(--accent) 10%, var(--surface-2)); border: 1px solid var(--accent); color: var(--accent); }
+  .btn.ghost { border: 1px solid var(--border); color: var(--text-dim); margin-top: 8px; }
+  .field { font-size: 0.8rem; font-weight: 700; color: var(--text-dim); margin: 14px 2px 6px; }
+  .field small { font-weight: 600; opacity: 0.8; }
+  .input { height: 44px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--accent); display: flex; align-items: center; padding: 0 14px; font-size: 0.95rem; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .gtile { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 8px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); font-size: 0.74rem; font-weight: 700; }
+  .gtile svg { width: 30px; height: 30px; color: var(--c); }
+  .gtile.sel { background: color-mix(in srgb, var(--c) 24%, var(--surface-2)); border-color: var(--c); }
+  .suggest { margin-top: 8px; padding: 10px 12px; border-radius: var(--radius); background: color-mix(in srgb, var(--highlight) 10%, var(--surface)); border: 1px dashed color-mix(in srgb, var(--highlight) 70%, transparent); display: flex; align-items: center; gap: 10px; font-size: 0.8rem; }
+  .suggest b { display: block; font-size: 0.88rem; }
+  .suggest .use { margin-left: auto; font-weight: 800; color: var(--highlight); }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg span { padding: 7px 11px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); font-size: 0.8rem; font-weight: 700; color: var(--text-dim); }
+  .seg span.sel { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  .hint { font-size: 0.72rem; color: var(--text-dim); margin: 6px 2px 0; }
+
+  .hero { display: flex; align-items: center; gap: 14px; margin: 6px 0 14px; }
+  .hero .badge { width: 64px; height: 64px; border-radius: 16px; }
+  .hero .badge svg { width: 50px; height: 50px; }
+  .hero h3 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; line-height: 1.15; }
+  .hero .sub { color: var(--text-dim); font-size: 0.8rem; }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .fact { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
+  .fact .k { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-dim); }
+  .fact .v { font-weight: 700; font-size: 0.9rem; margin-top: 3px; }
+  .howto { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 14px; }
+  .howto .top { display: flex; justify-content: space-between; font-weight: 800; font-size: 0.9rem; }
+  .howto ol { margin: 10px 0 0; padding-left: 18px; color: var(--text-dim); font-size: 0.84rem; line-height: 1.5; }
+  .howto ol li { margin-bottom: 4px; }
+
+  .seg2 { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3px; margin-bottom: 14px; }
+  .seg2 span { flex: 1; text-align: center; padding: 8px; border-radius: 9px; font-weight: 700; font-size: 0.85rem; color: var(--text-dim); }
+  .seg2 span.sel { background: var(--surface-2); color: var(--text); box-shadow: 0 0 0 1px var(--border); }
+  .art { border: 2px dashed var(--highlight); border-radius: 16px; color: var(--highlight); display: grid; place-items: center; text-align: center; font-size: 0.74rem; font-weight: 800; padding: 10px; line-height: 1.35; background: color-mix(in srgb, var(--highlight) 6%, transparent); }
+  .banner { display: flex; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 12px; margin-bottom: 14px; }
+  .banner .art { width: 84px; height: 84px; flex-shrink: 0; }
+  .banner .mascot { width: 92px; height: 92px; flex-shrink: 0; object-fit: contain; }
+  .banner .t { font-family: 'Baloo 2', sans-serif; font-size: 1.05rem; line-height: 1.2; }
+  .banner .s { font-size: 0.78rem; color: var(--text-dim); margin-top: 3px; line-height: 1.4; }
+  .gcards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .gcard { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); }
+  .gcard .n { font-weight: 700; font-size: 0.92rem; }
+  .gcard .c { font-size: 0.72rem; color: var(--text-dim); }
+
+  .guess { width: 116px; justify-content: center; white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 999px; font-size: 0.76rem; font-weight: 800; background: color-mix(in srgb, var(--c) 20%, var(--surface)); border: 1px solid var(--c); }
+  .guess.ask { --c: var(--highlight); border-style: dashed; color: var(--highlight); background: transparent; }
+  .check { color: var(--success); font-weight: 800; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- Extends docs/design/item-112-category-icons.html: same rounded figure, with shoulder caps and glutes added. -->
+    <g id="b-head"><circle cx="12" cy="4.2" r="2.7" /></g>
+    <g id="b-shoulders"><circle cx="6" cy="9.1" r="2.3" /><circle cx="18" cy="9.1" r="2.3" /></g>
+    <g id="b-arms"><rect x="3.1" y="10.8" width="2.8" height="8.6" rx="1.4" transform="rotate(8 4.5 10.8)" /><rect x="18.1" y="10.8" width="2.8" height="8.6" rx="1.4" transform="rotate(-8 19.5 10.8)" /></g>
+    <g id="b-chest"><rect x="7.6" y="7.4" width="8.8" height="6.4" rx="2.4" /></g>
+    <g id="b-core"><rect x="7.8" y="14.4" width="8.4" height="4.4" rx="1.6" /></g>
+    <g id="b-glutes"><circle cx="10" cy="21.2" r="2.35" /><circle cx="14" cy="21.2" r="2.35" /></g>
+    <g id="b-legs"><rect x="7.6" y="23.2" width="3.9" height="8.4" rx="1.9" /><rect x="12.5" y="23.2" width="3.9" height="8.4" rx="1.9" /></g>
+  </defs>
+</svg>
+
+<div class="intro">
+  <h1>Issue #39: starter exercise library, organized by muscle</h1>
+  <p class="note">Built from the decisions on 2026-09-29: 8 friendly muscle groups, a curated library of about 120 to 150 exercises, and exercises join your own list the first time you use them. Muscle figure icons, a collapsed how-to section, and a one-time "check your exercises" pass for existing accounts. Mascot art: <code>public/library-bunny.png</code> and <code>public/clipboard-bunny.png</code>.</p>
+</div>
+
+<div class="page">
+  <div>
+    <p class="cap">1 · Muscle group icons</p>
+    <p class="capnote">The template category figure (item 112), extended with shoulder caps and glutes. The worked group is lit and the rest dimmed. Back uses the same torso as chest, with a spine line so it reads as the back view. Always shown with a label; color is never the only cue.</p>
+    <div class="set" id="set"></div>
+  </div>
+
+  <div class="col">
+    <p class="cap">2 · Add exercise sheet (during a workout)</p>
+    <p class="capnote">Muscle chips come first. Your own exercises in that group come first, then library exercises with a quick Add. Search still searches everything.</p>
+    <div class="phone">
+      <div class="hdr"><h3>Add exercise</h3><span class="iconbtn">✕</span></div>
+      <div class="search">Search exercises</div>
+      <div class="chips" id="chips"></div>
+      <div class="label">Your leg exercises</div>
+      <div id="mine"></div>
+      <div class="label" style="margin-top:14px">From the library · Legs</div>
+      <div id="lib"></div>
+      <div class="btn create" style="margin-top:10px">+ New exercise</div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">3 · New exercise, muscle first</p>
+    <p class="capnote">Pick the group, then type the name. If the name matches a library exercise, it offers that instead of creating a duplicate. The group picks a sensible tracking type (Cardio → Timed), which you can change.</p>
+    <div class="phone">
+      <div class="hdr"><span class="iconbtn">‹</span><h3>New exercise</h3></div>
+      <div class="field" style="margin-top:0">What does it work?</div>
+      <div class="grid4" id="picker"></div>
+      <div class="field">Name</div>
+      <div class="input">Cable kickback<span style="color:var(--accent)">|</span></div>
+      <div class="suggest"><span class="badge" id="sugIcon" style="--c:#e79ad6;width:34px;height:34px"></span><div><b>Cable Glute Kickback</b>Already in the library · Glutes · Weight</div><span class="use">Use it</span></div>
+      <div class="field">Also works <small>(optional)</small></div>
+      <div class="chips" id="also"></div>
+      <div class="field" style="margin-top:4px">How do you track it?</div>
+      <div class="seg"><span class="sel">Weight</span><span>Level</span><span>Bodyweight</span><span>Assisted</span><span>Timed</span></div>
+      <p class="hint">Suggested from the muscle group. Change it anytime.</p>
+      <div class="btn primary" style="margin-top:18px">Create exercise</div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">4 · Library exercise detail</p>
+    <p class="capnote">Opened by tapping a library row. The how-to section is collapsed by default (shown open here), rewritten short and plain from the public-domain dataset.</p>
+    <div class="phone">
+      <div class="hdr"><span class="iconbtn">‹</span><h3 style="font-size:1rem;color:var(--text-dim)">Library</h3></div>
+      <div class="hero"><span class="badge" id="heroIcon" style="--c:#e79ad6"></span><div><h3>Barbell Hip Thrust</h3><div class="sub">Glutes · also works Legs</div></div></div>
+      <div class="facts">
+        <div class="fact"><div class="k">Equipment</div><div class="v">Barbell + bench</div></div>
+        <div class="fact"><div class="k">Tracked as</div><div class="v">Weight × reps</div></div>
+      </div>
+      <div class="howto">
+        <div class="top"><span>How to</span><span style="color:var(--text-dim)">▴</span></div>
+        <ol>
+          <li>Sit with your upper back against a bench, bar across your hips (a pad helps).</li>
+          <li>Feet flat, about hip-width, knees bent.</li>
+          <li>Drive through your heels and squeeze your glutes to lift your hips until your body is flat from shoulders to knees.</li>
+          <li>Pause, then lower with control.</li>
+        </ol>
+      </div>
+      <div class="btn primary">Add to this workout</div>
+      <div class="btn ghost">Add to my exercises</div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">5 · Exercises tab: Library view</p>
+    <p class="capnote">A new "My exercises / Library" toggle. The library opens on the 8 groups with counts; tapping one lists its exercises (same rows as screen 2).</p>
+    <div class="phone">
+      <div class="hdr"><h3>Exercises</h3></div>
+      <div class="seg2"><span>My exercises</span><span class="sel">Library</span></div>
+      <div class="banner"><img class="mascot" src="../../public/library-bunny.png" alt="" /><div><div class="t">140 exercises, ready to go</div><div class="s">Common gym machines, free weights, bodyweight, and cardio. Anything missing? Make your own.</div></div></div>
+      <div class="search">Search the library</div>
+      <div class="gcards" id="gcards"></div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">6 · One-time "check your exercises"</p>
+    <p class="capnote">Shown once to accounts that already have exercises, after the update. Names that match the library get their groups filled in; tap a chip to change it. Unmatched ones ask. It can be skipped, and anything unconfirmed can be fixed later in Exercises.</p>
+    <div class="phone">
+      <div class="banner" style="background:transparent;border:none;padding:0"><img class="mascot" src="../../public/clipboard-bunny.png" alt="" /><div><div class="t">Exercises now know their muscles</div><div class="s">We matched yours to the library. Take a quick look so your progress counts in the right place.</div></div></div>
+      <div id="review"></div>
+      <div class="btn primary" style="margin-top:12px">Looks good</div>
+      <div class="btn ghost">Later</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const DIM = 'opacity="0.26"'
+  const parts = ['head', 'shoulders', 'arms', 'chest', 'core', 'glutes', 'legs']
+  function body(lit, spine) {
+    const g = parts.map((p) => `<use href="#b-${p}" ${lit.includes(p) ? '' : DIM} />`).join('')
+    const s = spine ? '<path d="M12 7.8v10.6" stroke="#17111c" stroke-width="1.1" stroke-linecap="round"/><path d="M9.2 9.6l2.8 3 2.8-3" stroke="#17111c" stroke-width="0.9" fill="none" stroke-linecap="round"/>' : ''
+    return `<svg viewBox="0 0 24 32" fill="currentColor" aria-hidden="true">${g}${s}</svg>`
+  }
+  const cardio = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 5.6a5 5 0 0 0-7.1 0L12 6.9l-1.3-1.3a5 5 0 0 0-7.1 7.1l1.3 1.3L12 21l7.1-7 1.3-1.3a5 5 0 0 0 0-7.1z" fill="currentColor" fill-opacity="0.22"/><path d="M3.5 12h4l1.8-3 2.6 6 1.8-3h6.8"/></svg>`
+
+  const G = {
+    chest:     { label: 'Chest',     c: '#f2879c', svg: body(['chest']),            why: 'bench, press, fly, push-up', n: 16 },
+    back:      { label: 'Back',      c: '#b79cf0', svg: body(['chest', 'core'], 1), why: 'row, pulldown, pull-up', n: 18 },
+    shoulders: { label: 'Shoulders', c: '#8fc4f2', svg: body(['shoulders']),        why: 'overhead press, raises', n: 14 },
+    arms:      { label: 'Arms',      c: '#f2c069', svg: body(['arms']),             why: 'curls, triceps, dips', n: 20 },
+    core:      { label: 'Core',      c: '#a9cb8d', svg: body(['core']),             why: 'plank, crunch, ab machine', n: 15 },
+    glutes:    { label: 'Glutes',    c: '#e79ad6', svg: body(['glutes']),           why: 'hip thrust, abductor, kickback', n: 13 },
+    legs:      { label: 'Legs',      c: '#7fd4c1', svg: body(['legs']),             why: 'squat, leg press, curls, calves', n: 26 },
+    cardio:    { label: 'Cardio',    c: '#f4a07a', svg: cardio,                     why: 'treadmill, bike, stairs', n: 12 },
+  }
+  const badge = (k, extra = '') => `<span class="badge" style="--c:${G[k].c};${extra}">${G[k].svg}</span>`
+  const $ = (id) => document.getElementById(id)
+
+  $('set').innerHTML = Object.values(G)
+    .map((k) => `<div class="big" style="color:${k.c}">${k.svg}<div class="lbl">${k.label}</div><div class="why">${k.why}</div></div>`).join('')
+
+  $('chips').innerHTML = `<span class="chip" style="--c:var(--text-dim)">All</span>` +
+    ['legs', 'glutes', 'chest', 'back', 'shoulders'].map((k) =>
+      `<span class="chip${k === 'legs' ? ' sel' : ''}" style="--c:${G[k].c}"><span class="dot"></span>${G[k].label}</span>`).join('')
+
+  $('mine').innerHTML = [['Leg Press', 'Last: 140 lb × 10'], ['Leg Extension', 'Last: 60 lb × 12'], ['Seated Leg Curl', 'Last: 55 lb × 12']]
+    .map(([n, s]) => `<div class="row">${badge('legs')}<div class="grow"><div class="name">${n}</div><div class="sub">${s}</div></div></div>`).join('')
+
+  $('lib').innerHTML = [['Hack Squat', 'Machine · weight'], ['Goblet Squat', 'Dumbbell · weight'], ['Walking Lunge', 'Bodyweight'], ['Standing Calf Raise', 'Machine · weight']]
+    .map(([n, s]) => `<div class="row lib">${badge('legs')}<div class="grow"><div class="name">${n}</div><div class="sub">${s}</div></div><span class="add">+ Add</span></div>`).join('')
+
+  $('picker').innerHTML = Object.entries(G)
+    .map(([k, g]) => `<div class="gtile${k === 'glutes' ? ' sel' : ''}" style="--c:${g.c}">${g.svg}${g.label}</div>`).join('')
+  $('sugIcon').innerHTML = G.glutes.svg
+  $('heroIcon').innerHTML = G.glutes.svg
+
+  $('also').innerHTML = ['legs', 'core', 'back'].map((k) =>
+    `<span class="chip${k === 'legs' ? ' sel' : ''}" style="--c:${G[k].c}"><span class="dot"></span>${G[k].label}</span>`).join('')
+
+  $('gcards').innerHTML = Object.entries(G)
+    .map(([k, g]) => `<div class="gcard">${badge(k)}<div><div class="n">${g.label}</div><div class="c">${g.n} exercises</div></div></div>`).join('')
+
+  $('review').innerHTML = [
+    ['Leg Press', 'legs'], ['Lat Pulldown', 'back'], ['Hip Abductor', 'glutes'], ['Stair Stepper', 'cardio'], ['Tricep Rope Pushdown', 'arms'], ['Tuesday Burner', null],
+  ].map(([n, k]) => `<div class="row">${k ? badge(k) : '<span class="badge" style="--c:var(--highlight)">?</span>'}<div class="grow"><div class="name">${n}</div></div>${
+    k ? `<span class="guess" style="--c:${G[k].c}">${G[k].label} ▾</span>` : '<span class="guess ask">Pick a group ▾</span>'}</div>`).join('')
+</script>
+</body>
+</html>

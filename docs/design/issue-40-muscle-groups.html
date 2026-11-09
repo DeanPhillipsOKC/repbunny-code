@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Muscle Group Progress</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1300px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 10px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 32px; padding: 24px 32px 40px; align-items: flex-start; }
+  .col { width: 390px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 92px; }
+  .phone { width: 390px; height: 800px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; position: relative; overflow: hidden; padding: 22px 16px 0; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 2px; }
+  .lede { color: var(--text-dim); font-size: 0.82rem; margin: 0 0 14px; line-height: 1.4; }
+  .back { color: var(--text-dim); font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; }
+  .badge { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); font-weight: 800; font-size: 0.85rem; flex-shrink: 0; }
+
+  /* hub */
+  .tile { display: flex; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+  .tile.hl { outline: 2px solid color-mix(in srgb, var(--highlight) 70%, transparent); }
+  .tile .ic { flex-shrink: 0; width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); }
+  .tile .body { flex: 1; min-width: 0; }
+  .tile .t { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; line-height: 1.15; }
+  .tile .s { color: var(--text-dim); font-size: 0.78rem; margin-top: 2px; line-height: 1.35; }
+  .tile .s b { color: var(--text); }
+  .minibars { display: flex; gap: 3px; align-items: flex-end; height: 34px; }
+  .minibars i { display: block; width: 8px; border-radius: 3px 3px 1px 1px; }
+  .tile .chev { color: var(--text-dim); font-size: 1.2rem; }
+  .tile.faded { opacity: 0.5; }
+
+  /* list */
+  .weekline { display: flex; justify-content: space-between; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px 10px; margin-bottom: 12px; font-weight: 800; font-size: 0.9rem; }
+  .weekline span.arrow { width: 32px; height: 32px; border-radius: 10px; border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); }
+  .weekline span.arrow.off { opacity: 0.35; }
+  .weekline small { display: block; font-size: 0.7rem; color: var(--text-dim); font-weight: 700; text-align: center; }
+  .mrow { display: flex; align-items: center; gap: 12px; padding: 9px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 6px; }
+  .mrow .mid { flex: 1; min-width: 0; }
+  .mrow .n { display: flex; justify-content: space-between; font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; }
+  .mrow .n span { font-family: 'Baloo 2', sans-serif; font-size: 1rem; }
+  .mrow .n span small { font-family: Manrope, sans-serif; font-size: 0.7rem; color: var(--text-dim); font-weight: 700; }
+  .track { position: relative; height: 8px; border-radius: 4px; background: var(--surface-2); }
+  .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--c); }
+  .tick { position: absolute; top: -3px; bottom: -3px; width: 2px; border-radius: 1px; background: var(--text-dim); opacity: 0.7; }
+  .mrow .chev { color: var(--text-dim); }
+  .notset { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px dashed color-mix(in srgb, var(--highlight) 70%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--highlight) 8%, transparent); font-weight: 700; font-size: 0.85rem; margin-top: 10px; }
+  .notset .chev { margin-left: auto; color: var(--highlight); }
+  .key { display: flex; gap: 14px; font-size: 0.7rem; color: var(--text-dim); margin: 8px 2px 0; align-items: center; }
+  .key i { display: inline-block; width: 2px; height: 12px; background: var(--text-dim); vertical-align: middle; margin-right: 5px; border-radius: 1px; }
+  .key b { display: inline-block; width: 16px; height: 6px; border-radius: 3px; background: var(--secondary); vertical-align: middle; margin-right: 5px; }
+
+  /* detail */
+  .dhead { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .dhead h2 { margin: 0; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 14px; }
+  .k { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); }
+  .bign { display: flex; align-items: baseline; gap: 10px; }
+  .bign .v { font-family: 'Baloo 2', sans-serif; font-size: 2rem; color: #7fd4c1; line-height: 1.1; }
+  .bign .v small { font-size: 1rem; }
+  .sub { font-size: 0.74rem; color: var(--text-dim); margin-bottom: 8px; }
+  svg.chart { width: 100%; height: 140px; display: block; }
+  .axis { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; }
+  .ranges { display: flex; gap: 6px; margin-top: 10px; }
+  .ranges span { flex: 1; text-align: center; padding: 6px 0; border-radius: 999px; font-size: 0.74rem; font-weight: 800; color: var(--text-dim); border: 1px solid var(--border); }
+  .ranges span.sel { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .label { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.07em; color: var(--text-dim); text-transform: uppercase; margin: 4px 2px 8px; }
+  .exrow { display: flex; justify-content: space-between; align-items: baseline; padding: 9px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 6px; font-size: 0.88rem; font-weight: 700; }
+  .exrow small { display: block; font-size: 0.72rem; color: var(--text-dim); font-weight: 600; margin-top: 1px; }
+  .exrow .c { font-family: 'Baloo 2', sans-serif; font-size: 1.05rem; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#40 Muscle-group progress (defaults approved 2026-09-29)</h1>
+  <p class="note">Counts <b>sets per week</b> for every exercise type. A set counts <b>1</b> for its exercise's main muscle and <b>½</b> for each "also works" muscle. Weeks start Monday. Opens from the <b>Muscle groups</b> tile on the Progress hub (today it says "Later"). Plain numbers, no warnings or nudges: a muscle with no sets just shows 0. Muscle badges here are placeholders for the app's real <code>MuscleBadge</code> icons.</p>
+</div>
+<div class="page">
+
+  <!-- 1 -->
+  <div class="col">
+    <p class="cap">1. Progress hub tile goes live</p>
+    <p class="capnote">The dashed "Later" tile becomes a real one (highlighted). Its preview is a tiny bar per muscle for this week in each muscle's own color, plus the week's busiest muscle. Other tiles unchanged.</p>
+    <div class="phone">
+      <h2>Progress</h2>
+      <p class="lede">How your training is going.</p>
+      <div class="tile faded" style="--c: var(--secondary)"><div class="ic">📋</div><div class="body"><div class="t">Workout log</div><div class="s">Last: <b>Push day</b> · Fri, Sep 26</div></div><span class="chev">›</span></div>
+      <div class="tile faded" style="--c: var(--accent)"><div class="ic">📈</div><div class="body"><div class="t">Lift progress</div><div class="s"><b>Bench Press</b> est. 1RM</div></div><span class="chev">›</span></div>
+      <div class="tile faded" style="--c: var(--success)"><div class="ic">⚖️</div><div class="body"><div class="t">Body weight</div><div class="s"><b>142.4 lb</b> · Sep 27</div></div><span class="chev">›</span></div>
+      <div class="tile hl" style="--c: var(--highlight)">
+        <div class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="6" r="2.5"/><path d="M12 9v6M8 11l4-1 4 1M10 21l2-6 2 6"/></svg></div>
+        <div class="body"><div class="t">Muscle groups</div><div class="s">This week: <b>Back</b> leads<br />with 11 sets</div></div>
+        <div class="minibars" id="mini"></div>
+        <span class="chev">›</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="col">
+    <p class="cap">2. Muscle groups: this week</p>
+    <p class="capnote">One row per muscle, always in the same order (not ranked, so nothing looks like a "worst" list). The bar is this week's sets, and the grey tick is where last week ended. ‹ › steps back through past weeks. Exercises with no muscle group show as a "Not set" row at the bottom.</p>
+    <div class="phone">
+      <div class="back">‹ Progress</div>
+      <h2>Muscle groups</h2>
+      <p class="lede">Sets per week. "Also works" muscles count as half a set.</p>
+      <div class="weekline"><span class="arrow">‹</span><div>This week<small>Sep 29 – Oct 5 · so far</small></div><span class="arrow off">›</span></div>
+      <div id="rows"></div>
+      <div class="key"><span><b></b>This week</span><span><i></i>Last week</span></div>
+      <div class="notset"><span class="badge" style="--c: var(--highlight)">?</span>2 exercises need a muscle group<span class="chev">›</span></div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="col">
+    <p class="cap">3. One muscle over time</p>
+    <p class="capnote">Tapping a muscle shows its weekly sets as bars (this week in progress is lighter), with a dashed line for the average. Range pills match the lift chart. Below: which exercises made up this week's count, with half-set credit spelled out.</p>
+    <div class="phone">
+      <div class="back">‹ Muscle groups</div>
+      <div class="dhead"><span class="badge" style="--c: #7fd4c1; width: 42px; height: 42px">L</span><h2>Legs</h2></div>
+      <div class="card">
+        <div class="k">Sets this week</div>
+        <div class="bign"><span class="v">9 <small>sets</small></span></div>
+        <div class="sub">12-week average: 8.5 a week</div>
+        <svg class="chart" id="weekly" viewBox="0 0 326 140" preserveAspectRatio="none"></svg>
+        <div class="axis"><span>Jul 7</span><span>Aug 11</span><span>Sep 29</span></div>
+        <div class="ranges"><span>4W</span><span class="sel">12W</span><span>1Y</span><span>All</span></div>
+      </div>
+      <div class="label">This week</div>
+      <div class="exrow"><div>Barbell Back Squat<small>main muscle</small></div><span class="c">4</span></div>
+      <div class="exrow"><div>Leg Press<small>main muscle</small></div><span class="c">3</span></div>
+      <div class="exrow"><div>Romanian Deadlift<small>also works legs · 4 sets × ½</small></div><span class="c">2</span></div>
+    </div>
+  </div>
+</div>
+<script>
+  const T = { chest: ['Chest', '#f2879c', 8, 7], back: ['Back', '#b79cf0', 11, 10], shoulders: ['Shoulders', '#8fc4f2', 4.5, 6], arms: ['Arms', '#f2c069', 6, 6], core: ['Core', '#a9cb8d', 3, 4], glutes: ['Glutes', '#e79ad6', 3.5, 5], legs: ['Legs', '#7fd4c1', 9, 8], cardio: ['Cardio', '#f4a07a', 0, 2] }
+  const max = 12
+  document.getElementById('rows').innerHTML = Object.values(T).map(([n, c, v, last]) =>
+    `<div class="mrow" style="--c:${c}"><span class="badge">${n[0]}</span><div class="mid"><div class="n">${n}<span>${v} <small>sets</small></span></div><div class="track"><div class="fill" style="width:${(v / max) * 100}%"></div><div class="tick" style="left:calc(${(last / max) * 100}% - 1px)"></div></div></div><span class="chev">›</span></div>`).join('')
+  document.getElementById('mini').innerHTML = Object.values(T).map(([, c, v]) => `<i style="height:${Math.max(3, (v / max) * 34)}px;background:${c}"></i>`).join('')
+
+  const weeks = [7, 9, 8, 6, 10, 9, 8, 0, 9, 10, 9, 9]
+  const svg = document.getElementById('weekly'), W = 326, H = 140, topPad = 12, n = weeks.length, gap = 6
+  const bw = (W - gap * (n - 1)) / n, y = (v) => H - 4 - (v / max) * (H - topPad - 4)
+  let out = weeks.map((v, i) => `<rect x="${i * (bw + gap)}" y="${y(v)}" width="${bw}" height="${H - 4 - y(v)}" rx="4" fill="#7fd4c1" opacity="${i === n - 1 ? 0.5 : 1}"/>`).join('')
+  const avg = 8.5
+  out += `<line x1="0" x2="${W}" y1="${y(avg)}" y2="${y(avg)}" stroke="#b9a8c2" stroke-width="1.4" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/>`
+  out += `<line x1="0" x2="${W}" y1="${H - 4}" y2="${H - 4}" stroke="#3a2b40" stroke-width="1"/>`
+  svg.innerHTML = out
+</script>
+</body>
+</html>

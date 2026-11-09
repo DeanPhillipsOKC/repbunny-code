@@ -1,0 +1,176 @@
+# Posts a /review-pr verdict as the RepBunny Reviewer bot (#679): a real Approve or Request changes
+# instead of a comment from the owner's account. Started by `node scripts/bot-dispatch.mjs
+# post-review` from the review routine; cloud sessions can't act as the bot themselves (their proxy
+# swaps the token). Runs main's copy of the scripts and never checks out the PR.
+#
+# Known limit, accepted (docs/governance/threat-model.md > Accepted risks): any session with
+# Actions write can start this, so a Reviewer approval records the review but doesn't prove the
+# review routine gave it. The owner's own approval on tier 3 is the enforced one.
+name: Post review as Reviewer
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: PR number
+        type: string
+        required: true
+      commit:
+        description: The reviewed head commit (full 40-character SHA)
+        type: string
+        required: true
+      event:
+        description: Review verdict
+        type: choice
+        options: [APPROVE, REQUEST_CHANGES, COMMENT]
+        required: true
+      body:
+        description: Review body (markdown)
+        type: string
+        required: true
+      auto_merge:
+        description: Also turn on auto-merge (squash), so the PR merges itself once its rules pass (tier 1 and 2 on the Reviewer's approval, #1020; tier 3 on the owner's, #681)
+        type: boolean
+        default: false
+      merge_subject:
+        description: Squash commit subject, with auto_merge
+        type: string
+        required: false
+      merge_body:
+        description: Squash commit body, with auto_merge (keeps its Fixes #N or Issue: #N line)
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          sparse-checkout: scripts
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Check the inputs
+        env:
+          PR: ${{ inputs.pr }}
+          COMMIT: ${{ inputs.commit }}
+        run: |
+          printf '%s' "$PR" | grep -Eq '^[0-9]{1,6}$' || { echo "pr must be a number, not '$PR'." >&2; exit 1; }
+          printf '%s' "$COMMIT" | grep -Eq '^[0-9a-f]{40}$' || { echo "commit must be a full SHA, not '$COMMIT'." >&2; exit 1; }
+
+      - name: Mint a Reviewer token
+        id: token
+        env:
+          REVIEWER_APP_ID: ${{ secrets.REVIEWER_APP_ID }}
+          REVIEWER_APP_KEY: ${{ secrets.REVIEWER_APP_KEY }}
+        run: |
+          token="$(node scripts/gh-app-token.mjs --app reviewer)"
+          echo "::add-mask::$token"
+          echo "token=$token" >> "$GITHUB_OUTPUT"
+
+      # commit_id pins the review to the reviewed sha: if the PR moved since, GitHub shows the
+      # review as outdated instead of applying it to code nobody reviewed.
+      - name: Post the review
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ inputs.pr }}
+          COMMIT: ${{ inputs.commit }}
+          EVENT: ${{ inputs.event }}
+          REVIEW_BODY: ${{ inputs.body }}
+        run: |
+          printf '%s' "$REVIEW_BODY" > "$RUNNER_TEMP/body.md"
+          id="$(gh api -X POST "repos/{owner}/{repo}/pulls/$PR/reviews" -f commit_id="$COMMIT" -f event="$EVENT" -F body=@"$RUNNER_TEMP/body.md" --jq .id)"
+          echo "Posted review $id ($EVENT) on PR #$PR at ${COMMIT:0:7} as the Reviewer." | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # A COMMENT verdict ("Owner decides", tier 3) doesn't replace the Reviewer's earlier
+      # CHANGES_REQUESTED, so the PR would stay on "Changes requested" and auto-merge would never
+      # fire (#1000). When this round isn't a request for changes, dismiss the Reviewer's own
+      # still-standing CHANGES_REQUESTED reviews, naming the round that passed.
+      - name: Dismiss the Reviewer's stale changes-requested
+        if: inputs.event != 'REQUEST_CHANGES'
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ inputs.pr }}
+          COMMIT: ${{ inputs.commit }}
+        run: |
+          me="$(gh api "repos/{owner}/{repo}/pulls/$PR/reviews?per_page=100" --jq '.[] | select(.state=="CHANGES_REQUESTED") | select(.user.login=="repbunny-reviewer[bot]") | .id')"
+          for rid in $me; do
+            gh api -X PUT "repos/{owner}/{repo}/pulls/$PR/reviews/$rid/dismissals" \
+              -f message="Superseded: a later review round passed at ${COMMIT:0:7}." -f event=DISMISS > /dev/null
+            echo "Dismissed stale changes-requested review $rid on PR #$PR." | tee -a "$GITHUB_STEP_SUMMARY"
+          done
+
+      # Auto-merge is GraphQL-only and needs write access to the repo's contents. This step acts as
+      # the Builder, which has always had it (the Reviewer got Contents write in #770 only so its
+      # approvals count toward the ruleset). expectedHeadOid makes it
+      # refuse if the PR moved past the reviewed commit, so it can only ever merge what was reviewed.
+      # Turning it on fails when the repo has auto-merge off or the PR is already mergeable (the latter
+      # merges it now, below); bot-dispatch.mjs checks that auto-merge is on or the PR merged, and
+      # exits 5 when neither, so nobody waits on it.
+      - name: Mint a Builder token for auto-merge
+        id: builder
+        if: inputs.auto_merge
+        env:
+          BUILDER_APP_ID: ${{ secrets.BUILDER_APP_ID }}
+          BUILDER_APP_KEY: ${{ secrets.BUILDER_APP_KEY }}
+        run: |
+          token="$(node scripts/gh-app-token.mjs --app builder)"
+          echo "::add-mask::$token"
+          echo "token=$token" >> "$GITHUB_OUTPUT"
+
+      - name: Turn on auto-merge
+        if: inputs.auto_merge
+        env:
+          GH_TOKEN: ${{ steps.builder.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ inputs.pr }}
+          COMMIT: ${{ inputs.commit }}
+          MERGE_SUBJECT: ${{ inputs.merge_subject }}
+          MERGE_BODY: ${{ inputs.merge_body }}
+        run: |
+          node_id="$(gh api "repos/{owner}/{repo}/pulls/$PR" --jq .node_id)"
+          # $id, $head, $subject, and $body below are GraphQL variables, not shell ones.
+          # shellcheck disable=SC2016
+          query='mutation($id: ID!, $head: GitObjectID!, $subject: String, $body: String) {
+            enablePullRequestAutoMerge(input: {pullRequestId: $id, mergeMethod: SQUASH, expectedHeadOid: $head, commitHeadline: $subject, commitBody: $body}) {
+              pullRequest { autoMergeRequest { enabledAt } }
+            }
+          }'
+          if gh api graphql -f query="$query" -f id="$node_id" -f head="$COMMIT" \
+            -f subject="$MERGE_SUBJECT" -f body="$MERGE_BODY" > /dev/null; then
+            echo "Auto-merge (squash) is on for PR #$PR at ${COMMIT:0:7}." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          # GitHub refuses to turn auto-merge on for a PR it could merge right now ("clean": the
+          # approval just landed and CI is already green), which is the usual tier 1 and 2 case
+          # (#1020). Then merge it here, squashed and pinned to the reviewed commit with `sha`, which
+          # is what auto-merge would have done a moment later. The ruleset still checks the approval
+          # and CI on this call. Anything other than clean at the reviewed commit stays a failure, and
+          # bot-dispatch.mjs exits 5 so the owner merges it.
+          for _ in 1 2 3 4 5 6; do
+            pull="$(gh api "repos/{owner}/{repo}/pulls/$PR")"
+            state="$(printf '%s' "$pull" | jq -r .mergeable_state)"
+            head="$(printf '%s' "$pull" | jq -r .head.sha)"
+            [ "$state" != "unknown" ] && break
+            sleep 5
+          done
+          if [ "$state" != "clean" ] || [ "$head" != "$COMMIT" ]; then
+            echo "::error::Couldn't turn auto-merge on for PR #$PR (mergeable_state $state, head ${head:0:7}, reviewed ${COMMIT:0:7})." >&2
+            exit 1
+          fi
+          printf '%s' "$MERGE_BODY" > "$RUNNER_TEMP/merge-body.md"
+          gh api -X PUT "repos/{owner}/{repo}/pulls/$PR/merge" -f merge_method=squash -f sha="$COMMIT" \
+            -f commit_title="$MERGE_SUBJECT" -F commit_message=@"$RUNNER_TEMP/merge-body.md" > /dev/null
+          echo "PR #$PR was already mergeable, so it was squash-merged at ${COMMIT:0:7} instead of waiting on auto-merge." | tee -a "$GITHUB_STEP_SUMMARY"

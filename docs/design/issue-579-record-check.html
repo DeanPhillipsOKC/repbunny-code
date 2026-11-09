@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>#579 Record check sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --secondary: #b79cf0;
+    --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+    --font-display: 'Baloo 2', sans-serif; --font-body: 'Manrope', sans-serif;
+  }
+  body { margin: 0; padding: 24px; background: #0d0a10; color: var(--text); font-family: var(--font-body); }
+  h1 { font-size: 16px; margin: 0 0 4px; }
+  .note { color: var(--text-dim); font-size: 13px; margin: 0 0 20px; max-width: 1200px; }
+  .row { display: flex; gap: 24px; align-items: flex-start; }
+  .phone { width: 375px; }
+  .cap { font-size: 12px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: .3px; margin-bottom: 8px; }
+  .screen { position: relative; height: 760px; background: var(--bg); border-radius: 24px; overflow: hidden; border: 1px solid var(--border); }
+  .under { padding: 20px 16px; opacity: .35; }
+  .under h2 { margin: 0 0 12px; font-size: 1.3rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+  td { padding: 6px 0; border-top: 1px solid var(--border); text-align: right; }
+  td:first-child { text-align: left; color: var(--text-dim); font-weight: 700; }
+  .scrim { position: absolute; inset: 0; background: color-mix(in srgb, var(--bg) 70%, transparent); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--bg); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 16px 16px 24px; }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .close { width: 36px; height: 36px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); display: grid; place-items: center; flex-shrink: 0; }
+  .kicker { font-size: .7rem; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; color: var(--text-dim); }
+  .title { margin: 2px 0 6px; font-family: var(--font-display); font-size: 1.35rem; line-height: 1.2; font-weight: 700; }
+  .title.rec { color: var(--highlight); }
+  .rule { margin: 0 0 12px; font-size: .86rem; color: var(--text-dim); line-height: 1.45; }
+  .rule b { color: var(--text); }
+  .calc { border: 1px dashed var(--border); border-radius: var(--radius); padding: 2px 14px; background: var(--surface); margin-bottom: 14px; }
+  .line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 10px 0; }
+  .line + .line { border-top: 1px solid var(--border); }
+  .lbl { font-size: .88rem; white-space: nowrap; }
+  .opts { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; text-align: right; font-size: .9rem; }
+  .opts b { font-weight: 800; }
+  .opts .or { color: var(--text-dim); font-size: .74rem; margin-right: 4px; font-weight: 600; }
+  .sub { display: block; font-size: .74rem; color: var(--text-dim); margin-top: 2px; }
+  .math { font-variant-numeric: tabular-nums; font-size: .9rem; white-space: nowrap; text-align: right; }
+  .math b { font-weight: 800; }
+  .wins-h { font-size: .7rem; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; color: var(--text-dim); margin: 0 0 4px; }
+  .win { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); font-size: .86rem; }
+  .win .dim { color: var(--text-dim); font-size: .78rem; }
+  .ok { color: var(--success); font-weight: 800; white-space: nowrap; }
+  .need { color: var(--text-dim); font-weight: 700; white-space: nowrap; }
+  .btn { margin-top: 14px; width: 100%; padding: 12px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-weight: 800; font: inherit; font-weight: 800; }
+  .wrong { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 8px; color: var(--text-dim); font-size: .8rem; font-weight: 700; }
+  .wrong i { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid currentColor; display: inline-grid; place-items: center; font-style: normal; font-size: .62rem; font-weight: 800; }
+</style>
+</head>
+<body>
+<h1>#579 "Why wasn't this a record?" record check sheet (option A, as specified in the issue)</h1>
+<p class="note">Tap any set row in a lift's Sessions list, or the Workout log's "PR set this workout" line, to open this sheet over the lift's history. One rule line, a calc box with both products and what would beat it, then the small wins replayed at that point. "Open the record set" scrolls to the best set in Sessions. 1RM best only shows with Premium, as on the rest screen.</p>
+<div class="row">
+  <div class="phone">
+    <div class="cap">A · Not a record (weight)</div>
+    <div class="screen">
+      <div class="under"><h2>Barbell Bench Press</h2><div class="card"><table><tr><td>1</td><td>155 lb</td><td>7</td></tr><tr><td>2</td><td>155 lb</td><td>7</td></tr></table></div></div>
+      <div class="scrim"></div>
+      <div class="sheet">
+        <div class="top"><div><div class="kicker">Barbell Bench Press · Set 1</div><div class="title">155 lb × 7: not a record, yet</div></div><span class="close">✕</span></div>
+        <p class="rule">A record is your most <b>weight × reps</b> in a single set.</p>
+        <div class="calc">
+          <div class="line"><span class="lbl">This set</span><span class="math">155 × 7 = <b>1,085</b></span></div>
+          <div class="line"><span class="lbl">Your best<span class="sub">150 lb × 8 · Oct 12, set 1</span></span><span class="math">150 × 8 = <b>1,200</b></span></div>
+          <div class="line"><span class="lbl">To beat it</span><span class="opts"><b>155 × 8</b><span><span class="or">or</span><b>175 × 7</b></span></span></div>
+        </div>
+        <div class="wins-h">Small wins</div>
+        <div class="win"><span>Heaviest yet <span class="dim">(over 150 lb)</span></span><span class="ok">✓ 155 lb</span></div>
+        <div class="win"><span>Rep best at 155 lb</span><span class="need">first time</span></div>
+        <div class="win"><span>1RM best <span class="dim">(over 190)</span></span><span class="ok">✓ 191</span></div>
+        <button class="btn">Open the record set</button>
+        <div class="wrong"><i>!</i>This looks wrong</div>
+      </div>
+    </div>
+  </div>
+  <div class="phone">
+    <div class="cap">A · A record (names what it beat)</div>
+    <div class="screen">
+      <div class="under"><h2>Barbell Bench Press</h2><div class="card"><table><tr><td>1</td><td>150 lb</td><td>8</td></tr></table></div></div>
+      <div class="scrim"></div>
+      <div class="sheet">
+        <div class="top"><div><div class="kicker">Barbell Bench Press · Set 1</div><div class="title rec">150 lb × 8: a record</div></div><span class="close">✕</span></div>
+        <p class="rule">A record is your most <b>weight × reps</b> in a single set.</p>
+        <div class="calc">
+          <div class="line"><span class="lbl">This set</span><span class="math">150 × 8 = <b>1,200</b></span></div>
+          <div class="line"><span class="lbl">Best before it<span class="sub">145 lb × 8 · Oct 8, set 2</span></span><span class="math">145 × 8 = <b>1,160</b></span></div>
+          <div class="line"><span class="lbl">Beat it by</span><span class="math"><b>40</b></span></div>
+        </div>
+        <div class="wins-h">Small wins</div>
+        <div class="win"><span>Heaviest yet <span class="dim">(over 145 lb)</span></span><span class="ok">✓ 150 lb</span></div>
+        <div class="win"><span>Rep best at 150 lb <span class="dim">(over 6)</span></span><span class="ok">✓ 8 reps</span></div>
+        <button class="btn">Open the set it beat</button>
+        <div class="wrong"><i>!</i>This looks wrong</div>
+      </div>
+    </div>
+  </div>
+  <div class="phone">
+    <div class="cap">A · Bodyweight, no weigh-in</div>
+    <div class="screen">
+      <div class="under"><h2>Pull-up</h2><div class="card"><table><tr><td>1</td><td>–</td><td>9</td></tr></table></div></div>
+      <div class="scrim"></div>
+      <div class="sheet">
+        <div class="top"><div><div class="kicker">Pull-up · Set 1</div><div class="title">Body weight × 9: not a record, yet</div></div><span class="close">✕</span></div>
+        <p class="rule">A record is your most <b>(body weight + added weight) × reps</b> in a single set. No weigh-in on file, so it compares <b>reps first</b>, then added weight.</p>
+        <div class="calc">
+          <div class="line"><span class="lbl">This set</span><span class="math"><b>9 reps</b></span></div>
+          <div class="line"><span class="lbl">Your best<span class="sub">BW + 10 lb × 10 · Oct 3, set 1</span></span><span class="math"><b>10 reps</b></span></div>
+          <div class="line"><span class="lbl">To beat it</span><span class="opts"><b>11 reps</b><span><span class="or">or</span><b>10 reps with over 10 lb added</b></span></span></div>
+        </div>
+        <button class="btn">Open the record set</button>
+        <div class="wrong"><i>!</i>This looks wrong</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

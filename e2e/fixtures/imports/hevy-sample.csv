@@ -1,0 +1,6 @@
+"title","start_time","end_time","description","exercise_title","superset_id","exercise_notes","set_index","set_type","weight_kg","reps","distance_km","duration_seconds","rpe"
+"Leg Day","4 Mar 2024, 18:05","4 Mar 2024, 19:01","Good session","Squat (Barbell)",,"",0,"warmup",40,10,,,
+"Leg Day","4 Mar 2024, 18:05","4 Mar 2024, 19:01","Good session","Squat (Barbell)",,"Belt on",1,"normal",100,5,,,8.5
+"Leg Day","4 Mar 2024, 18:05","4 Mar 2024, 19:01","Good session","Squat (Barbell)",,"Belt on",2,"normal",100,5,,,
+"Leg Day","4 Mar 2024, 18:05","4 Mar 2024, 19:01","Good session","Plank",,"",0,"normal",,,,60,
+"Leg Day","4 Mar 2024, 18:05","4 Mar 2024, 19:01","Good session","Pull Up",,"",0,"normal",,8,,,

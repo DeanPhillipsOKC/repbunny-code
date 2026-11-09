@@ -1,0 +1,17 @@
+#!/bin/sh
+# Refuses every push to main (#681). Every change, the owner's included, reaches main through a
+# pull request: GitHub's `main` ruleset (.github/rulesets/main.json) enforces it, and this hook
+# says so before the push leaves the machine. Push a claude/ branch and open a PR instead
+# (docs/architecture/commit-policy.md). Branch and tag pushes go through.
+# Active via `git config core.hooksPath scripts/git-hooks`, which `npm install` sets (the
+# "prepare" script) and scripts/cloud-session-start.mjs sets in cloud sessions.
+
+status=0
+
+while read local_ref local_sha remote_ref remote_sha; do
+  [ "$remote_ref" = "refs/heads/main" ] || continue
+  echo "pre-push: refusing to push to main. Push a claude/ branch and open a PR (commit-policy.md, #681)." >&2
+  status=1
+done
+
+exit $status

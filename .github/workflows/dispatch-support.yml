@@ -1,0 +1,47 @@
+# Starts the Support triage routine (/triage-support headless) only when support mail is waiting
+# (#309), so an empty inbox costs no routine runs. scripts/check-support-mail.mjs counts untriaged
+# threads under the "RepBunny Support" Gmail label over read-only IMAP; scripts/dispatch-support.mjs
+# fires the routine's API trigger when the count is above 0. No AI runs here. 4 runs a day.
+# See docs/backlog-runner.md > Support triage.
+name: Dispatch support triage
+
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: dispatch-support
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Check mail and fire
+        id: dispatch
+        run: node scripts/dispatch-support.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTOMATION_PAUSED: ${{ vars.AUTOMATION_PAUSED }}
+          GMAIL_SENDER_ADDRESS: ${{ secrets.GMAIL_SENDER_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SUPPORT_ROUTINE_ID: ${{ secrets.SUPPORT_ROUTINE_ID }}
+          SUPPORT_ROUTINE_TOKEN: ${{ secrets.SUPPORT_ROUTINE_TOKEN }}
+
+      # Only runs after a real fire. The script looks for this step's name in earlier runs to
+      # avoid firing twice within an hour.
+      - name: Routine fired
+        if: steps.dispatch.outputs.fired == 'true'
+        run: echo "Support triage routine fired"

@@ -1,0 +1,96 @@
+<!doctype html>
+<!--
+  Intro title card for the narrated guide clips (#424). One template for every
+  clip: it takes only its two lines of words (?a=Build a&b=routine) and the
+  clip's first frame (?bg=...), which it zooms out to reveal at the end, so the
+  card hands straight over to the held setup screen. cards.mjs renders it frame
+  by frame at 30fps by setting each animation's currentTime, so everything here
+  must be a CSS animation that starts on load. window.CARD tells the renderer
+  how long the card runs and where its sound effects go.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: 'Baloo 2'; font-weight: 600 800; src: url(/site/fonts/baloo2-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 400 800; src: url(/site/fonts/manrope-latin.woff2) format('woff2'); }
+  :root { --bg: #17111c; --surface: #211829; --accent: #f2879c; --secondary: #b79cf0; --highlight: #f2c069; --text: #f5edf2; --text-soft: #cdbfca; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 480px; height: 1040px; overflow: hidden; background: #000; }
+  #bg { position: absolute; inset: 0; width: 480px; height: 1040px; object-fit: cover; }
+  .card {
+    position: absolute; inset: 0; overflow: hidden; background: var(--bg);
+    font-family: 'Baloo 2', sans-serif; color: var(--text);
+    animation: zoom-out 0.6s cubic-bezier(.55, 0, .8, .4) 3.6s both;
+  }
+  @keyframes zoom-out { to { transform: scale(1.35); opacity: 0; filter: blur(6px); } }
+
+  .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; }
+  .b1 { width: 340px; height: 340px; background: var(--accent); left: -120px; top: 80px; animation: drift1 4.2s ease-in-out both; }
+  .b2 { width: 300px; height: 300px; background: var(--secondary); right: -110px; top: 420px; animation: drift2 4.2s ease-in-out both; }
+  .b3 { width: 260px; height: 260px; background: var(--highlight); left: 60px; bottom: -120px; opacity: .35; animation: drift1 4.2s ease-in-out reverse both; }
+  @keyframes drift1 { from { transform: translate(0, 0); } to { transform: translate(60px, 40px); } }
+  @keyframes drift2 { from { transform: translate(0, 0); } to { transform: translate(-50px, -60px); } }
+
+  .brand { position: absolute; top: 72px; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 12px; animation: pop .45s cubic-bezier(.3, 1.6, .5, 1) .15s both; }
+  .brand img { width: 52px; height: 52px; border-radius: 14px; }
+  .brand span { font-size: 34px; font-weight: 800; letter-spacing: .2px; }
+  @keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .title { position: absolute; top: 168px; left: 0; right: 0; text-align: center; line-height: .98; }
+  .l1 { display: block; font-size: 56px; font-weight: 700; animation: from-left .5s cubic-bezier(.2, .9, .3, 1.15) .55s both; }
+  .l2 {
+    display: block; font-size: 84px; font-weight: 800; padding: 0 16px;
+    background: linear-gradient(90deg, var(--accent), var(--secondary), var(--highlight), var(--accent));
+    background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: from-right .5s cubic-bezier(.2, .9, .3, 1.15) .85s both, shimmer 3.4s linear .85s both;
+  }
+  @keyframes from-left { from { transform: translateX(-520px); } to { transform: translateX(0); } }
+  @keyframes from-right { from { transform: translateX(520px); } to { transform: translateX(0); } }
+  @keyframes shimmer { from { background-position: 0% 0; } to { background-position: 100% 0; } }
+
+  .phone { position: absolute; width: 168px; border-radius: 22px; border: 5px solid #2c2236; background: var(--bg); box-shadow: 0 18px 40px rgba(0, 0, 0, .45); overflow: hidden; }
+  .phone img { display: block; width: 100%; }
+  .p1 { left: 46px; top: 400px; --r: -9deg; animation: rise .7s cubic-bezier(.2, .9, .3, 1.1) 1.25s both; }
+  .p2 { right: 46px; top: 380px; --r: 8deg; animation: rise .7s cubic-bezier(.2, .9, .3, 1.1) 1.4s both; }
+  @keyframes rise { from { transform: translateY(620px) rotate(var(--r)); } to { transform: translateY(0) rotate(var(--r)); } }
+
+  .bunny { position: absolute; left: 50%; top: 470px; width: 320px; margin-left: -160px; animation: drop .55s cubic-bezier(.5, 0, .9, .5) 1.7s both; }
+  .bunny .sq { transform-origin: 50% 100%; animation: squash .35s ease-out 2.25s both; }
+  .bunny img { display: block; width: 100%; transform-origin: 50% 80%; filter: drop-shadow(0 14px 24px rgba(0, 0, 0, .5)); animation: curl .5s ease-in-out 2.6s 2 alternate; }
+  @keyframes drop { from { transform: translateY(-1100px); } to { transform: translateY(0); } }
+  @keyframes squash { 0% { transform: scale(1.18, .8); } 60% { transform: scale(.94, 1.06); } 100% { transform: scale(1, 1); } }
+  @keyframes curl { from { transform: rotate(0); } to { transform: rotate(-6deg) translateY(-10px); } }
+
+  .spark { position: absolute; width: 26px; height: 26px; background: var(--highlight); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: twinkle .9s ease-in-out both; }
+  .spark.s { width: 16px; height: 16px; background: var(--text); }
+  .spark.p { background: var(--accent); }
+  @keyframes twinkle { 0% { transform: scale(0) rotate(0); opacity: 0; } 50% { transform: scale(1.2) rotate(45deg); opacity: 1; } 100% { transform: scale(0) rotate(90deg); opacity: 0; } }
+</style>
+</head>
+<body>
+  <img id="bg" alt="" />
+  <div class="card">
+    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+    <div class="brand"><img src="/site/img/icon.png" alt="" /><span>RepBunny</span></div>
+    <h1 class="title"><span class="l1" id="a"></span><span class="l2" id="b"></span></h1>
+    <div class="phone p1"><img src="/site/img/shot-templates.webp" alt="" /></div>
+    <div class="phone p2"><img src="/site/img/shot-logging.webp" alt="" /></div>
+    <div class="bunny"><div class="sq"><img src="/site/img/bunny-dumbbell.webp" alt="" /></div></div>
+    <i class="spark" style="left:70px;top:150px;animation-delay:1.1s"></i>
+    <i class="spark s" style="left:400px;top:190px;animation-delay:1.5s"></i>
+    <i class="spark p" style="left:380px;top:420px;animation-delay:2.3s"></i>
+    <i class="spark s" style="left:58px;top:400px;animation-delay:2.6s"></i>
+    <i class="spark" style="left:410px;top:720px;animation-delay:2.9s"></i>
+    <i class="spark p" style="left:40px;top:760px;animation-delay:2.1s"></i>
+    <i class="spark s" style="left:230px;top:440px;animation-delay:3.1s"></i>
+  </div>
+  <script>
+    const q = new URLSearchParams(location.search)
+    document.getElementById('a').textContent = q.get('a') ?? ''
+    document.getElementById('b').textContent = q.get('b') ?? ''
+    if (q.get('bg')) document.getElementById('bg').src = q.get('bg')
+    window.CARD = { duration: 4.2, sounds: [['whoosh', 0.55], ['whoosh', 0.85], ['whoosh', 3.6]] }
+  </script>
+</body>
+</html>

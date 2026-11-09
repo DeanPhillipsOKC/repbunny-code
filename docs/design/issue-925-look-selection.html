@@ -1,0 +1,150 @@
+<title>Look Step Selection</title>
+
+
+<style>@font-face { font-family: "Baloo 2"; font-weight: 500 800; src: url(../../public/fonts/baloo2-latin.woff2) format("woff2"); } @font-face { font-family: "Manrope"; font-weight: 400 800; src: url(../../public/fonts/manrope-latin.woff2) format("woff2"); }</style>
+<style>
+  /* Three states of setup step 2 after #925, drawn in the app's tokens
+     (src/lib/theme.ts). One option: the issue specifies the layout. */
+  :root {
+    color-scheme: dark;
+    --page: #0f0b13; --ink: #f5edf2; --ink-dim: #b9a8c2; --note: #f2c069;
+    --display: 'Baloo 2', 'Trebuchet MS', sans-serif;
+    --body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  }
+  .classic { --bg: #17111c; --surface: #211829; --surface-2: #2a1f33; --border: #3a2b40; --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c; }
+  .chalk { --bg: #121417; --surface: #1b1e23; --surface-2: #22262c; --border: #343a42; --text: #eef1f4; --text-dim: #a3acb6; --accent: #8fb4d9; --accent-text: #121417; }
+  .halloween { --bg: #151019; --surface: #211a29; --surface-2: #2a2133; --border: #3d3048; --text: #f6efe6; --text-dim: #bfb1c9; --accent: #ff9a3c; --accent-text: #1d1418; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--body); }
+  .wrap { padding: 28px 16px 48px; max-width: 1240px; margin: 0 auto; }
+  h1 { font-family: var(--display); font-size: 1.9rem; margin: 0 0 6px; }
+  .intro { color: var(--ink-dim); line-height: 1.55; max-width: 76ch; margin: 0 0 6px; }
+  .intro b { color: var(--ink); }
+  .options { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 22px; }
+  .opt { width: 375px; max-width: 100%; display: flex; flex-direction: column; gap: 10px; }
+  .label { color: var(--note); font-size: .74rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 800; margin: 0; }
+  .opt h2 { font-family: var(--display); font-size: 1.25rem; margin: 0; }
+  .why { color: var(--ink-dim); font-size: .86rem; line-height: 1.5; margin: 0; }
+  .why b { color: var(--ink); }
+
+  .phone { background: var(--bg); color: var(--text); border-radius: 34px; border: 1px solid #3a2b40; padding: 18px 16px 16px; display: flex; flex-direction: column; gap: 12px; min-height: 640px; }
+  .steps { display: flex; gap: 6px; justify-content: center; }
+  .steps i { width: 22px; height: 5px; border-radius: 3px; background: var(--border); }
+  .steps i.on { background: var(--accent); }
+  .ptitle { font-family: var(--display); font-size: 1.6rem; line-height: 1.1; margin: 4px 0 0; }
+  .lede { color: var(--text-dim); font-size: .9rem; margin: 0; }
+  .go { margin-top: auto; border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-text); font: 800 1rem var(--body); padding: 14px; }
+
+  /* Tile, as in SetupLookStep.vue */
+  .look { position: relative; display: flex; gap: 14px; align-items: center; width: 100%; text-align: left; border: 1.5px solid var(--border); background: var(--surface); border-radius: 18px; padding: 12px; color: var(--text); font: inherit; }
+  .look.on { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+  .look .t { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .look .n { font-weight: 800; font-size: 1.05rem; }
+  .look .d { font-size: .8rem; color: var(--text-dim); line-height: 1.4; }
+  /* New: no empty circle. Only the selected control gets the check. */
+  .check { width: 24px; height: 24px; border-radius: 99px; flex-shrink: 0; display: grid; place-items: center; font-size: 13px; font-weight: 900; background: var(--accent); color: var(--accent-text); }
+  .sticker { position: absolute; right: -6px; top: -26px; width: 58px; transform: rotate(-12deg); filter: drop-shadow(0 4px 8px rgba(0,0,0,.45)); }
+
+  .mini { position: relative; display: block; width: 100px; height: 136px; flex-shrink: 0; overflow: hidden; border-radius: 12px; padding: 9px; background: var(--bg); border: 1px solid rgba(255,255,255,.08); }
+  .mini .h { display: block; height: 7px; width: 54px; border-radius: 4px; margin-bottom: 8px; background: var(--text); }
+  .mini .c { display: block; height: 34px; border-radius: 7px; margin-bottom: 6px; background: var(--surface); border: 1px solid var(--border); }
+  .mini .b { position: absolute; left: 9px; right: 9px; bottom: 9px; height: 13px; border-radius: 99px; background: var(--accent); }
+  .mini .art { position: absolute; left: 50%; transform: translateX(-50%); top: 50px; width: 62px; }
+  .mini .mark { position: absolute; right: 9px; top: 7px; width: 13px; border-radius: 3px; }
+
+  /* The link row, normal and selected */
+  .more { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--border); background: transparent; color: var(--text-dim); font: inherit; font-size: .82rem; font-weight: 700; text-align: left; }
+  .more .x { flex: 1; }
+  .dots { display: flex; }
+  .dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bg); margin-left: -5px; }
+  .dots i:first-child { margin-left: 0; }
+  .more.on { border: 1.5px solid var(--accent); background: var(--surface); color: var(--text); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+  .more.on .x { display: flex; flex-direction: column; gap: 1px; }
+  .more.on .name { font-size: .95rem; font-weight: 800; }
+  .more.on .sub { font-size: .74rem; color: var(--text-dim); font-weight: 600; }
+  .swatch { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); box-shadow: 0 0 0 1px var(--border); flex-shrink: 0; }
+  .change { color: var(--accent); font-weight: 800; }
+
+  .verdict { margin-top: 30px; border-top: 1px solid #2a2030; padding-top: 18px; max-width: 80ch; color: var(--ink-dim); line-height: 1.6; font-size: .92rem; }
+  .verdict b { color: var(--ink); }
+</style>
+
+<div class="wrap">
+  <h1>Setup step 2: showing what's picked</h1>
+  <p class="intro"><b>#925.</b> Today an unpicked tile shows an empty circle, and a theme picked from the sheet leaves both tiles with empty circles, which reads as "you still have to pick one". Below: no empty circles, and a theme from the sheet shows as the selection on the link row.</p>
+
+  <div class="options">
+    <section class="opt">
+      <p class="label">State 1</p>
+      <h2>Fresh install</h2>
+      <div class="phone classic">
+        <div class="steps"><i></i><i class="on"></i><i></i><i></i></div>
+        <p class="ptitle">Pick your look</p>
+        <p class="lede">Cute or all business. It's your call.</p>
+        <div class="look on">
+          <span class="mini classic"><span class="h"></span><span class="c"></span><img class="art" src="../../public/celebration-bunny.png" alt=""><span class="b"></span></span>
+          <span class="t"><span class="n">Playful</span><span class="d">Pink, with the bunny cheering you on and confetti for records.</span></span>
+          <span class="check">✓</span>
+          <img class="sticker" src="../../public/heart-eyes-sticker.webp" alt="">
+        </div>
+        <div class="look">
+          <span class="mini chalk"><span class="h"></span><span class="c"></span><span class="c"></span><img class="mark" src="../../public/icon-512.png" alt=""><span class="b"></span></span>
+          <span class="t"><span class="n">Just your numbers</span><span class="d">Steel blue on graphite. No bunny art, no confetti.</span></span>
+        </div>
+        <div class="more"><span class="dots"><i style="background:#ff9a3c"></i><i style="background:#e0873a"></i><i style="background:#f7a8d2"></i><i style="background:#f08a3c"></i></span><span class="x">See every theme, seasonal ones too</span><span>›</span></div>
+        <div class="go">Next</div>
+      </div>
+      <p class="why"><b>Unpicked tile is plain.</b> Its border stays, its circle is gone. Only Playful carries the accent border and the check.</p>
+    </section>
+
+    <section class="opt">
+      <p class="label">State 2</p>
+      <h2>A theme from the sheet</h2>
+      <div class="phone halloween">
+        <div class="steps"><i></i><i class="on"></i><i></i><i></i></div>
+        <p class="ptitle">Pick your look</p>
+        <p class="lede">Cute or all business. It's your call.</p>
+        <div class="look">
+          <span class="mini classic"><span class="h"></span><span class="c"></span><img class="art" src="../../public/celebration-bunny.png" alt=""><span class="b"></span></span>
+          <span class="t"><span class="n">Playful</span><span class="d">Pink, with the bunny cheering you on and confetti for records.</span></span>
+          <img class="sticker" src="../../public/heart-eyes-sticker.webp" alt="">
+        </div>
+        <div class="look">
+          <span class="mini chalk"><span class="h"></span><span class="c"></span><span class="c"></span><img class="mark" src="../../public/icon-512.png" alt=""><span class="b"></span></span>
+          <span class="t"><span class="n">Just your numbers</span><span class="d">Steel blue on graphite. No bunny art, no confetti.</span></span>
+        </div>
+        <div class="more on"><span class="swatch"></span><span class="x"><span class="name">Halloween</span><span class="sub">Your theme</span></span><span class="check">✓</span><span class="change">Change ›</span></div>
+        <div class="go">Next</div>
+      </div>
+      <p class="why"><b>The row is the selection.</b> It takes the tile's selected style and names the theme; tapping it reopens the sheet. "Classic, no bunny" reads <b>Classic, no bunny</b> here. Tapping a tile applies that look and the row goes back to State 1's link.</p>
+    </section>
+
+    <section class="opt">
+      <p class="label">State 3</p>
+      <h2>Just your numbers tapped</h2>
+      <div class="phone chalk">
+        <div class="steps"><i></i><i class="on"></i><i></i><i></i></div>
+        <p class="ptitle">Pick your look</p>
+        <p class="lede">Cute or all business. It's your call.</p>
+        <div class="look">
+          <span class="mini classic"><span class="h"></span><span class="c"></span><img class="art" src="../../public/celebration-bunny.png" alt=""><span class="b"></span></span>
+          <span class="t"><span class="n">Playful</span><span class="d">Pink, with the bunny cheering you on and confetti for records.</span></span>
+          <img class="sticker" src="../../public/heart-eyes-sticker.webp" alt="">
+        </div>
+        <div class="look on">
+          <span class="mini chalk"><span class="h"></span><span class="c"></span><span class="c"></span><img class="mark" src="../../public/icon-512.png" alt=""><span class="b"></span></span>
+          <span class="t"><span class="n">Just your numbers</span><span class="d">Steel blue on graphite. No bunny art, no confetti.</span></span>
+          <span class="check">✓</span>
+        </div>
+        <div class="more"><span class="dots"><i style="background:#ff9a3c"></i><i style="background:#e0873a"></i><i style="background:#f7a8d2"></i><i style="background:#f08a3c"></i></span><span class="x">See every theme, seasonal ones too</span><span>›</span></div>
+        <div class="go">Next</div>
+      </div>
+      <p class="why"><b>Exactly one selected control,</b> always: a tile, or the row. Screen readers get <code>aria-pressed</code> on whichever one it is.</p>
+    </section>
+  </div>
+
+  <div class="verdict">
+    <p><b>Chosen by next-item:</b> the single layout above, since the issue spells it out. The selected row reuses the tile's accent border and check, so it reads as the same kind of choice, and "Change" says how to get back to the sheet.</p>
+  </div>
+</div>

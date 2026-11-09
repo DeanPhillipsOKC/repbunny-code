@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Record Celebrations Setting</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: #f5edf2; font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1300px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: #b9a8c2; font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; max-width: 1100px; }
+  .note b { color: #f5edf2; }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; display: flex; flex-direction: column; gap: 10px; }
+  .cap { color: #f2c069; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 0 4px; }
+  .capnote { color: #b9a8c2; font-size: 0.78rem; margin: 0 0 0 4px; line-height: 1.45; min-height: 44px; }
+  .phone { width: 377px; height: 700px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 28px 14px; position: relative; }
+
+  /* Account > Preferences, as in src/components/AccountSheet.vue */
+  .sheet-title { font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; font-weight: 800; margin: 0 4px 12px; }
+  .group { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .pref-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 10px 10px 14px; border-top: 1px solid var(--border); }
+  .pref-row:first-child { border-top: 0; }
+  .pref-row.stacked { flex-direction: column; align-items: stretch; gap: 8px; padding-right: 14px; }
+  .data-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .data-title { font-weight: 700; font-size: .95rem; }
+  .data-caption { font-size: .8rem; color: var(--text-dim); line-height: 1.4; }
+  .switch { flex-shrink: 0; width: 50px; height: 30px; border-radius: 999px; background: var(--accent); position: relative; }
+  .switch::after { content: ''; position: absolute; top: 3px; right: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-text); }
+  .options { display: flex; gap: 6px; }
+  .options span { flex: 1 1 0; min-height: 44px; display: grid; place-items: center; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); font-weight: 700; font-size: .86rem; }
+  .options span.active { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+
+  /* RecordCelebration.vue */
+  .celebrate { background: radial-gradient(circle at 50% 38%, var(--surface-2) 0%, var(--bg) 62%, #0d0910 100%); display: flex; align-items: center; justify-content: center; padding: 0 30px; }
+  .c-content { display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; width: 100%; }
+  .badge { font-size: .78rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--highlight); }
+  .badge.target { color: var(--success); }
+  .mascot { width: 176px; height: 176px; object-fit: contain; }
+  .headline { margin: 0; font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+  .stat { width: 100%; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 24px; display: flex; flex-direction: column; gap: 6px; }
+  .stat .ex { font-size: .9rem; color: var(--text-dim); }
+  .stat .num { font-size: 1.5rem; font-weight: 700; }
+  .stat .delta { font-size: .8rem; font-weight: 600; color: var(--success); }
+  .nice { width: 100%; min-height: 48px; border-radius: 12px; background: var(--accent); color: var(--accent-text); font-weight: 800; display: grid; place-items: center; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#476 Record celebrations: big ones only or all wins</h1>
+  <p class="note">One option. <b>Preferences</b> gets a stacked row under Milestone moments with two equal buttons, styled like the Strength standards choices. <b>Big ones only</b> is the default and keeps today's behavior. <b>All wins</b> opens the same full-screen celebration for a small win (#475): the badge names the win, the stat card shows the set and the win's detail line, and the phrase fits the win type. The chip and rest-screen line stay in both choices.</p>
+</div>
+<div class="page">
+  <div class="col">
+    <p class="cap">Account › Preferences</p>
+    <p class="capnote">Default shown. Summary on the menu adds "All wins celebrated" only when it isn't the default.</p>
+    <div class="phone">
+      <p class="sheet-title">Preferences</p>
+      <div class="group">
+        <div class="pref-row">
+          <span class="data-text"><span class="data-title">Show what's new after updates</span><span class="data-caption">A one-time note on the Log screen. Always in About.</span></span>
+          <span class="switch"></span>
+        </div>
+        <div class="pref-row">
+          <span class="data-text"><span class="data-title">Milestone moments</span><span class="data-caption">The card on your workout recap when you reach one. Milestones still count, under Progress.</span></span>
+          <span class="switch"></span>
+        </div>
+        <div class="pref-row stacked">
+          <span class="data-text"><span class="data-title">Record celebrations</span><span class="data-caption">The full screen for new records only, or for small wins like Heaviest yet too.</span></span>
+          <div class="options"><span class="active">Big ones only</span><span>All wins</span></div>
+        </div>
+        <div class="pref-row">
+          <span class="data-text"><span class="data-title">Run setup again</span><span class="data-caption">Unit, look, and body weight. Nothing gets deleted.</span></span>
+          <span style="color:var(--text-dim)">›</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <p class="cap">All wins: heaviest yet</p>
+    <p class="capnote">Gold badge for a best. Long exercise name wraps in the card.</p>
+    <div class="phone celebrate">
+      <div class="c-content">
+        <div class="badge">★ Heaviest yet ★</div>
+        <img class="mascot" src="../../public/celebration-flex-bunny.png" alt="" />
+        <p class="headline">Heaviest you've lifted here.</p>
+        <div class="stat"><div class="ex">Incline Dumbbell Bench Press (Neutral Grip)</div><div class="num">190 lb × 5</div><div class="delta">190 lb, up from 185 lb</div></div>
+        <div class="nice">Nice!</div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <p class="cap">All wins: target hit (kg)</p>
+    <p class="capnote">Green badge for a target hit, matching its chip.</p>
+    <div class="phone celebrate">
+      <div class="c-content">
+        <div class="badge target">★ Target hit ★</div>
+        <img class="mascot" src="../../public/celebration-dumbbell-bunny.png" alt="" />
+        <p class="headline">Right on target.</p>
+        <div class="stat"><div class="ex">Back Squat</div><div class="num">100 kg × 6</div><div class="delta">Target: 100 kg × 5</div></div>
+        <div class="nice">Nice!</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

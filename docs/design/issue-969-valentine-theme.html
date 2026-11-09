@@ -1,0 +1,162 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Valentine Theme Options</title>
+<style>@font-face { font-family: "Baloo 2"; font-weight: 500 800; src: url(../../public/fonts/baloo2-latin.woff2) format("woff2"); } @font-face { font-family: "Manrope"; font-weight: 400 800; src: url(../../public/fonts/manrope-latin.woff2) format("woff2"); }</style>
+<style>
+  /* Issue #969: the Valentine's Day theme. A burgundy dark scheme and a blush
+     light scheme, each drawn as Log home, the rest timer, and a record
+     celebration at 375px. Classic, Christmas, and Cotton Candy sit beside them,
+     since they're the nearest themes. The heart is the week mark and confetti. */
+  :root {
+    color-scheme: dark;
+    --page: #0f0b10; --ink: #f5edf2; --ink-dim: #b9a8c2; --note: #f3c96b;
+    --display: 'Baloo 2', 'Trebuchet MS', sans-serif;
+    --body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+    --cane: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.2s-8.7-5.4-8.7-11.4C3.3 6.5 5.7 4.3 8.3 4.3c1.6 0 3 .8 3.7 2.1.7-1.3 2.1-2.1 3.7-2.1 2.6 0 5 2.2 5 5.5 0 6-8.7 11.4-8.7 11.4z' fill='%23ff4f86' stroke='%23ffd6e1' stroke-width='1.3' stroke-linejoin='round'/%3E%3Cellipse cx='8.2' cy='8.6' rx='1.9' ry='1.2' transform='rotate(-35 8.2 8.6)' fill='%23fff' opacity='.75'/%3E%3C/svg%3E");
+  }
+  .classic { --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40; --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c; --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; }
+.christmas { --bg: #1b0d14; --surface: #27141e; --surface-2: #301a26; --border: #4c2a3a; --text: #fbf1e6; --text-dim: #cfb3b6; --accent: #ff5c74; --accent-text: #22101a; --secondary: #6fcf97; --highlight: #f3c96b; --success: #b5dd8a; }
+  .cotton { color-scheme: light; --bg: #fff7f4; --surface: #ffffff; --surface-2: #fdeef0; --border: #f0d4da; --text: #2b1d2a; --text-dim: #6e5868; --accent: #bf3a65; --accent-text: #ffffff; --secondary: #7650c4; --highlight: #8f5c08; --success: #2e7a3d; }
+  .xa { --bg: #3b0c1e; --surface: #4a1228; --surface-2: #561830; --border: #7d2c48; --text: #fff0f3; --text-dim: #efc3d0; --accent: #ff86b0; --accent-text: #2a0814; --secondary: #ffbfd0; --highlight: #f8cf73; --success: #a3e6b6; }
+  .xb { color-scheme: light; --bg: #fff3f5; --surface: #ffffff; --surface-2: #ffe6ec; --border: #f4c7d3; --text: #3b0e1f; --text-dim: #7a4253; --accent: #c41f4e; --accent-text: #ffffff; --secondary: #8c2a55; --highlight: #8a6400; --success: #2e7a3d; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--body); }
+  .wrap { padding: 28px 16px 48px; max-width: 1240px; margin: 0 auto; }
+  h1 { font-family: var(--display); font-size: 1.9rem; margin: 0 0 6px; }
+  .intro { color: var(--ink-dim); line-height: 1.55; max-width: 74ch; margin: 0 0 6px; }
+  .label { color: var(--note); font-size: .74rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 800; margin: 28px 0 4px; }
+  .label .pickme { background: var(--note); color: #241a2c; border-radius: 999px; padding: 2px 8px; margin-left: 6px; }
+  h2 { font-family: var(--display); font-size: 1.3rem; margin: 0; }
+  .why { color: var(--ink-dim); font-size: .88rem; line-height: 1.5; margin: 4px 0 14px; max-width: 80ch; }
+  .row { display: flex; flex-wrap: wrap; gap: 20px; }
+
+  .phone { width: 375px; max-width: 100%; height: 520px; position: relative; overflow: hidden; background: var(--bg); color: var(--text); border-radius: 30px; border: 1px solid var(--border); padding: 18px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .top b { font-family: var(--display); font-size: 1.5rem; }
+  .pill { border-radius: 999px; background: var(--accent); color: var(--accent-text); font-weight: 800; padding: 12px 16px; text-align: center; }
+  .pill.ghost { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 12px 14px; }
+  .card h3 { margin: 0 0 8px; font-size: .9rem; }
+  .dim { color: var(--text-dim); font-size: .8rem; }
+  .week { display: flex; justify-content: space-between; }
+  .day { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: .7rem; color: var(--text-dim); }
+  .slot { width: 30px; height: 30px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; }
+  .slot.done { border-color: var(--accent); }
+  .slot.done i { width: 18px; height: 18px; background: var(--cane) no-repeat center / contain; }
+  .stats { display: flex; gap: 10px; }
+  .stats .card { flex: 1; }
+  .stats b { font-size: 1.15rem; display: block; }
+  .pr { color: var(--success); font-weight: 700; font-size: .72rem; }
+  .sec { color: var(--secondary); font-weight: 700; }
+  .gold { color: var(--highlight); font-weight: 700; }
+  .rest { align-items: center; text-align: center; }
+  .rest img { width: 220px; height: 220px; object-fit: contain; }
+  .timer { font-family: var(--display); font-size: 3.2rem; line-height: 1; }
+  .bar { width: 100%; height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 62%; background: var(--accent); }
+  .cele { align-items: center; text-align: center; justify-content: center; }
+  .cele img { width: 230px; height: 230px; object-fit: contain; }
+  .cele h4 { font-family: var(--display); font-size: 1.5rem; margin: 0; }
+  .conf { position: absolute; width: 18px; height: 18px; background: var(--cane) no-repeat center / contain; }
+  .classic .conf, .christmas .conf, .cotton .conf { display: none; }
+  .mini { width: 175px; height: 270px; }
+  .mini img { width: 110px; height: 110px; object-fit: contain; align-self: center; }
+</style>
+<div class="wrap">
+  <h1>Valentine's Day theme (#969)</h1>
+  <p class="intro">Two ways to keep Valentine's Day apart from Classic, its nearest theme. Both put a rosy heart on the week tracker and drop hearts as record confetti, with gold accents from the art.</p>
+
+  <p class="label">Option A <span class="pickme">Chosen</span></p>
+  <h2>Burgundy base, hot pink lead</h2>
+  <p class="why">A deep burgundy background, the ribbon color in the art, so it reads red where Classic reads plum and Christmas reads wine. Hot pink buttons and timer bar match the bunny's fur, blush is the secondary, gold the highlight. Records go mint and errors warm orange so neither looks like the pink.</p>
+  <div class="row xa">
+    <div class="phone">
+      <div class="top"><b>Log</b><span class="dim">Sat, Feb 14</span></div>
+      <div class="pill">Start workout</div>
+      <div class="pill ghost">Freeform</div>
+      <div class="card"><h3>This week</h3>
+        <div class="week">
+          <div class="day"><span class="slot done"><i></i></span>S</div>
+          <div class="day"><span class="slot"></span>M</div>
+          <div class="day"><span class="slot done"><i></i></span>T</div>
+          <div class="day"><span class="slot"></span>W</div>
+          <div class="day"><span class="slot done"><i></i></span>T</div>
+          <div class="day"><span class="slot"></span>F</div>
+          <div class="day"><span class="slot"></span>S</div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="card"><span class="dim">Last workout</span><b>Push Day</b><span class="sec">Barbell Bench Press</span></div>
+        <div class="card"><span class="dim">Heaviest</span><b>185 lb</b><span class="pr">New record</span></div>
+      </div>
+      <div class="card"><span class="gold">Next time</span> <span class="dim">Incline Dumbbell Press, 3 sets of 10 at 55 lb</span></div>
+    </div>
+    <div class="phone rest">
+      <span class="dim">Rest</span>
+      <img src="../../public/themes/valentine/rest-bunny.webp" alt="">
+      <div class="timer">1:14</div>
+      <div class="bar"><i></i></div>
+      <span class="dim">Next: Barbell Bench Press, set 3 of 4</span>
+      <div class="pill" style="width:100%">Skip Rest</div>
+    </div>
+    <div class="phone cele">
+      <i class="conf" style="left:8%;top:6%;transform:rotate(-20deg)"></i><i class="conf" style="left:30%;top:14%;transform:rotate(35deg)"></i><i class="conf" style="left:76%;top:5%;transform:rotate(15deg)"></i><i class="conf" style="left:88%;top:22%;transform:rotate(-40deg)"></i><i class="conf" style="left:6%;top:34%;transform:rotate(60deg)"></i><i class="conf" style="left:64%;top:16%;transform:rotate(-60deg)"></i>
+      <img src="../../public/themes/valentine/celebration-bunny.webp" alt="">
+      <h4>New record!</h4>
+      <span class="dim">Barbell Bench Press, 8 times 185 lb</span>
+      <div class="pill" style="width:60%">Nice!</div>
+    </div>
+  </div>
+
+  <p class="label">Option B</p>
+  <h2>Blush light scheme, rose red lead</h2>
+  <p class="why">A light blush background with rose red buttons and burgundy secondary. Clearly not Classic, but it sits very close to Cotton Candy, the other light pink theme, and the pink bunny loses its pop on a pink page.</p>
+  <div class="row xb">
+    <div class="phone">
+      <div class="top"><b>Log</b><span class="dim">Sat, Feb 14</span></div>
+      <div class="pill">Start workout</div>
+      <div class="pill ghost">Freeform</div>
+      <div class="card"><h3>This week</h3>
+        <div class="week">
+          <div class="day"><span class="slot done"><i></i></span>S</div>
+          <div class="day"><span class="slot"></span>M</div>
+          <div class="day"><span class="slot done"><i></i></span>T</div>
+          <div class="day"><span class="slot"></span>W</div>
+          <div class="day"><span class="slot done"><i></i></span>T</div>
+          <div class="day"><span class="slot"></span>F</div>
+          <div class="day"><span class="slot"></span>S</div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="card"><span class="dim">Last workout</span><b>Push Day</b><span class="sec">Barbell Bench Press</span></div>
+        <div class="card"><span class="dim">Heaviest</span><b>185 lb</b><span class="pr">New record</span></div>
+      </div>
+      <div class="card"><span class="gold">Next time</span> <span class="dim">Incline Dumbbell Press, 3 sets of 10 at 55 lb</span></div>
+    </div>
+    <div class="phone rest">
+      <span class="dim">Rest</span>
+      <img src="../../public/themes/valentine/rest-bunny.webp" alt="">
+      <div class="timer">1:14</div>
+      <div class="bar"><i></i></div>
+      <span class="dim">Next: Barbell Bench Press, set 3 of 4</span>
+      <div class="pill" style="width:100%">Skip Rest</div>
+    </div>
+    <div class="phone cele">
+      <i class="conf" style="left:8%;top:6%;transform:rotate(-20deg)"></i><i class="conf" style="left:30%;top:14%;transform:rotate(35deg)"></i><i class="conf" style="left:76%;top:5%;transform:rotate(15deg)"></i><i class="conf" style="left:88%;top:22%;transform:rotate(-40deg)"></i><i class="conf" style="left:6%;top:34%;transform:rotate(60deg)"></i><i class="conf" style="left:64%;top:16%;transform:rotate(-60deg)"></i>
+      <img src="../../public/themes/valentine/celebration-bunny.webp" alt="">
+      <h4>New record!</h4>
+      <span class="dim">Barbell Bench Press, 8 times 185 lb</span>
+      <div class="pill" style="width:60%">Nice!</div>
+    </div>
+  </div>
+
+  <p class="label">For comparison</p>
+  <div class="row">
+    <div class="phone mini classic"><b>Classic</b><img src="../../public/celebration-bunny.png" alt=""><div class="pill">Start workout</div></div>
+    <div class="phone mini christmas"><b>Christmas</b><img src="../../public/themes/christmas/celebration-bunny.webp" alt=""><div class="pill">Start workout</div></div>
+    <div class="phone mini cotton"><b>Cotton Candy</b><img src="../../public/celebration-bunny.png" alt=""><div class="pill">Start workout</div></div>
+    <div class="phone mini xa"><b>Valentine A</b><img src="../../public/themes/valentine/celebration-bunny.webp" alt=""><div class="pill">Start workout</div></div>
+  </div>
+</div>

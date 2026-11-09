@@ -1,0 +1,241 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Note Markers</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1220px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; }
+  .opt-title { font-family: 'Baloo 2', sans-serif; color: var(--accent); font-size: 1.2rem; margin: 0 0 2px 4px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 76px; }
+  .capnote b { color: var(--text); }
+  .phone { width: 377px; height: 760px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 20px 16px 0; }
+  .back { color: var(--secondary); font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.45rem; margin: 0 0 10px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+  .metric-label { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); }
+  .headline { display: flex; align-items: baseline; gap: 10px; margin: 2px 0; }
+  .hv { font-family: 'Baloo 2', sans-serif; font-size: 2rem; line-height: 1.1; color: var(--accent); }
+  .hv small { font-size: 1rem; }
+  .pill { font-size: 0.78rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
+  .sub { margin: 0 0 6px; font-size: 0.74rem; color: var(--text-dim); }
+  .wrap { position: relative; }
+  svg.chart { display: block; width: 100%; height: auto; overflow: visible; }
+  .grid { stroke: var(--border); stroke-dasharray: 3 4; }
+  .gl { fill: var(--text-dim); font-size: 9px; font-family: Manrope; }
+  .area { fill: var(--accent); opacity: 0.1; }
+  .line { stroke: var(--accent); stroke-width: 2.5; fill: none; stroke-linejoin: round; }
+  .dot { fill: var(--accent); }
+  .dot.best { fill: var(--highlight); }
+  .dot.sel { fill: var(--bg); stroke: var(--accent); stroke-width: 2.5; }
+  .axis { position: relative; height: 1.1rem; margin-top: 2px; font-size: 0.7rem; color: var(--text-dim); }
+  .axis span { position: absolute; white-space: nowrap; }
+  .ranges { display: flex; gap: 6px; margin-top: 10px; }
+  .ranges span { flex: 1; height: 32px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-dim); font-size: 0.74rem; font-weight: 800; display: grid; place-items: center; }
+  .ranges span.on { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .tip { position: absolute; z-index: 1; background: var(--surface-2); border: 1px solid var(--accent); border-radius: 10px; padding: 5px 9px; font-size: 0.72rem; line-height: 1.35; white-space: nowrap; }
+  .tip b { color: var(--accent); }
+
+  .story { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--secondary) 10%, transparent); border: 1px solid color-mix(in srgb, var(--secondary) 35%, var(--border)); font-size: 0.8rem; line-height: 1.4; margin-bottom: 8px; }
+  .story svg { flex-shrink: 0; margin-top: 2px; }
+  /* the workout note: the user's own words, so it reads as a quote, not a system line */
+  .wnote { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 10px; background: var(--surface-2); border-left: 3px solid var(--accent); font-size: 0.8rem; line-height: 1.4; margin-bottom: 8px; }
+  .wnote svg { flex-shrink: 0; margin-top: 2px; }
+  .wnote span { overflow-wrap: anywhere; }
+
+  .session-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-bottom: 8px; }
+  .kick { flex-basis: 100%; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); }
+  .sd { font-weight: 700; }
+  .sv { margin-left: auto; font-family: 'Baloo 2', sans-serif; font-size: 1.05rem; color: var(--accent); }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-top: 1px solid var(--border); font-size: 0.86rem; }
+  li span:last-child { text-align: right; display: flex; flex-direction: column; }
+  li small { font-size: 0.7rem; color: var(--text-dim); }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#168 Note markers on Template progress</h1>
+  <p class="note"><b>Scope after #158.</b> Story markers (#158) already flag a <b>skipped exercise</b>, <b>planned sets left undone</b>, and <b>swaps</b> on this chart, saved with each workout as it finishes. So the gap left is the <b>workout note</b>. A session with a note gets a marker, and tapping it shows the note in the session card. Older workouts from before #158 have no saved story, and they won't be guessed at by comparing them to today's template, since the template may have changed since then.</p>
+  <p class="note">Sample: "Push Day", Sep 25 (note only: "Shoulder felt tight, dropped the bench to 155."), and Oct 2 (note plus a skipped exercise).</p>
+</div>
+
+<div class="page">
+
+  <!-- ===================== OPTION A ===================== -->
+  <div class="col">
+    <p class="cap">Option A · Two badges</p>
+    <p class="opt-title">Pink pencil badge, its own kind</p>
+    <p class="capnote">A note gets a <b>pink pencil badge</b> (the user's own words), and a story keeps its <b>lavender bubble</b>. A session with both shows the two badges side by side over the point. In the card, the note comes first as a quote, with the story under it.</p>
+    <div class="phone">
+      <div class="back">‹ Template progress</div>
+      <h2>Push Day</h2>
+      <div class="card">
+        <span class="metric-label">Total volume</span>
+        <div class="headline"><span class="hv">9,640<small> lb</small></span><span class="pill">↑ 820 lb</span></div>
+        <p class="sub">Best: 9,910 lb on Sep 18</p>
+        <div class="wrap">
+          <svg class="chart" viewBox="0 0 326 150">
+            <line x1="0" x2="326" y1="12" y2="12" class="grid"/><text x="324" y="15" text-anchor="end" class="gl">9,910</text>
+            <line x1="0" x2="326" y1="76" y2="76" class="grid"/><text x="324" y="79" text-anchor="end" class="gl">8,620</text>
+            <line x1="0" x2="326" y1="140" y2="140" class="grid"/><text x="324" y="143" text-anchor="end" class="gl">7,330</text>
+            <polygon class="area" points="8,150 8,110 56,92 104,60 152,12 200,118 248,132 296,26 296,150"/>
+            <polyline class="line" points="8,110 56,92 104,60 152,12 200,118 248,132 296,26"/>
+            <circle class="dot" cx="8" cy="110" r="3"/><circle class="dot" cx="56" cy="92" r="3"/><circle class="dot" cx="104" cy="60" r="3"/>
+            <circle class="dot best" cx="152" cy="12" r="5"/><circle class="dot" cx="200" cy="118" r="3"/>
+            <circle class="dot sel" cx="248" cy="132" r="5"/><circle class="dot" cx="296" cy="26" r="3"/>
+            <!-- Sep 25: note only -->
+            <g transform="translate(200 98)"><circle r="8" fill="var(--accent)"/><path d="M-3.6 3.6l0.8-2.6 4.4-4.4 1.8 1.8-4.4 4.4z" fill="var(--accent-text)"/></g>
+            <!-- Oct 2: note + story, side by side -->
+            <g transform="translate(239 112)"><circle r="8" fill="var(--accent)"/><path d="M-3.6 3.6l0.8-2.6 4.4-4.4 1.8 1.8-4.4 4.4z" fill="var(--accent-text)"/></g>
+            <g transform="translate(257 112)"><circle r="8" fill="var(--secondary)"/><path d="M-4 -3h8v5h-4l-3 2.5v-2.5h-1z" fill="var(--accent-text)"/></g>
+          </svg>
+          <div class="tip" style="left:76%;top:62%;transform:translate(-85%,-100%) translateY(-18px)">Oct 2 · <b>7,420 lb</b></div>
+        </div>
+        <div class="axis"><span style="left:0">Aug 21</span><span style="left:46%;transform:translateX(-50%)">Sep 18</span><span style="left:91%;transform:translateX(-50%)">Oct 6</span></div>
+        <div class="ranges"><span>1M</span><span class="on">3M</span><span>1Y</span><span>All</span></div>
+      </div>
+      <div class="card">
+        <div class="session-head"><span class="kick">Selected session</span><span class="sd">Thu, Oct 2, 2026</span><b class="sv">7,420 lb</b></div>
+        <div class="wnote">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>
+          <span>Gym was packed, cut it short. Bench felt strong though.</span>
+        </div>
+        <div class="story">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11h-9l-5 4v-4H4z"/></svg>
+          <span>Skipped Cable Lateral Raise.</span>
+        </div>
+        <ul>
+          <li><span>Bench Press</span><span><b>175 lb × 6</b><small>4 sets</small></span></li>
+          <li><span>Seated Dumbbell Shoulder Press</span><span><b>55 lb × 8</b><small>3 sets</small></span></li>
+          <li><span>Tricep Pushdown</span><span><b>60 lb × 12</b><small>3 sets</small></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== OPTION B ===================== -->
+  <div class="col">
+    <p class="cap">Option B · One badge per point (recommended)</p>
+    <p class="opt-title">One badge, icon says what's inside</p>
+    <p class="capnote">Never more than one badge on a point, so nothing new crowds the line. Note only: a <b>lavender pencil</b>. A story (with or without a note): the existing <b>bubble</b>, plus a small pink dot on it when there's also a note. The card is the same as A.</p>
+    <div class="phone">
+      <div class="back">‹ Template progress</div>
+      <h2>Push Day</h2>
+      <div class="card">
+        <span class="metric-label">Total volume</span>
+        <div class="headline"><span class="hv">9,640<small> lb</small></span><span class="pill">↑ 820 lb</span></div>
+        <p class="sub">Best: 9,910 lb on Sep 18</p>
+        <div class="wrap">
+          <svg class="chart" viewBox="0 0 326 150">
+            <line x1="0" x2="326" y1="12" y2="12" class="grid"/><text x="324" y="15" text-anchor="end" class="gl">9,910</text>
+            <line x1="0" x2="326" y1="76" y2="76" class="grid"/><text x="324" y="79" text-anchor="end" class="gl">8,620</text>
+            <line x1="0" x2="326" y1="140" y2="140" class="grid"/><text x="324" y="143" text-anchor="end" class="gl">7,330</text>
+            <polygon class="area" points="8,150 8,110 56,92 104,60 152,12 200,118 248,132 296,26 296,150"/>
+            <polyline class="line" points="8,110 56,92 104,60 152,12 200,118 248,132 296,26"/>
+            <circle class="dot" cx="8" cy="110" r="3"/><circle class="dot" cx="56" cy="92" r="3"/><circle class="dot" cx="104" cy="60" r="3"/>
+            <circle class="dot best" cx="152" cy="12" r="5"/><circle class="dot" cx="200" cy="118" r="3"/>
+            <circle class="dot sel" cx="248" cy="132" r="5"/><circle class="dot" cx="296" cy="26" r="3"/>
+            <!-- Sep 25: note only -->
+            <g transform="translate(200 98)"><circle r="8" fill="var(--secondary)"/><path d="M-3.6 3.6l0.8-2.6 4.4-4.4 1.8 1.8-4.4 4.4z" fill="var(--accent-text)"/></g>
+            <!-- Oct 2: story + note -->
+            <g transform="translate(248 112)"><circle r="8" fill="var(--secondary)"/><path d="M-4 -3h8v5h-4l-3 2.5v-2.5h-1z" fill="var(--accent-text)"/><circle cx="6" cy="-6" r="3.2" fill="var(--accent)" stroke="var(--surface)" stroke-width="1.5"/></g>
+          </svg>
+          <div class="tip" style="left:76%;top:62%;transform:translate(-85%,-100%) translateY(-18px)">Oct 2 · <b>7,420 lb</b></div>
+        </div>
+        <div class="axis"><span style="left:0">Aug 21</span><span style="left:46%;transform:translateX(-50%)">Sep 18</span><span style="left:91%;transform:translateX(-50%)">Oct 6</span></div>
+        <div class="ranges"><span>1M</span><span class="on">3M</span><span>1Y</span><span>All</span></div>
+      </div>
+      <div class="card">
+        <div class="session-head"><span class="kick">Selected session</span><span class="sd">Thu, Oct 2, 2026</span><b class="sv">7,420 lb</b></div>
+        <div class="wnote">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>
+          <span>Gym was packed, cut it short. Bench felt strong though.</span>
+        </div>
+        <div class="story">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11h-9l-5 4v-4H4z"/></svg>
+          <span>Skipped Cable Lateral Raise.</span>
+        </div>
+        <ul>
+          <li><span>Bench Press</span><span><b>175 lb × 6</b><small>4 sets</small></span></li>
+          <li><span>Seated Dumbbell Shoulder Press</span><span><b>55 lb × 8</b><small>3 sets</small></span></li>
+          <li><span>Tricep Pushdown</span><span><b>60 lb × 12</b><small>3 sets</small></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SHARED: DENSE RANGE ===================== -->
+  <div class="col">
+    <p class="cap">Both options · All range, 40 sessions</p>
+    <p class="opt-title">Dense charts shrink badges to pips</p>
+    <p class="capnote">When points sit closer than a badge is wide (under about 18px apart), every marker drops to a <b>small pip</b> over its point, in its badge's color (option B shown). Tapping the point still opens its note and story in the card. Same rule for the existing story badges, which crowd here today.</p>
+    <div class="phone">
+      <div class="back">‹ Template progress</div>
+      <h2>Push Day</h2>
+      <div class="card">
+        <span class="metric-label">Total volume</span>
+        <div class="headline"><span class="hv">9,640<small> lb</small></span><span class="pill">↑ 3,180 lb</span></div>
+        <p class="sub">Best: 9,910 lb on Sep 18</p>
+        <div class="wrap">
+          <svg class="chart" viewBox="0 0 326 150" id="dense">
+            <line x1="0" x2="326" y1="12" y2="12" class="grid"/><text x="324" y="15" text-anchor="end" class="gl">9,910</text>
+            <line x1="0" x2="326" y1="76" y2="76" class="grid"/><text x="324" y="79" text-anchor="end" class="gl">8,170</text>
+            <line x1="0" x2="326" y1="140" y2="140" class="grid"/><text x="324" y="143" text-anchor="end" class="gl">6,430</text>
+          </svg>
+        </div>
+        <div class="axis"><span style="left:0">Jan 6</span><span style="left:46%;transform:translateX(-50%)">May 19</span><span style="left:91%;transform:translateX(-50%)">Oct 6</span></div>
+        <div class="ranges"><span>1M</span><span>3M</span><span>1Y</span><span class="on">All</span></div>
+      </div>
+      <div class="card">
+        <div class="session-head"><span class="kick">Selected session</span><span class="sd">Thu, Sep 25, 2026</span><b class="sv">7,690 lb</b></div>
+        <div class="wnote">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>
+          <span>Shoulder felt tight, dropped the bench to 155.</span>
+        </div>
+        <ul>
+          <li><span>Bench Press</span><span><b>155 lb × 8</b><small>4 sets</small></span></li>
+          <li><span>Seated Dumbbell Shoulder Press</span><span><b>50 lb × 8</b><small>3 sets</small></span></li>
+          <li><span>Tricep Pushdown</span><span><b>60 lb × 12</b><small>3 sets</small></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+  // Dense artboard: 40 points with a gentle upward trend, a few marked.
+  const svg = document.getElementById('dense')
+  const ns = 'http://www.w3.org/2000/svg'
+  const n = 40, pLeft = 8, pRight = 296, pTop = 12, pBottom = 140
+  const vals = Array.from({ length: n }, (_, i) => 6600 + i * 70 + Math.sin(i * 1.7) * 420)
+  vals[33] = 7690; vals[30] = 9910
+  const lo = Math.min(...vals), hi = Math.max(...vals)
+  const x = (i) => pLeft + (i / (n - 1)) * (pRight - pLeft)
+  const y = (v) => pBottom - ((v - lo) / (hi - lo)) * (pBottom - pTop)
+  const pts = vals.map((v, i) => `${x(i)},${y(v)}`).join(' ')
+  const el = (tag, attrs) => { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); svg.appendChild(e); return e }
+  el('polygon', { class: 'area', points: `${x(0)},150 ${pts} ${x(n - 1)},150` })
+  el('polyline', { class: 'line', points: pts })
+  vals.forEach((v, i) => el('circle', { class: 'dot' + (i === 30 ? ' best' : '') + (i === 33 ? ' sel' : ''), cx: x(i), cy: y(v), r: i === 30 || i === 33 ? 4 : 2 }))
+  const marks = { 5: 'secondary', 12: 'secondary', 13: 'secondary', 21: 'secondary', 33: 'secondary', 37: 'secondary' }
+  for (const i in marks) {
+    const py = y(vals[i]); const my = py < pTop + 12 ? py + 9 : py - 9
+    el('circle', { cx: x(i), cy: my, r: 3, fill: `var(--${marks[i]})` })
+  }
+</script>
+</body>
+</html>

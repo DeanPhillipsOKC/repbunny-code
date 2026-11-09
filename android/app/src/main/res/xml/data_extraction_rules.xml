@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Issue #430: the Android 12+ twin of backup_rules.xml. Cloud backup
+     leaves out the restore points database (the 25 MB cap, #117) and keeps
+     everything else, repbunnySQLite.db included. A device-to-device transfer
+     has no cap, so it takes everything but the plugin's secrets file (#639). -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="database" path="repbunny-restore-pointsSQLite.db" />
+        <exclude domain="database" path="repbunny-restore-pointsSQLite.db-journal" />
+        <exclude domain="database" path="repbunny-restore-pointsSQLite.db-wal" />
+        <exclude domain="database" path="repbunny-restore-pointsSQLite.db-shm" />
+        <!-- Issue #639: the SQLite plugin's secrets file is locked with an
+             Android Keystore key, which a backup never carries, so a restored
+             copy can't be read. The app doesn't use it (encryption is off). -->
+        <exclude domain="sharedpref" path="sqlite_encrypted_shared_prefs.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="sqlite_encrypted_shared_prefs.xml" />
+    </device-transfer>
+</data-extraction-rules>

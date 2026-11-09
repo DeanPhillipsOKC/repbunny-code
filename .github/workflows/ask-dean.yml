@@ -1,0 +1,49 @@
+# Asks the owner a question on an issue (#227). Agents act on GitHub as the owner, and GitHub never
+# notifies anyone about their own comments, so the question is posted here as github-actions[bot]
+# with an @mention. Call it through scripts/ask-dean.mjs (or
+# `gh workflow run ask-dean.yml -f issue=<N> -f question=<markdown>`). The owner's reply flips the
+# issue to `dean-replied` (dean-replied.yml). See docs/backlog-runner.md > Asking the owner.
+name: Ask Dean
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: Issue number to ask on
+        required: true
+        type: string
+      question:
+        description: The question as markdown, lettered options with the recommendation first
+        required: true
+        type: string
+
+permissions:
+  issues: write
+
+concurrency:
+  group: ask-dean-${{ inputs.issue }}
+  cancel-in-progress: false
+
+jobs:
+  ask:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Inputs go through env, never straight into the script, so the question can't inject shell.
+      - name: Post the question and label the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE: ${{ inputs.issue }}
+          QUESTION: ${{ inputs.question }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          case "$ISSUE" in ''|*[!0-9]*) echo "issue must be a number, got: $ISSUE"; exit 1 ;; esac
+          body_file="$RUNNER_TEMP/question.md"
+          {
+            printf '@%s %s\n\n' "$OWNER" "$QUESTION"
+            printf '<sub>Asked through ask-dean.yml (#227). Reply here or to the notification email.</sub>\n'
+            printf '<!-- ask-dean -->\n'
+          } > "$body_file"
+          gh issue comment "$ISSUE" --body-file "$body_file"
+          gh issue edit "$ISSUE" --add-label awaiting-dean --remove-label dean-replied

@@ -1,0 +1,107 @@
+# Posts the triage routine's "seen again" note on an open issue as the RepBunny Builder bot (#679,
+# #695). The note is built by scripts/support-evidence.mjs from checked fields only (a date, a
+# version, a platform, error codes, a Gmail link), so no words from an email can ride into an
+# issue's comments this way. Started by `node scripts/bot-dispatch.mjs support-evidence` from the
+# triage routine; cloud sessions can't act as the bot themselves (their proxy swaps the token).
+# Runs main's copy of the scripts.
+#
+# Known limit, accepted (docs/governance/threat-model.md > Accepted risks): a session also holds
+# the owner's credential and could comment as the owner without this workflow. Only the triage
+# skill's rules say not to. What this changes is that the normal path can't carry free text.
+name: Post support evidence as Builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: Open issue number the email matches
+        type: string
+        required: true
+      date:
+        description: Date of the support email (YYYY-MM-DD)
+        type: string
+        required: true
+      version:
+        description: App version from the report, or unknown
+        type: string
+        required: true
+      platform:
+        description: Platform from the report
+        type: choice
+        options: [Android, iOS, Web, unknown]
+        required: true
+      codes:
+        description: Error codes separated by commas, or none
+        type: string
+        required: true
+      gmail:
+        description: Gmail thread link (https://mail.google.com/mail/...)
+        type: string
+        required: true
+      notify:
+        description: The sender asked to hear back (adds the notify-reporter label)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: support-evidence-${{ inputs.issue }}
+  cancel-in-progress: false
+
+jobs:
+  post:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          sparse-checkout: scripts
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Check the issue number
+        env:
+          ISSUE: ${{ inputs.issue }}
+        run: |
+          printf '%s' "$ISSUE" | grep -Eq '^[0-9]{1,6}$' || { echo "issue must be a number, not '$ISSUE'." >&2; exit 1; }
+
+      - name: Build the note from checked fields
+        env:
+          EVIDENCE_DATE: ${{ inputs.date }}
+          EVIDENCE_VERSION: ${{ inputs.version }}
+          EVIDENCE_PLATFORM: ${{ inputs.platform }}
+          EVIDENCE_CODES: ${{ inputs.codes }}
+          EVIDENCE_GMAIL: ${{ inputs.gmail }}
+          EVIDENCE_NOTIFY: ${{ inputs.notify }}
+        run: node scripts/support-evidence.mjs > "$RUNNER_TEMP/note.md"
+
+      - name: Mint a Builder token
+        id: token
+        env:
+          BUILDER_APP_ID: ${{ secrets.BUILDER_APP_ID }}
+          BUILDER_APP_KEY: ${{ secrets.BUILDER_APP_KEY }}
+        run: |
+          token="$(node scripts/gh-app-token.mjs --app builder)"
+          echo "::add-mask::$token"
+          echo "token=$token" >> "$GITHUB_OUTPUT"
+
+      - name: Post the note
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE: ${{ inputs.issue }}
+          NOTIFY: ${{ inputs.notify }}
+        run: |
+          # Only an open issue (not a PR, not a closed one: those get a tracking issue and a question).
+          state="$(gh api "repos/{owner}/{repo}/issues/$ISSUE" --jq 'if .pull_request then "pr" else .state end')"
+          [ "$state" = "open" ] || { echo "Issue #$ISSUE is '$state', not an open issue; nothing posted." >&2; exit 1; }
+          gh issue comment "$ISSUE" --body-file "$RUNNER_TEMP/note.md"
+          if [ "$NOTIFY" = "true" ]; then gh issue edit "$ISSUE" --add-label notify-reporter; fi
+          echo "Posted a support-evidence note on #$ISSUE as the Builder." | tee -a "$GITHUB_STEP_SUMMARY"

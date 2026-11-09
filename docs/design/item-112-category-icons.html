@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Category Icons</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: Manrope, sans-serif; }
+  .page { display: flex; gap: 40px; padding: 32px; align-items: flex-start; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.3rem; margin: 0 0 4px; }
+  .note { color: var(--text-dim); font-size: 0.85rem; margin: 0 0 18px; max-width: 520px; line-height: 1.5; }
+  .set { display: grid; grid-template-columns: repeat(3, 150px); gap: 14px; }
+  .big { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 10px 14px; text-align: center; }
+  .big svg { width: 72px; height: 72px; }
+  .big .lbl { margin-top: 8px; font-weight: 700; font-size: 0.95rem; }
+  .big .why { color: var(--text-dim); font-size: 0.75rem; margin-top: 3px; }
+  .phone { width: 390px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; padding: 20px 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 16px; }
+  .heading { font-weight: 700; font-size: 1.05rem; margin-bottom: 12px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tile { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); }
+  .tile.sel { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  .badge { flex-shrink: 0; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); }
+  .tile.sel .badge { background: rgba(255,255,255,0.35); color: var(--accent-text); }
+  .badge svg { height: 36px; width: 36px; }
+  .name { font-weight: 700; font-size: 1rem; line-height: 1.2; }
+  .sub { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+  .tile.sel .sub { color: inherit; opacity: 0.8; }
+  .free { grid-column: 1 / -1; min-height: 0; }
+  .free .sub { line-height: 1.4; }
+  .section-gap { height: 26px; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 8px; }
+  .row .badge { width: 48px; height: 48px; }
+  .free { flex-direction: row; }
+  .row .sub { font-size: 0.8rem; }
+  .cap { color: var(--text-dim); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; margin: 0 0 8px 4px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- Body parts; each variant fills the trained region and dims the rest. -->
+    <g id="b-head"><circle cx="12" cy="4.2" r="2.7" /></g>
+    <g id="b-arms"><rect x="3" y="8.4" width="2.8" height="10" rx="1.4" transform="rotate(8 4.4 8.4)" /><rect x="18.2" y="8.4" width="2.8" height="10" rx="1.4" transform="rotate(-8 19.6 8.4)" /></g>
+    <g id="b-chest"><rect x="6.6" y="7.6" width="10.8" height="6.6" rx="2.6" /></g>
+    <g id="b-core"><rect x="7.3" y="14.9" width="9.4" height="4.3" rx="1.6" /></g>
+    <g id="b-legs"><rect x="7.4" y="19.9" width="4.1" height="11" rx="2" /><rect x="12.5" y="19.9" width="4.1" height="11" rx="2" /></g>
+  </defs>
+</svg>
+
+<template id="tpl">
+</template>
+
+<div class="page">
+  <div>
+    <h2>Category icon set</h2>
+    <p class="note">One rounded figure, reused for every body category, with the trained region lit up and the rest dimmed. Cardio and Other get their own glyphs. All of it is inline SVG using the current text color, so it works in any tile state.</p>
+    <div class="set" id="set"></div>
+  </div>
+
+  <div>
+    <div class="phone">
+      <p class="cap">Home start screen</p>
+      <div class="card">
+        <div class="heading">What are you training today?</div>
+        <div class="grid" id="tiles"></div>
+      </div>
+      <div class="section-gap"></div>
+      <p class="cap">Templates screen</p>
+      <div id="rows"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const DIM = 'opacity="0.28"'
+  const parts = ['head', 'arms', 'chest', 'core', 'legs']
+  function body(lit) {
+    const g = parts.map((p) => `<use href="#b-${p}" ${lit.includes(p) ? '' : DIM} />`).join('')
+    return `<svg viewBox="0 0 24 32" fill="currentColor" aria-hidden="true">${g}</svg>`
+  }
+  const cardio = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 5.6a5 5 0 0 0-7.1 0L12 6.9l-1.3-1.3a5 5 0 0 0-7.1 7.1l1.3 1.3L12 21l7.1-7 1.3-1.3a5 5 0 0 0 0-7.1z" fill="currentColor" fill-opacity="0.22"/><path d="M3.5 12h4l1.8-3 2.6 6 1.8-3h6.8"/></svg>`
+  const other = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2.5" y="8" width="3.2" height="8" rx="1.2" fill="currentColor"/><rect x="18.3" y="8" width="3.2" height="8" rx="1.2" fill="currentColor"/><rect x="5.7" y="9.6" width="2.4" height="4.8" rx="0.8" fill="currentColor" fill-opacity="0.6"/><rect x="15.9" y="9.6" width="2.4" height="4.8" rx="0.8" fill="currentColor" fill-opacity="0.6"/><path d="M8.1 12h7.8"/></svg>`
+
+  const cats = {
+    upper: { label: 'Upper body', c: 'var(--accent)', svg: body(['head', 'arms', 'chest']), why: 'push, pull, upper, chest…' },
+    lower: { label: 'Lower body', c: 'var(--secondary)', svg: body(['legs']), why: 'leg, lower, glutes, quads…' },
+    full: { label: 'Full body', c: 'var(--highlight)', svg: body(parts), why: 'full, total body, or a mix' },
+    core: { label: 'Core', c: 'var(--success)', svg: body(['core']), why: 'core, abs, plank, crunch…' },
+    cardio: { label: 'Cardio', c: '#f4a07a', svg: cardio, why: 'cardio, run, treadmill…' },
+    other: { label: 'Other', c: 'var(--text-dim)', svg: other, why: 'chosen, or no match' },
+  }
+
+  document.getElementById('set').innerHTML = Object.values(cats)
+    .map((k) => `<div class="big" style="color:${k.c}">${k.svg}<div class="lbl" style="color:var(--text)">${k.label}</div><div class="why">${k.why}</div></div>`)
+    .join('')
+
+  const tiles = [
+    ['Leg - Quads', 'lower', true],
+    ['Push Day', 'upper'],
+    ['Full Body A', 'full'],
+    ['Stairs + Abs', 'cardio'],
+    ['Core Finisher', 'core'],
+    ['Tuesday', 'other'],
+  ]
+  document.getElementById('tiles').innerHTML =
+    tiles
+      .map(([n, k, sel]) => `<div class="tile${sel ? ' sel' : ''}"><span class="badge" style="--c:${cats[k].c}">${cats[k].svg}</span><div><div class="name">${n}</div><div class="sub">${cats[k].label}</div></div></div>`)
+      .join('') +
+    `<div class="tile free"><div><div class="name">Freeform</div><div class="sub">Add exercises as you go. No plan to follow, no auto-finish, and no progress chart. You can save it as a template from History afterward.</div></div></div>`
+
+  const rows = [
+    ['Push Day', 'upper', '5 exercises'],
+    ['Leg - Quads', 'lower', '4 exercises'],
+    ['Tuesday', 'other', '3 exercises'],
+  ]
+  document.getElementById('rows').innerHTML = rows
+    .map(([n, k, s]) => `<div class="row"><span class="badge" style="--c:${cats[k].c}">${cats[k].svg}</span><div><div class="name">${n}</div><div class="sub">${s} · ${cats[k].label}</div></div></div>`)
+    .join('')
+</script>
+</body>
+</html>

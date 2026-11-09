@@ -1,0 +1,260 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Story Markers</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1180px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; }
+  .opt-title { font-family: 'Baloo 2', sans-serif; color: var(--accent); font-size: 1.2rem; margin: 0 0 2px 4px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 58px; }
+  .capnote b { color: var(--text); }
+  .phone { width: 377px; height: 750px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 20px 16px 0; }
+  .back { color: var(--secondary); font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.45rem; margin: 0 0 10px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+  .metric-label { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); }
+  .headline { display: flex; align-items: baseline; gap: 10px; margin: 2px 0; }
+  .hv { font-family: 'Baloo 2', sans-serif; font-size: 2rem; line-height: 1.1; color: var(--accent); }
+  .hv small { font-size: 1rem; }
+  .pill { font-size: 0.78rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
+  .sub { margin: 0 0 6px; font-size: 0.74rem; color: var(--text-dim); }
+  .wrap { position: relative; }
+  svg.chart { display: block; width: 100%; height: auto; overflow: visible; }
+  .grid { stroke: var(--border); stroke-dasharray: 3 4; }
+  .gl { fill: var(--text-dim); font-size: 9px; font-family: Manrope; }
+  .area { fill: var(--accent); opacity: 0.1; }
+  .line { stroke: var(--accent); stroke-width: 2.5; fill: none; stroke-linejoin: round; }
+  .dot { fill: var(--accent); }
+  .dot.best { fill: var(--highlight); }
+  .dot.sel { fill: var(--bg); stroke: var(--accent); stroke-width: 2.5; }
+  .axis { position: relative; height: 1.1rem; margin-top: 2px; font-size: 0.7rem; color: var(--text-dim); }
+  .axis span { position: absolute; white-space: nowrap; }
+  .ranges { display: flex; gap: 6px; margin-top: 10px; }
+  .ranges span { flex: 1; height: 32px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-dim); font-size: 0.74rem; font-weight: 800; display: grid; place-items: center; }
+  .ranges span.on { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .tip { position: absolute; z-index: 1; background: var(--surface-2); border: 1px solid var(--accent); border-radius: 10px; padding: 5px 9px; font-size: 0.72rem; line-height: 1.35; white-space: nowrap; }
+  .tip b { color: var(--accent); }
+  .tip.story { display: block; white-space: normal; width: 230px; border-color: var(--secondary); }
+  .tip .st { display: block; gap: 6px; margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border); color: var(--text); }
+
+  /* story line, shared */
+  .story { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--secondary) 10%, transparent); border: 1px solid color-mix(in srgb, var(--secondary) 35%, var(--border)); font-size: 0.8rem; line-height: 1.4; margin-top: 10px; }
+  .story + .story { margin-top: 6px; }
+  .story svg { flex-shrink: 0; margin-top: 2px; }
+  .story.compact { background: none; border: none; padding: 0; margin-top: 4px; color: var(--text); }
+
+  .session-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-bottom: 6px; }
+  .kick { flex-basis: 100%; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); }
+  .sd { font-weight: 700; }
+  .sv { margin-left: auto; font-family: 'Baloo 2', sans-serif; font-size: 1.05rem; color: var(--accent); }
+  ul { list-style: none; margin: 8px 0 0; padding: 0; }
+  li { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-top: 1px solid var(--border); font-size: 0.86rem; }
+  li span:last-child { text-align: right; display: flex; flex-direction: column; }
+  li small { font-size: 0.7rem; color: var(--text-dim); }
+  .swapped { font-size: 0.7rem; color: var(--secondary); display: block; }
+
+  .metric-toggle { display: flex; gap: 6px; margin-bottom: 10px; }
+  .metric-toggle span { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); font-size: 0.78rem; font-weight: 800; color: var(--text-dim); }
+  .metric-toggle span.on { border-color: var(--accent); color: var(--accent); }
+  .ov-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .ov-head h2 { margin: 0; }
+  .x { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); }
+
+  /* workout log */
+  .seg { display: flex; border: 1px solid var(--border); border-radius: 999px; padding: 3px; margin-bottom: 12px; }
+  .seg span { flex: 1; text-align: center; padding: 7px 0; border-radius: 999px; font-size: 0.8rem; font-weight: 800; color: var(--text-dim); }
+  .seg span.on { background: var(--accent); color: var(--accent-text); }
+  .entry h3 { margin: 0; font-size: 0.95rem; }
+  .eh { display: flex; justify-content: space-between; align-items: center; }
+  .tag { font-size: 0.7rem; font-weight: 800; padding: 3px 8px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+  .pr { display: flex; gap: 6px; align-items: center; font-size: 0.78rem; color: var(--highlight); margin-top: 8px; }
+  .ghost { display: inline-block; margin-top: 8px; padding: 6px 12px; border-radius: 9px; border: 1px solid var(--border); font-size: 0.76rem; font-weight: 700; color: var(--text-dim); }
+  .gt { font-size: 0.8rem; font-weight: 800; color: var(--text-dim); margin: 12px 0 4px; }
+  .sl { display: flex; gap: 10px; font-size: 0.86rem; padding: 6px 0; }
+  .sl b { width: 18px; color: var(--text-dim); text-align: center; }
+  .collapsed { padding: 12px 14px; }
+  .collapsed .meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#158 Story markers for unusual workouts</h1>
+  <p class="note">A session with a <b>swap</b>, a <b>skipped exercise</b>, or an <b>early finish</b> gets a lavender marker on its chart point. Tapping the point tells the story in plain words. Lavender (<b>--secondary</b>) keeps it apart from the pink line and the gold best dot, and never reads as an error. Exercise charts only show the parts of the story that involve that exercise. The Workout log line (right) is the same in both options.</p>
+  <p class="note">Sample: template "Leg Day A", Oct 2 session. Leg Press was swapped for Hack Squat (2 sets), Calf Raise was skipped, and the workout ended with 3 planned sets left.</p>
+</div>
+
+<div class="page">
+
+  <!-- ===================== OPTION A ===================== -->
+  <div class="col">
+    <p class="cap">Option A · Template progress</p>
+    <p class="opt-title">Badge above the point</p>
+    <p class="capnote">A small lavender <b>speech-bubble badge</b> floats over each marked point. Tap the point: the normal tooltip shows, and the story lines go in the session card below the chart, where the session's lifts already are.</p>
+    <div class="phone">
+      <div class="back">‹ Template progress</div>
+      <h2>Leg Day A</h2>
+      <div class="card">
+        <span class="metric-label">Total volume</span>
+        <div class="headline"><span class="hv">14,820<small> lb</small></span><span class="pill">↑ 1,240 lb</span></div>
+        <p class="sub">Best: 15,100 lb on Sep 18</p>
+        <div class="wrap">
+          <svg class="chart" viewBox="0 0 326 150">
+            <line x1="0" x2="326" y1="12" y2="12" class="grid"/><text x="324" y="15" text-anchor="end" class="gl">15,100</text>
+            <line x1="0" x2="326" y1="76" y2="76" class="grid"/><text x="324" y="79" text-anchor="end" class="gl">12,600</text>
+            <line x1="0" x2="326" y1="140" y2="140" class="grid"/><text x="324" y="143" text-anchor="end" class="gl">10,100</text>
+            <polygon class="area" points="8,150 8,104 56,86 104,60 152,12 200,40 248,124 296,19 296,150"/>
+            <polyline class="line" points="8,104 56,86 104,60 152,12 200,40 248,124 296,19"/>
+            <circle class="dot" cx="8" cy="104" r="3"/><circle class="dot" cx="56" cy="86" r="3"/><circle class="dot" cx="104" cy="60" r="3"/>
+            <circle class="dot best" cx="152" cy="12" r="5"/><circle class="dot" cx="200" cy="40" r="3"/>
+            <circle class="dot sel" cx="248" cy="124" r="5"/><circle class="dot" cx="296" cy="19" r="3"/>
+            <!-- badge over Sep 4 (swap) and Oct 2 (selected) -->
+            <g transform="translate(56 66)"><circle r="8" fill="var(--secondary)"/><path d="M-4 -3h8v5h-4l-3 2.5v-2.5h-1z" fill="var(--accent-text)"/></g>
+            <g transform="translate(248 104)"><circle r="8" fill="var(--secondary)"/><path d="M-4 -3h8v5h-4l-3 2.5v-2.5h-1z" fill="var(--accent-text)"/></g>
+          </svg>
+          <div class="tip" style="left:76%;top:48%;transform:translate(-85%,-100%)">Oct 2 · <b>10,980 lb</b></div>
+        </div>
+        <div class="axis"><span style="left:0">Aug 21</span><span style="left:46%;transform:translateX(-50%)">Sep 18</span><span style="left:91%;transform:translateX(-50%)">Oct 6</span></div>
+        <div class="ranges"><span>1M</span><span class="on">3M</span><span>1Y</span><span>All</span></div>
+      </div>
+      <div class="card">
+        <div class="session-head"><span class="kick">Selected session</span><span class="sd">Thu, Oct 2, 2026</span><b class="sv">10,980 lb</b></div>
+        <div class="story">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11h-9l-5 4v-4H4z"/></svg>
+          <span>Leg Press was taken, so you did Hack Squat (2 sets).<br/>Skipped Calf Raise.<br/>Finished with 3 planned sets left.</span>
+        </div>
+        <ul>
+          <li><span>Back Squat</span><span><b>225 lb × 6</b><small>4 sets</small></span></li>
+          <li><span>Hack Squat<span class="swapped">swapped in for Leg Press</span></span><span><b>180 lb × 10</b><small>2 sets</small></span></li>
+          <li><span>Romanian Deadlift</span><span><b>185 lb × 8</b><small>2 sets</small></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">Option A · Exercise chart</p>
+    <p class="opt-title">Same badge, story under the chart</p>
+    <p class="capnote">On <b>Hack Squat</b>'s chart only the swap shows (the skip and early finish weren't about this lift). The story sits in a strip right under the chart while that point is selected.</p>
+    <div class="phone">
+      <div class="ov-head"><h2>Hack Squat</h2><span class="x">✕</span></div>
+      <div class="card">
+        <div class="metric-toggle"><span class="on">Heaviest</span><span>Est. 1RM</span><span>Volume</span></div>
+        <span class="metric-label">Heaviest</span>
+        <div class="headline"><span class="hv">190<small> lb</small></span><span class="pill">↑ 20 lb</span></div>
+        <p class="sub">Best: 190 lb × 8 on Oct 5</p>
+        <div class="wrap">
+          <svg class="chart" viewBox="0 0 326 150">
+            <line x1="0" x2="326" y1="12" y2="12" class="grid"/><text x="324" y="15" text-anchor="end" class="gl">190</text>
+            <line x1="0" x2="326" y1="76" y2="76" class="grid"/><text x="324" y="79" text-anchor="end" class="gl">180</text>
+            <line x1="0" x2="326" y1="140" y2="140" class="grid"/><text x="324" y="143" text-anchor="end" class="gl">170</text>
+            <polygon class="area" points="8,150 8,140 104,108 200,76 296,12 296,150"/>
+            <polyline class="line" points="8,140 104,108 200,76 296,12"/>
+            <circle class="dot" cx="8" cy="140" r="3"/><circle class="dot" cx="104" cy="108" r="3"/>
+            <circle class="dot sel" cx="200" cy="76" r="5"/><circle class="dot best" cx="296" cy="12" r="5"/>
+            <g transform="translate(200 56)"><circle r="8" fill="var(--secondary)"/><path d="M-4 -3h8v5h-4l-3 2.5v-2.5h-1z" fill="var(--accent-text)"/></g>
+          </svg>
+          <div class="tip" style="left:61%;top:28%;transform:translate(-50%,-100%)">Oct 2 · <b>180 lb</b><br/>180 lb × 10</div>
+        </div>
+        <div class="axis"><span style="left:0">Sep 11</span><span style="left:32%;transform:translateX(-50%)">Sep 25</span><span style="left:91%;transform:translateX(-50%)">Oct 5</span></div>
+        <div class="story">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11h-9l-5 4v-4H4z"/></svg>
+          <span>Oct 2: Leg Press was taken, so you did Hack Squat (2 sets).</span>
+        </div>
+        <div class="ranges"><span>1M</span><span class="on">3M</span><span>1Y</span><span>All</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== OPTION B ===================== -->
+  <div class="col">
+    <p class="cap">Option B · Template progress</p>
+    <p class="opt-title">Ringed point, story in the tooltip</p>
+    <p class="capnote">No badge: a marked point gets a <b>lavender ring</b> and a small tick on the date axis. Tapping it widens the tooltip to hold the story, so it reads in place on both chart screens.</p>
+    <div class="phone">
+      <div class="back">‹ Template progress</div>
+      <h2>Leg Day A</h2>
+      <div class="card">
+        <span class="metric-label">Total volume</span>
+        <div class="headline"><span class="hv">14,820<small> lb</small></span><span class="pill">↑ 1,240 lb</span></div>
+        <p class="sub">Best: 15,100 lb on Sep 18</p>
+        <div class="wrap">
+          <svg class="chart" viewBox="0 0 326 150">
+            <line x1="0" x2="326" y1="12" y2="12" class="grid"/><text x="324" y="15" text-anchor="end" class="gl">15,100</text>
+            <line x1="0" x2="326" y1="76" y2="76" class="grid"/><text x="324" y="79" text-anchor="end" class="gl">12,600</text>
+            <line x1="0" x2="326" y1="140" y2="140" class="grid"/><text x="324" y="143" text-anchor="end" class="gl">10,100</text>
+            <polygon class="area" points="8,150 8,104 56,86 104,60 152,12 200,40 248,124 296,19 296,150"/>
+            <polyline class="line" points="8,104 56,86 104,60 152,12 200,40 248,124 296,19"/>
+            <circle class="dot" cx="8" cy="104" r="3"/><circle class="dot" cx="104" cy="60" r="3"/>
+            <circle class="dot best" cx="152" cy="12" r="5"/><circle class="dot" cx="200" cy="40" r="3"/><circle class="dot" cx="296" cy="19" r="3"/>
+            <circle cx="56" cy="86" r="7" fill="none" stroke="var(--secondary)" stroke-width="2"/><circle class="dot" cx="56" cy="86" r="3"/>
+            <circle cx="248" cy="124" r="9" fill="none" stroke="var(--secondary)" stroke-width="2"/><circle class="dot sel" cx="248" cy="124" r="5"/>
+            <line x1="56" x2="56" y1="144" y2="150" stroke="var(--secondary)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="248" x2="248" y1="144" y2="150" stroke="var(--secondary)" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          <div class="tip story" style="left:76%;top:76%;transform:translate(-85%,-100%) translateY(-14px)"><div>Oct 2 · <b>10,980 lb</b></div>
+            <div class="st"><span>Leg Press was taken, so you did Hack Squat (2 sets). Skipped Calf Raise. Finished with 3 planned sets left.</span></div>
+          </div>
+        </div>
+        <div class="axis"><span style="left:0">Aug 21</span><span style="left:46%;transform:translateX(-50%)">Sep 18</span><span style="left:91%;transform:translateX(-50%)">Oct 6</span></div>
+        <div class="ranges"><span>1M</span><span class="on">3M</span><span>1Y</span><span>All</span></div>
+      </div>
+      <div class="card">
+        <div class="session-head"><span class="kick">Selected session</span><span class="sd">Thu, Oct 2, 2026</span><b class="sv">10,980 lb</b></div>
+        <ul>
+          <li><span>Back Squat</span><span><b>225 lb × 6</b><small>4 sets</small></span></li>
+          <li><span>Hack Squat<span class="swapped">swapped in for Leg Press</span></span><span><b>180 lb × 10</b><small>2 sets</small></span></li>
+          <li><span>Romanian Deadlift</span><span><b>185 lb × 8</b><small>2 sets</small></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SHARED: WORKOUT LOG ===================== -->
+  <div class="col">
+    <p class="cap">Both options · Workout log</p>
+    <p class="opt-title">Story line on the card</p>
+    <p class="capnote">The same lines sit under the PR marker on the workout's card, in the lavender strip, above notes and how it felt. Cards without a story are unchanged.</p>
+    <div class="phone">
+      <h2>Progress</h2>
+      <div class="seg"><span>Overview</span><span>Lifts</span><span class="on">Workouts</span></div>
+      <div class="card collapsed">
+        <div class="eh"><h3>Sun, Oct 5 · 6:10 PM</h3><span class="tag">Leg Day A</span></div>
+        <div class="meta">3 exercises · 12 sets</div>
+      </div>
+      <div class="card entry">
+        <div class="eh"><h3>Thu, Oct 2 · 7:42 AM</h3><span class="tag">Leg Day A</span></div>
+        <div class="story">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11h-9l-5 4v-4H4z"/></svg>
+          <span>Leg Press was taken, so you did Hack Squat (2 sets).<br/>Skipped Calf Raise.<br/>Finished with 3 planned sets left.</span>
+        </div>
+        <span class="ghost">Add notes</span>
+        <p class="gt">Back Squat</p>
+        <div class="sl"><b>1</b>225 lb × 6</div>
+        <div class="sl"><b>2</b>225 lb × 6</div>
+        <p class="gt">Hack Squat</p>
+        <div class="sl"><b>1</b>180 lb × 10</div>
+      </div>
+      <div class="card collapsed">
+        <div class="eh"><h3>Mon, Sep 29 · 6:55 PM</h3><span class="tag">Push Day</span></div>
+        <div class="meta">4 exercises · 15 sets</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

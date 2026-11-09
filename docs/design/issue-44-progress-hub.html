@@ -1,0 +1,213 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Progress Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1700px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.85rem; margin: 0 0 14px; line-height: 1.5; }
+  .page { display: flex; flex-wrap: wrap; gap: 32px; padding: 24px 32px 40px; align-items: flex-start; }
+  .col { width: 390px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 74px; }
+  .phone { width: 390px; height: 800px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; position: relative; overflow: hidden; padding: 22px 16px 0; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.7rem; margin: 0 0 2px; }
+  .lede { color: var(--text-dim); font-size: 0.84rem; margin: 0 0 16px; }
+
+  .tile { display: flex; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 12px; position: relative; }
+  .tile .ic { flex-shrink: 0; width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); }
+  .tile .ic svg { width: 28px; height: 28px; }
+  .tile .body { flex: 1; min-width: 0; }
+  .tile .t { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; line-height: 1.15; }
+  .tile .s { color: var(--text-dim); font-size: 0.78rem; margin-top: 2px; line-height: 1.35; }
+  .tile .s b { color: var(--text); }
+  .tile .chev { color: var(--text-dim); font-size: 1.2rem; }
+  .tile svg.spark { width: 92px; height: 34px; flex-shrink: 0; }
+  .tile.soon { border-style: dashed; background: transparent; }
+  .tile.soon .t { color: var(--text-dim); }
+  .soonpill { font-family: Manrope, sans-serif; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; color: var(--highlight); border: 1px solid color-mix(in srgb, var(--highlight) 60%, transparent); padding: 2px 6px; border-radius: 999px; margin-left: 6px; vertical-align: 3px; }
+
+  .hero { display: flex; gap: 12px; align-items: center; background: color-mix(in srgb, var(--accent) 9%, var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border)); border-radius: 16px; padding: 12px 14px; margin-bottom: 16px; }
+  .hero img { width: 70px; height: 70px; object-fit: contain; }
+  .hero .t { font-weight: 800; font-size: 0.95rem; }
+  .hero .s { color: var(--text-dim); font-size: 0.78rem; margin-top: 2px; line-height: 1.35; }
+  .stats { display: flex; gap: 14px; margin-top: 6px; }
+  .stats div { font-size: 0.7rem; color: var(--text-dim); font-weight: 700; }
+  .stats b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; color: var(--accent); }
+
+  .back { display: flex; align-items: center; gap: 8px; color: var(--text-dim); font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; }
+  .search { height: 42px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; padding: 0 14px; color: var(--text-dim); font-size: 0.9rem; margin-bottom: 10px; }
+  .chips { display: flex; gap: 6px; margin-bottom: 12px; }
+  .chip { padding: 6px 11px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); font-size: 0.78rem; font-weight: 700; color: var(--text-dim); }
+  .chip.sel { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .lift { display: flex; align-items: center; gap: 12px; padding: 11px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; }
+  .lift .grow { flex: 1; min-width: 0; }
+  .lift .n { font-weight: 700; font-size: 0.93rem; }
+  .lift .m { font-size: 0.74rem; color: var(--text-dim); margin-top: 1px; }
+  .lift svg { width: 70px; height: 28px; flex-shrink: 0; }
+  .lift .v { text-align: right; min-width: 64px; }
+  .lift .v b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 1.05rem; color: var(--text); line-height: 1.1; }
+  .up { font-size: 0.7rem; font-weight: 800; color: var(--success); }
+  .flat { font-size: 0.7rem; font-weight: 800; color: var(--text-dim); }
+  .label { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.07em; color: var(--text-dim); text-transform: uppercase; margin: 4px 2px 8px; }
+
+  .wk { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; }
+  .wk .top { display: flex; justify-content: space-between; font-weight: 800; font-size: 0.92rem; }
+  .wk .top span { color: var(--text-dim); font-weight: 700; font-size: 0.76rem; }
+  .wk .ex { font-size: 0.8rem; color: var(--text-dim); margin-top: 4px; line-height: 1.5; }
+
+  .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 70px; background: var(--surface-2); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 4px 6px; }
+  .nav .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--text-dim); font-size: 0.74rem; font-weight: 700; }
+  .nav .tab .ti { width: 48px; height: 30px; border-radius: 15px; display: grid; place-items: center; }
+  .nav .tab svg { width: 22px; height: 22px; }
+  .nav .tab.on { color: var(--accent); font-weight: 800; }
+  .nav .tab.on .ti { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+  .navcmp { margin-top: 18px; }
+  .navcmp .lbl { font-size: 0.72rem; color: var(--text-dim); font-weight: 700; margin: 0 0 6px 4px; }
+  .navcmp .nav { position: relative; border: 1px solid var(--border); border-radius: 14px; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#44 History tab becomes a Progress hub</h1>
+  <p class="note">Decided with the user 2026-09-29: hub replaces the History tab, Body folds in as a tile, four tabs. The History tab turns into <b>Progress</b>: big tiles that each open a section. The workout log (today's History screen, still where you fix past data) is one tile, and lift progress charts are another. The per-exercise chart from <code>issue-21-progress-graph.png</code> screen A is what "Lift progress" opens, and it still opens from Exercises and the live logger too.</p>
+</div>
+<div class="page">
+
+  <!-- H1 -->
+  <div class="col">
+    <p class="cap">1. Progress tab (the hub)</p>
+    <p class="capnote">A cheerful summary strip, then one big tile per section. Each tile previews its own content (latest workout, top lift trend, weight trend) so the hub is useful at a glance even before you tap in. Muscle groups (#40) slots in later as its own tile.</p>
+    <div class="phone">
+      <h2>Progress</h2>
+      <p class="lede">How your training is going.</p>
+      <div class="hero"><img src="../../public/celebration-bunny.png" alt="" /><div><div class="t">You're on a roll!</div><div class="stats"><div><b>3</b>this week</div><div><b>11</b>this month</div><div><b>2</b>new bests</div></div></div></div>
+
+      <div class="tile" style="--c: var(--secondary)">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4h6v3H9z"/><path d="M8.5 11.5h7M8.5 15h5"/></svg></div>
+        <div class="body"><div class="t">Workout log</div><div class="s">Last: <b>Push day</b> · Fri, Sep 26<br />Review or fix past workouts</div></div>
+        <span class="chev">›</span>
+      </div>
+
+      <div class="tile" style="--c: var(--accent)">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg></div>
+        <div class="body"><div class="t">Lift progress</div><div class="s"><b>Bench Press</b> est. 1RM<br /><span class="up">▲ 29 lb</span> in 3 months</div></div>
+        <svg class="spark" id="s1" viewBox="0 0 92 34" preserveAspectRatio="none"></svg>
+      </div>
+
+      <div class="tile" style="--c: var(--success)">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4.5"/><path d="M8.5 11a3.5 3.5 0 017 0"/><path d="M12 11l1.4-1.8"/></svg></div>
+        <div class="body"><div class="t">Body weight</div><div class="s"><b>142.4 lb</b> · Sep 27<br />Opens the Body screen</div></div>
+        <svg class="spark" id="s2" viewBox="0 0 92 34" preserveAspectRatio="none"></svg>
+      </div>
+
+      <div class="tile soon" style="--c: var(--highlight)">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="6" r="2.5"/><path d="M12 9v6M8 11l4-1 4 1M10 21l2-6 2 6"/></svg></div>
+        <div class="body"><div class="t">Muscle groups <span class="soonpill">Later</span></div><div class="s">Which muscles you're training most (#40)</div></div>
+      </div>
+
+      <div class="nav" id="navH1"></div>
+    </div>
+  </div>
+
+  <!-- H2 -->
+  <div class="col">
+    <p class="cap">2. Lift progress</p>
+    <p class="capnote">Every exercise you've logged 2+ times, most recently trained first, each with a sparkline and its headline number. Tapping one opens the chart sheet (graph mockup, screen A). Muscle filter chips reuse the ones from the exercise library.</p>
+    <div class="phone">
+      <div class="back">‹ Progress</div>
+      <h2>Lift progress</h2>
+      <div class="search">Search exercises</div>
+      <div class="chips"><span class="chip sel">All</span><span class="chip">Chest</span><span class="chip">Back</span><span class="chip">Legs</span><span class="chip">Arms</span></div>
+      <div class="label">Recently trained</div>
+      <div class="lift"><div class="grow"><div class="n">Barbell Bench Press</div><div class="m">Est. 1RM · Sep 26</div></div><svg id="l1" viewBox="0 0 70 28" preserveAspectRatio="none"></svg><div class="v"><b>234 lb</b><span class="up">▲ 29</span></div></div>
+      <div class="lift"><div class="grow"><div class="n">Lat Pulldown</div><div class="m">Est. 1RM · Sep 26</div></div><svg id="l2" viewBox="0 0 70 28" preserveAspectRatio="none"></svg><div class="v"><b>128 lb</b><span class="up">▲ 12</span></div></div>
+      <div class="lift"><div class="grow"><div class="n">Assisted Pull-Up</div><div class="m">Least assist · Sep 24</div></div><svg id="l3" viewBox="0 0 70 28" preserveAspectRatio="none"></svg><div class="v"><b>40 lb</b><span class="up">▼ 20 assist</span></div></div>
+      <div class="lift"><div class="grow"><div class="n">Goblet Squat</div><div class="m">Est. 1RM · Sep 23</div></div><svg id="l4" viewBox="0 0 70 28" preserveAspectRatio="none"></svg><div class="v"><b>71 lb</b><span class="flat">no change</span></div></div>
+      <div class="lift"><div class="grow"><div class="n">Stair Climber</div><div class="m">Best level · Sep 22</div></div><svg id="l5" viewBox="0 0 70 28" preserveAspectRatio="none"></svg><div class="v"><b>Lvl 12</b><span class="up">▲ 4</span></div></div>
+      <div class="lift"><div class="grow"><div class="n">Plank</div><div class="m">Longest · Sep 22</div></div><svg id="l6" viewBox="0 0 70 28" preserveAspectRatio="none"></svg><div class="v"><b>1:30</b><span class="up">▲ 0:45</span></div></div>
+    </div>
+  </div>
+
+  <!-- H3 -->
+  <div class="col">
+    <p class="cap">3. Workout log</p>
+    <p class="capnote">Today's History screen, moved one level down and renamed. Same editing, same everything; it just gains a back link to Progress. This is where you fix mistakes in past data.</p>
+    <div class="phone">
+      <div class="back">‹ Progress</div>
+      <h2>Workout log</h2>
+      <p class="lede">Tap a workout to review or fix it.</p>
+      <div class="label">This week</div>
+      <div class="wk"><div class="top">Push day <span>Fri, Sep 26 · 52 min</span></div><div class="ex">Bench Press 3 sets · Incline DB Press 3 sets · Tricep Pushdown 3 sets</div></div>
+      <div class="wk"><div class="top">Pull day <span>Wed, Sep 24 · 48 min</span></div><div class="ex">Lat Pulldown 3 sets · Assisted Pull-Up 3 sets · Seated Row 3 sets</div></div>
+      <div class="wk"><div class="top">Legs <span>Mon, Sep 22 · 55 min</span></div><div class="ex">Goblet Squat 3 sets · Leg Press 3 sets · Plank 3 sets · Stair Climber</div></div>
+      <div class="label" style="margin-top:14px">Last week</div>
+      <div class="wk"><div class="top">Push day <span>Fri, Sep 19 · 50 min</span></div><div class="ex">Bench Press 3 sets · Incline DB Press 3 sets · Tricep Pushdown 3 sets</div></div>
+    </div>
+  </div>
+
+  <!-- H4 -->
+  <div class="col">
+    <p class="cap">4. Tab bar (Option 2 chosen)</p>
+    <p class="capnote">Option 1 keeps five tabs and just swaps History for Progress. Option 2 also folds Body into Progress (its tile opens the Body screen) to get down to four tabs, at the cost of one more tap to log a weigh-in.</p>
+    <div class="navcmp">
+      <p class="lbl">Option 1: five tabs (History renamed Progress)</p>
+      <div class="nav" id="nav5"></div>
+    </div>
+    <div class="navcmp" style="margin-top:28px">
+      <p class="lbl">Option 2: four tabs, Body folded into Progress (decided 2026-09-29)</p>
+      <div class="nav" id="nav4"></div>
+    </div>
+    <div class="navcmp" style="margin-top:28px">
+      <p class="lbl">Today, for comparison</p>
+      <div class="nav" id="navNow"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function spark(id, vals, color = '#f2879c') {
+    const svg = document.getElementById(id)
+    const [W, H] = svg.getAttribute('viewBox').split(' ').slice(2).map(Number)
+    const pad = 3, min = Math.min(...vals), r = Math.max(Math.max(...vals) - min, 1)
+    const x = (i) => pad + (i / (vals.length - 1)) * (W - pad * 2)
+    const y = (v) => H - pad - ((v - min) / r) * (H - pad * 2)
+    const pts = vals.map((v, i) => `${x(i)},${y(v)}`).join(' ')
+    svg.innerHTML = `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/><circle cx="${x(vals.length - 1)}" cy="${y(vals[vals.length - 1])}" r="2.5" fill="${color}"/>`
+  }
+  spark('s1', [205, 208, 212, 210, 216, 219, 217, 224, 226, 228, 228, 234])
+  spark('s2', [146, 145.6, 145.8, 144.9, 144.2, 144.5, 143.6, 143.1, 142.4], '#a9cb8d')
+  spark('l1', [205, 212, 210, 219, 224, 228, 234])
+  spark('l2', [116, 118, 120, 121, 124, 126, 128])
+  spark('l3', [-60, -55, -55, -50, -45, -40])
+  spark('l4', [69, 71, 70, 71, 71, 71], '#b9a8c2')
+  spark('l5', [8, 9, 9, 10, 11, 12])
+  spark('l6', [45, 55, 60, 70, 75, 90])
+
+  const icons = {
+    Home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5L12 4l8 7.5"/><path d="M6 10v9a1 1 0 001 1h3v-5a2 2 0 014 0v5h3a1 1 0 001-1v-9"/></svg>',
+    Progress: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg>',
+    History: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+    Templates: '<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="7" width="13" height="9" rx="2.5" stroke="currentColor" stroke-width="1.8"/><rect x="7.5" y="3.5" width="13" height="9" rx="2.5" stroke="currentColor" stroke-width="1.8" opacity="0.55"/></svg>',
+    Exercises: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="2.5" y="9.5" width="3" height="5" rx="1"/><rect x="18.5" y="9.5" width="3" height="5" rx="1"/><rect x="5.5" y="8" width="2.4" height="8" rx="1"/><rect x="16" y="8" width="2.4" height="8" rx="1"/><rect x="8" y="11" width="8" height="2" rx="1"/></svg>',
+    Body: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="4.5"/><path d="M8.5 11a3.5 3.5 0 017 0"/><path d="M12 11l1.4-1.8"/></svg>',
+  }
+  function nav(id, tabs, on) {
+    document.getElementById(id).innerHTML = tabs.map((t) => `<div class="tab ${t === on ? 'on' : ''}"><span class="ti">${icons[t]}</span>${t}</div>`).join('')
+  }
+  nav('navH1', ['Home', 'Progress', 'Templates', 'Exercises'], 'Progress')
+  nav('nav5', ['Home', 'Progress', 'Templates', 'Exercises', 'Body'], 'Progress')
+  nav('nav4', ['Home', 'Progress', 'Templates', 'Exercises'], 'Progress')
+  nav('navNow', ['Home', 'History', 'Templates', 'Exercises', 'Body'], 'History')
+</script>
+</body>
+</html>

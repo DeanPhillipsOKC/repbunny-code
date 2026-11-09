@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Issue 276: Account on the title row</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --success: #a9cb8d; --highlight: #f2c069;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .page { display: flex; flex-wrap: wrap; gap: 26px; padding: 26px; align-items: flex-start; width: 1700px; }
+  .col { width: 375px; }
+  .tag { display: inline-block; margin-bottom: 8px; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .tag-now { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+  .tag-new { background: rgba(242,192,105,0.16); color: var(--highlight); }
+  .col-title { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; margin: 0 0 2px; }
+  .col-note { color: var(--text-dim); font-size: 0.8rem; margin: 0 0 12px; line-height: 1.45; min-height: 58px; }
+
+  .phone { height: 560px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding-top: 12px; }
+  .app-header { display: flex; justify-content: flex-end; padding: 8px 16px 0; }
+  .content { padding: 0 16px; display: flex; flex-direction: column; }
+  .acct { flex-shrink: 0; width: 44px; height: 44px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; }
+  .acct i { width: 18px; height: 18px; border-radius: 99px; border: 2px solid var(--text); }
+  .back-link { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; margin-bottom: 2px; color: var(--text-dim); font-size: 0.85rem; font-weight: 700; }
+  .back-link span { font-size: 1.2rem; line-height: 1; }
+  .page-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .page-title { flex: 1; min-width: 0; margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.7rem; line-height: 1.2; display: flex; align-items: center; gap: 8px; }
+  .page-title .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .page-title.wrap .t { white-space: normal; overflow-wrap: anywhere; }
+  .pencil { flex-shrink: 0; width: 14px; height: 14px; border: 2px solid var(--text-dim); border-radius: 2px; transform: rotate(45deg) scaleX(.45); }
+  .old-head { display: flex; align-items: center; gap: 10px; min-height: 48px; }
+  .old-head .chev { width: 40px; text-align: center; font-size: 1.5rem; }
+  .old-head h1 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.5rem; display: flex; gap: 8px; align-items: center; }
+  .label { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim); margin: 12px 0 8px; }
+  .cats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .cat { height: 58px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); font-size: .68rem; display: grid; place-items: center; color: var(--text-dim); }
+  .cat.on { border-color: var(--accent); color: var(--text); }
+  .ex { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; font-weight: 700; font-size: .92rem; }
+  .ex small { color: var(--text-dim); font-weight: 600; }
+  .pill { display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px 0 8px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); font-weight: 700; margin-bottom: 8px; }
+  .hero { display: flex; align-items: center; gap: 14px; margin: 6px 0 14px; }
+  .badge { flex-shrink: 0; width: 64px; height: 64px; border-radius: 16px; background: rgba(183,156,240,.18); border: 1px solid rgba(183,156,240,.4); }
+  .badge.sm { width: 42px; height: 42px; border-radius: 12px; }
+  .hero h2 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; }
+  .sub { color: var(--text-dim); font-size: .8rem; }
+  .lede { margin: -6px 0 16px; color: var(--text-dim); font-size: .84rem; }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .fact { padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; font-size: .9rem; font-weight: 700; }
+  .fact div { color: var(--text-dim); font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; }
+  .cta { min-height: 48px; border-radius: 12px; background: var(--accent); color: var(--accent-text); display: grid; place-items: center; font-weight: 800; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- Routine editor -->
+  <div class="col">
+    <span class="tag tag-now">Now</span>
+    <p class="col-title">Routine editor</p>
+    <p class="col-note">Account sits alone on a row, then the back chevron and title. About 50px of header holds nothing.</p>
+    <div class="phone">
+      <div class="app-header"><div class="acct"><i></i></div></div>
+      <div class="content">
+        <div class="old-head"><span class="chev">‹</span><h1>Push Day <span class="pencil"></span></h1></div>
+        <div class="label"><span>Category</span><span>Auto: Push</span></div>
+        <div class="cats"><div class="cat on">Push</div><div class="cat">Pull</div><div class="cat">Legs</div><div class="cat">Full</div><div class="cat">Cardio</div></div>
+        <div class="label"><span>Exercises</span><span>4</span></div>
+        <div class="ex">Bench Press <small>3 × 8</small></div>
+        <div class="ex">Overhead Press <small>3 × 10</small></div>
+        <div class="ex">Incline Dumbbell Press <small>3 × 10</small></div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <span class="tag tag-new">Option A (chosen)</span>
+    <p class="col-title">Routine editor, PageHeader layout</p>
+    <p class="col-note">"‹ Routines" back link like every Progress sub-screen, then the title with its rename pencil and Account on one row. One more exercise fits above the fold.</p>
+    <div class="phone">
+      <div class="content">
+        <div class="back-link"><span>‹</span>Routines</div>
+        <div class="page-header"><h1 class="page-title"><span class="t">Push Day</span><span class="pencil"></span></h1><div class="acct"><i></i></div></div>
+        <div class="label" style="margin-top:0"><span>Category</span><span>Auto: Push</span></div>
+        <div class="cats"><div class="cat on">Push</div><div class="cat">Pull</div><div class="cat">Legs</div><div class="cat">Full</div><div class="cat">Cardio</div></div>
+        <div class="label"><span>Exercises</span><span>4</span></div>
+        <div class="ex">Bench Press <small>3 × 8</small></div>
+        <div class="ex">Overhead Press <small>3 × 10</small></div>
+        <div class="ex">Incline Dumbbell Press <small>3 × 10</small></div>
+        <div class="ex">Cable Triceps Pushdown <small>3 × 12</small></div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <span class="tag tag-new">Option A, long name</span>
+    <p class="col-title">Long routine name</p>
+    <p class="col-note">A long name ellipsizes before the pencil, so Account never gets pushed off the row.</p>
+    <div class="phone">
+      <div class="content">
+        <div class="back-link"><span>‹</span>Routines</div>
+        <div class="page-header"><h1 class="page-title"><span class="t">Upper Body Hypertrophy Block B</span><span class="pencil"></span></h1><div class="acct"><i></i></div></div>
+        <div class="label" style="margin-top:0"><span>Category</span><span>Auto: Full</span></div>
+        <div class="cats"><div class="cat">Push</div><div class="cat">Pull</div><div class="cat">Legs</div><div class="cat on">Full</div><div class="cat">Cardio</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Library detail -->
+  <div class="col">
+    <span class="tag tag-now">Now</span>
+    <p class="col-title">Library exercise detail</p>
+    <p class="col-note">Account row, then a "‹ Library" pill, then the exercise hero. Three rows before the name.</p>
+    <div class="phone">
+      <div class="app-header"><div class="acct"><i></i></div></div>
+      <div class="content">
+        <div class="pill"><span>‹</span>Library</div>
+        <div class="hero"><div class="badge"></div><div><h2>Romanian Deadlift</h2><div class="sub">Hamstrings · also works Glutes, Back</div></div></div>
+        <div class="facts"><div class="fact"><div>Equipment</div>Barbell</div><div class="fact"><div>Tracked as</div>Weight × reps</div></div>
+        <div class="cta">Add to my exercises</div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <span class="tag tag-new">Option A (chosen)</span>
+    <p class="col-title">Library detail, PageHeader layout</p>
+    <p class="col-note">"‹ Library" back link, then badge, name and Account on one row (same as Muscle detail), with the muscle line as the lede under it.</p>
+    <div class="phone">
+      <div class="content">
+        <div class="back-link"><span>‹</span>Library</div>
+        <div class="page-header"><div class="badge sm"></div><h2 class="page-title wrap"><span class="t">Romanian Deadlift</span></h2><div class="acct"><i></i></div></div>
+        <p class="lede">Hamstrings · also works Glutes, Back</p>
+        <div class="facts"><div class="fact"><div>Equipment</div>Barbell</div><div class="fact"><div>Tracked as</div>Weight × reps</div></div>
+        <div class="cta">Add to my exercises</div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <span class="tag tag-new">Option A, long name</span>
+    <p class="col-title">Long exercise name</p>
+    <p class="col-note">Library names wrap (they're the thing you're reading), and Account stays centered on the row.</p>
+    <div class="phone">
+      <div class="content">
+        <div class="back-link"><span>‹</span>Library</div>
+        <div class="page-header"><div class="badge sm"></div><h2 class="page-title wrap"><span class="t">Single-Leg Dumbbell Romanian Deadlift</span></h2><div class="acct"><i></i></div></div>
+        <p class="lede">Hamstrings · also works Glutes</p>
+        <div class="facts"><div class="fact"><div>Equipment</div>Dumbbell</div><div class="fact"><div>Tracked as</div>Weight × reps</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

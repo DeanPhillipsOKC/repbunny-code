@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">RepBunny</string>
+    <string name="title_activity_main">RepBunny</string>
+    <string name="package_name">app.repbunny</string>
+    <string name="custom_url_scheme">app.repbunny</string>
+    <!-- Issue #144: home screen widgets. Everything a widget shows comes
+         from the app's snapshot; these are the picker's names and the
+         message before the app has written one. -->
+    <string name="widget_brand">RepBunny</string>
+    <string name="widget_setup">Open RepBunny once to fill this in.</string>
+    <string name="widget_week_label">This week</string>
+    <string name="widget_week_description">Your workouts this week, one mark per day.</string>
+    <string name="widget_next_label">Next workout</string>
+    <string name="widget_next_description">The routine you\'d do next. Tap to start it.</string>
+    <string name="widget_record_label">Latest record</string>
+    <string name="widget_record_description">Your newest personal record.</string>
+</resources>

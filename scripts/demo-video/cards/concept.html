@@ -1,0 +1,187 @@
+<!doctype html>
+<!--
+  Concept card for the lifting basics video (#426). One template for every
+  concept: ?kind= picks the visual (setup, rep, set, weight, rest, rpe, words),
+  ?d= is how long the card runs (seconds), and ?t= lists when each of its
+  narrated lines starts (seconds into the card, comma separated), so each
+  visual moves in time with its line. ?n= and ?of= drive the progress dots.
+  Like intro.html, cards.mjs renders it frame by frame by setting each CSS
+  animation's currentTime, so all motion is CSS animation that starts on load;
+  the script below only fills in the markup and timing variables first.
+  The setup card is the intro card's background, so it holds still at 0 s.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: 'Baloo 2'; font-weight: 600 800; src: url(/site/fonts/baloo2-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 400 800; src: url(/site/fonts/manrope-latin.woff2) format('woff2'); }
+  @property --p { syntax: '<percentage>'; inherits: false; initial-value: 100%; }
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40; --text: #f5edf2; --text-dim: #b9a8c2;
+    --accent: #f2879c; --accent-text: #241a2c; --secondary: #b79cf0; --highlight: #f2c069;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 480px; height: 1040px; overflow: hidden; background: var(--bg); }
+  body { position: relative; font-family: 'Baloo 2', sans-serif; color: var(--text); }
+
+  .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .3; }
+  .b1 { width: 300px; height: 300px; background: var(--accent); left: -140px; top: 40px; animation: drift1 var(--d) ease-in-out both; }
+  .b2 { width: 280px; height: 280px; background: var(--secondary); right: -140px; top: 560px; animation: drift2 var(--d) ease-in-out both; }
+  @keyframes drift1 { to { transform: translate(40px, 30px); } }
+  @keyframes drift2 { to { transform: translate(-30px, -40px); } }
+
+  .head { position: absolute; top: 56px; left: 36px; right: 36px; display: flex; align-items: center; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; }
+  .brand img { width: 36px; height: 36px; border-radius: 10px; }
+  .dots { display: flex; gap: 6px; }
+  .dots i { width: 9px; height: 9px; border-radius: 99px; background: rgba(245, 237, 242, .2); }
+  .dots i.done { background: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+  .dots i.on { width: 26px; background: var(--accent); animation: grow .4s ease-out both; }
+  @keyframes grow { from { width: 9px; } }
+
+  .title { position: absolute; top: 130px; left: 0; right: 0; text-align: center; }
+  .eyebrow { font-family: Manrope, sans-serif; font-size: 18px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--highlight); animation: fade .35s ease-out .05s both; }
+  .name { font-size: 84px; font-weight: 800; line-height: 1; margin-top: 6px; animation: pop .45s cubic-bezier(.3, 1.5, .5, 1) .1s both; }
+  .sub { font-family: Manrope, sans-serif; font-size: 24px; font-weight: 700; color: var(--text-dim); margin-top: 8px; animation: fade .4s ease-out .3s both; }
+  @keyframes pop { from { transform: scale(.4); opacity: 0; } }
+  @keyframes fade { from { opacity: 0; transform: translateY(10px); } }
+  @keyframes rise { from { opacity: 0; transform: translateY(60px); } }
+  @keyframes in { from { opacity: 0; transform: scale(.6); } }
+
+  .vis { position: absolute; top: 350px; left: 36px; right: 36px; height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; }
+  .art { position: absolute; right: 18px; bottom: 150px; width: 170px; filter: drop-shadow(0 12px 20px rgba(0, 0, 0, .5)); animation: rise .5s cubic-bezier(.2, .9, .3, 1.15) .35s both; }
+  .chip { font-family: Manrope, sans-serif; font-size: 22px; font-weight: 800; padding: 12px 20px; border-radius: 999px; background: color-mix(in srgb, var(--highlight) 16%, var(--surface)); border: 2px solid color-mix(in srgb, var(--highlight) 55%, var(--border)); color: var(--text); animation: in .35s cubic-bezier(.3, 1.5, .5, 1) var(--at) both; }
+
+  /* setup: the bunny and the question, still at 0 s */
+  .setup .hello { position: absolute; top: 210px; left: 0; right: 0; text-align: center; }
+  .setup .hello img { width: 300px; filter: drop-shadow(0 16px 26px rgba(0, 0, 0, .5)); animation: float 2.4s ease-in-out infinite alternate; }
+  .setup .q { font-size: 64px; font-weight: 800; line-height: 1; margin-top: 18px; }
+  .setup .q2 { font-family: Manrope, sans-serif; font-size: 24px; font-weight: 700; color: var(--text-dim); margin-top: 12px; }
+  @keyframes float { to { transform: translateY(-14px); } }
+
+  /* rep: a counter ticking 1 to 8 while the bunny lifts */
+  .counter { display: flex; align-items: flex-end; font-weight: 800; color: var(--accent); }
+  .digits { height: 190px; overflow: hidden; font-size: 190px; line-height: 190px; }
+  .digits div { animation: tick var(--rep-d) steps(7, end) var(--t0) both; }
+  .digits span { display: block; text-align: center; width: 120px; }
+  @keyframes tick { to { transform: translateY(-1330px); } }
+  .counter small { font-size: 60px; line-height: 1.6; color: var(--text-dim); }
+  .rep .art { width: 200px; }
+  .rep .art { animation: rise .5s cubic-bezier(.2, .9, .3, 1.15) .35s both, lift calc(var(--rep-d) / 8) ease-in-out var(--t0) 8; }
+  @keyframes lift { 50% { transform: translateY(-36px); } }
+
+  /* set: 3 x 8, and three rows of dots filling in */
+  .x { font-size: 110px; font-weight: 800; line-height: 1; color: var(--accent); animation: in .4s cubic-bezier(.3, 1.5, .5, 1) var(--at) both; }
+  .row { display: flex; align-items: center; gap: 10px; font-family: Manrope, sans-serif; font-weight: 800; font-size: 20px; color: var(--text-dim); animation: fade .3s ease-out .4s both; }
+  .row b { width: 58px; }
+  .row i { width: 26px; height: 26px; border-radius: 99px; border: 3px solid var(--border); position: relative; }
+  .row i::after { content: ''; position: absolute; inset: -3px; border-radius: 99px; background: var(--accent); animation: in .2s ease-out var(--at) both; }
+
+  /* weight: effort per rep, the last two hard */
+  .bars { display: flex; align-items: flex-end; gap: 10px; height: 220px; }
+  .bars span { width: 34px; border-radius: 8px 8px 4px 4px; background: color-mix(in srgb, var(--secondary) 60%, var(--surface-2)); transform-origin: bottom; animation: up .3s ease-out var(--at) both; }
+  .bars span.h { background: var(--accent); }
+  @keyframes up { from { transform: scaleY(0); } }
+  .hard { font-family: Manrope, sans-serif; font-weight: 800; font-size: 20px; color: var(--accent); align-self: flex-end; margin-right: 34px; margin-top: -12px; animation: fade .3s ease-out var(--at) both; }
+
+  /* rest: a ring and a clock counting down */
+  .ring { width: 250px; height: 250px; border-radius: 50%; background: conic-gradient(var(--accent) 0 var(--p), var(--surface-2) var(--p) 100%); display: grid; place-items: center; animation: in .4s ease-out .3s both, drain var(--clock-d) linear var(--t0) both; }
+  @keyframes drain { to { --p: 72%; } }
+  .ring > div { width: 212px; height: 212px; border-radius: 50%; background: var(--bg); display: grid; place-items: center; }
+  .clock { height: 90px; overflow: hidden; font-size: 76px; line-height: 90px; font-weight: 800; }
+  .clock div { animation: tick-clock var(--clock-d) steps(var(--clock-n), end) var(--t0) both; }
+  .clock span { display: block; text-align: center; }
+  @keyframes tick-clock { to { transform: translateY(calc(var(--clock-n) * -90px)); } }
+
+  /* rpe: a 1 to 10 meter filling to 8 */
+  .meter { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; width: 100%; }
+  .meter span { height: 76px; border-radius: 10px; background: var(--surface-2); border: 2px solid var(--border); display: grid; place-items: end center; padding-bottom: 6px; font-size: 22px; font-weight: 800; color: var(--text-dim); position: relative; overflow: hidden; }
+  .meter span::before { content: ''; position: absolute; inset: 0; background: color-mix(in srgb, var(--accent) 30%, transparent); transform-origin: bottom; animation: up .2s ease-out var(--at) both; }
+  .meter span.no::before { display: none; }
+  .meter span.on { animation: hit .35s cubic-bezier(.3, 1.6, .5, 1) var(--at) both; }
+  @keyframes hit { to { background: var(--accent); border-color: var(--accent); color: var(--accent-text); transform: scale(1.12); } }
+
+  /* words: one card per word, as it's said */
+  .word { width: 100%; padding: 16px 20px; border-radius: 18px; background: var(--surface); border: 2px solid var(--border); animation: rise .4s cubic-bezier(.2, .9, .3, 1.15) var(--at) both; }
+  .word b { display: block; font-size: 34px; line-height: 1.1; }
+  .word span { font-family: Manrope, sans-serif; font-size: 20px; font-weight: 700; color: var(--text-dim); }
+  .words .vis { top: 330px; height: 420px; gap: 14px; }
+</style>
+</head>
+<body>
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="head"><div class="brand"><img src="/site/img/icon.png" alt="" /><span>Lifting basics</span></div><div class="dots" id="dots"></div></div>
+  <div id="card"></div>
+  <script>
+    const q = new URLSearchParams(location.search)
+    const kind = q.get('kind') ?? 'setup'
+    const d = Number(q.get('d') ?? 4)
+    const t = (q.get('t') ?? '0').split(',').map(Number)
+    const n = Number(q.get('n') ?? 0)
+    const of = Number(q.get('of') ?? 7)
+    const s = (x) => `${x.toFixed(3)}s`
+    const root = document.documentElement.style
+    root.setProperty('--d', s(d))
+    root.setProperty('--t0', s(t[0]))
+    // The time a line has until the next one (or the card's end).
+    const span = (i) => (t[i + 1] ?? d - 0.4) - t[i]
+    const at = (x) => `style="--at:${s(x)}"`
+    const title = (eyebrow, name, sub) => `<div class="title"><div class="eyebrow">${n} · ${eyebrow}</div><div class="name">${name}</div><div class="sub">${sub}</div></div>`
+    const art = (img) => `<img class="art" src="/site/img/${img}" alt="" />`
+
+    if (kind !== 'setup') {
+      document.getElementById('dots').innerHTML = Array.from({ length: of }, (_, i) => `<i class="${i + 1 < n ? 'done' : i + 1 === n ? 'on' : ''}"></i>`).join('')
+    }
+    document.body.className = kind
+    const cards = {
+      setup: () => `<div class="hello"><img src="/site/img/bunny-hop.webp" alt="" /><div class="q">New to the gym?</div><div class="q2">Here's what the words mean</div></div>`,
+      rep: () => {
+        root.setProperty('--rep-d', s(Math.min(span(0), 3.4)))
+        return title('Rep', 'Rep', 'one lift, up and down') +
+          `<div class="vis"><div class="counter"><div class="digits"><div>${[1, 2, 3, 4, 5, 6, 7, 8].map((x) => `<span>${x}</span>`).join('')}</div></div><small>/8</small></div></div>` + art('bunny-dumbbell.webp')
+      },
+      set: () => {
+        // The dots fill across the first line; "3 x 8" lands with the second.
+        const each = (span(0) - 0.4) / 24
+        const rows = [1, 2, 3].map((r) => `<div class="row"><b>Set ${r}</b>${Array.from({ length: 8 }, (_, i) => `<i ${at(t[0] + 0.3 + ((r - 1) * 8 + i) * each)}></i>`).join('')}</div>`)
+        return title('Set', 'Set', 'reps done back to back') + `<div class="vis"><div class="x" ${at(t[1] ?? t[0])}>3 × 8</div>${rows.join('')}</div>`
+      },
+      weight: () => {
+        const h = [60, 75, 90, 105, 120, 140, 175, 210]
+        const each = Math.min(0.3, (span(0) * 0.7) / 8)
+        const bars = h.map((x, i) => `<span class="${i > 5 ? 'h' : ''}" style="height:${x}px;--at:${s(t[0] + 0.2 + i * each)}"></span>`).join('')
+        return title('Weight', 'Weight', 'the last reps feel hard') +
+          `<div class="vis"><div class="bars">${bars}</div><div class="hard" ${at(t[0] + 0.2 + 7 * each)}>hard!</div><div class="chip" ${at(t[1] ?? t[0])}>When unsure, go lighter</div></div>` + art('bunny-flex.webp')
+      },
+      rest: () => {
+        // 1:30 counting down a second at a time for the rest of the card.
+        const secs = Math.max(1, Math.floor(d - t[0]))
+        root.setProperty('--clock-d', s(secs))
+        root.setProperty('--clock-n', String(secs))
+        const clock = Array.from({ length: secs + 1 }, (_, i) => { const x = 90 - i; return `<span>${Math.floor(x / 60)}:${String(x % 60).padStart(2, '0')}</span>` }).join('')
+        return title('Rest', 'Rest', '1 to 3 min between sets') +
+          `<div class="vis"><div class="ring"><div><div class="clock"><div>${clock}</div></div></div></div><div class="chip" ${at(t[1] ?? t[0])}>The timer starts for you</div></div>` + art('rest-bunny.webp')
+      },
+      rpe: () => {
+        const each = Math.min(0.18, (span(0) * 0.6) / 8)
+        const cells = Array.from({ length: 10 }, (_, i) => {
+          const x = i + 1
+          const cls = x === 8 ? 'on no' : x > 8 ? 'no' : ''
+          const when = x === 8 ? (t[1] ?? t[0] + 8 * each) : t[0] + 0.3 + i * each
+          return `<span class="${cls}" ${at(when)}>${x}</span>`
+        }).join('')
+        return title('RPE', 'RPE', 'how hard it felt, 1 to 10') +
+          `<div class="vis"><div class="meter">${cells}</div><div class="chip" ${at((t[1] ?? t[0]) + 0.3)}>8 = about 2 reps left</div><div class="chip" ${at(t[2] ?? t[0])}>Optional</div></div>` + art('bunny-thumbs.webp')
+      },
+      words: () => {
+        const words = [['Warm-up set', 'a lighter set, to get loose'], ['PR', 'personal record, your best ever'], ['Progressive overload', 'add a little over time']]
+        return title('Gym words', 'Words', "you'll hear") +
+          `<div class="vis">${words.map(([w, m], i) => `<div class="word" ${at(t[i + 1] ?? t[0])}><b>${w}</b><span>${m}</span></div>`).join('')}</div>`
+      },
+    }
+    document.getElementById('card').innerHTML = cards[kind]()
+    window.CARD = { duration: d, sounds: kind === 'setup' ? [] : [['whoosh', 0]] }
+  </script>
+</body>
+</html>

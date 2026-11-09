@@ -1,0 +1,481 @@
+[
+  {
+    "date": "2026-10-15",
+    "build": 724,
+    "items": [
+      "Logged sets now read \"8 × 150 lb\", with a space before the unit.",
+      "A muscle's Sets chart now labels the grey 10–20 sets band and says why it's there.",
+      {
+        "text": "Jot a note on a lift for just this workout: tap + Note for today under your sets. It shows under that exercise in your Workout log, and under Last time the next time you do the lift. Notes from Strong and Hevy imports land there too.",
+        "guide": "log-a-workout/"
+      },
+      "Want the same session again? After a freeform workout, Home offers Do this again: same exercises in the same order, one open row per set you logged, filled in from last time.",
+      "Roomier exercise list: tap an exercise to see its history, and tap ⋯ for Edit and Delete. Names fit on one line, and every button is easier to hit."
+    ]
+  },
+  {
+    "date": "2026-10-14",
+    "build": 704,
+    "items": [
+      "Big phone text no longer piles up: with a large font size, the workout header, exercise card, set columns, recap, and tab bar now wrap and stack to fit.",
+      "Imported history from Strong or Hevy no longer sets off a burst of milestones. The ones it reached show as Before RepBunny on the Milestones screen, with no celebration, trial passes, or Extras. New ones you earn here still do.",
+      {
+        "text": "Got a Premium code? Tap Redeem a code next to Restore Purchases on the Premium sheet to redeem it in Google Play. Premium turns on when you come back.",
+        "platforms": [
+          "android"
+        ]
+      },
+      "Archived a routine by mistake? It now waits under Archived routines on the Routines screen, with a Restore button to bring it back with its exercises.",
+      "Tap a day on the Training calendar to see its summary: sets, volume, time, and any records, with a link to each workout. Rest days say so.",
+      "Importing from Strong or Hevy now tells you how many rows couldn't be read and were left out, instead of skipping them silently.",
+      "Exporting a backup or CSV in the app now says it's ready to save and points you to Drive or Files in the share sheet, instead of claiming it's already saved.",
+      {
+        "text": "On Android, the back gesture now closes the open sheet first, then steps up one screen, and only leaves the app from Home.",
+        "platforms": [
+          "android"
+        ]
+      },
+      "Started a trial pass? It now says where to find what you unlocked, with a button straight there, like Pick a theme, and a link to its guide.",
+      "Saving a past workout as a routine is easier to spot: open it in your workout log and tap Save as routine.",
+      "Restore and Import now say why they're greyed out during a workout: finish or discard it first.",
+      "Your workout log now shows the volume for each set and a total for each exercise, so you can check the numbers at a glance.",
+      "Small wins get a nod now: a set that's your heaviest yet, a rep best, or right on target gets a chip on its row and a line on the rest screen, no takeover needed.",
+      {
+        "text": "Love a big moment? Set Record celebrations to All wins in Preferences and small wins get the full-screen celebration too.",
+        "guide": "log-a-workout/"
+      },
+      "Restoring a partial backup that has nothing new now says so up front, with a Done button, instead of promising to add things.",
+      "Linking an exercise to the library from its edit screen now suggests the closest matches, so \"Lat Pull\" is one tap away from Lat Pulldown."
+    ]
+  },
+  {
+    "date": "2026-10-13",
+    "build": 672,
+    "items": [
+      "Switching to the Progress tab is much quicker with years of workouts: it now stays ready between visits instead of recounting your whole history each time.",
+      "Custom and imported exercises with a bar in the name, like \"Romanian Deadlift (Barbell)\", now get the plate calculator automatically. Matching your own exercises during an import now shows their equipment too.",
+      "Sharing a PDF report, saving a backup, and exporting a CSV now open your phone's share sheet in the Android and iPhone apps, and show an error if the file can't be shared.",
+      "Opening Premium on a Google account or Apple ID that already owns it now unlocks it right away. Restore Purchases is a quiet link with a note on what it does.",
+      "The Extras rest chimes and record fanfares are now a touch quieter, and the pickers remind you they can turn heads. Try one at low volume before the gym.",
+      "The plate calculator keeps the bar and its Change button even when your plates can't make the weight, so you can switch bars without retyping.",
+      "Unlock Premium now says \"Connecting to Google Play…\" while it waits, and if Google Play can't be reached it tells you so, instead of looking like nothing happened.",
+      {
+        "text": "The rest timer now starts at 2:00 for new lifters, and the rest screen says where the time came from with a link to change it. Nudged it with -15s or +15s? Tap Keep to make that the exercise's rest from now on.",
+        "guide": "rest-timer/"
+      },
+      {
+        "text": "Your lifting history now has a safety net on your phone. RepBunny saves a restore point after every workout and before each update, and checks every update before it keeps it. Find the last 10 in Account > Your data > Restore points.",
+        "platforms": [
+          "ios",
+          "android"
+        ]
+      },
+      {
+        "text": "If your workouts ever can't open, RepBunny now shows a calm recovery screen that brings back your newest restore point in one tap, and keeps the damaged copy aside. Reinstalling? Tap Restoring from a backup? on the welcome screen.",
+        "platforms": [
+          "ios",
+          "android"
+        ]
+      },
+      {
+        "text": "Lifting basics now starts with a 90-second video, with sound and captions: reps, sets, picking a weight, rest, RPE, a few gym words, and logging your first set. Tap Watch the basics on the first card. It plays offline too.",
+        "guide": "lifting-basics/"
+      },
+      {
+        "text": "New to lifting? Setup's \"How do you want to train?\" step now links a 2-minute basics guide: sets and reps, picking a weight, rest, RPE, and logging a set. Find it again anytime in Account > About > Lifting basics.",
+        "guide": "lifting-basics/"
+      },
+      "Adding a starter program on your first run now takes you straight to Home, with the first routine highlighted so your first workout is one tap away."
+    ]
+  },
+  {
+    "date": "2026-10-12",
+    "build": 634,
+    "items": [
+      "Setup now ends by asking how you want to train: a starter program, your own program (build each routine you do in the week, one after another), or just log as you go. Each one takes you straight there, with a \"See how\" clip if you want a peek first.",
+      "Setup now asks how you want RepBunny to look: Classic, Classic without the bunny, or Chalk. Tap one and the app changes right away.",
+      "New routines from a starter program (or saved from a workout) now show their real exercise count right away instead of \"0 exercises\".",
+      "New here? A quick setup now welcomes you on a fresh install: pick lb or kg (we guess from your phone's region) and, if you like, your body weight. Skip it anytime, or run it again from Account > Preferences.",
+      {
+        "text": "The Chalk theme and the Minimal mascot are now free: steel blue and no bunny art, no Premium needed.",
+        "guide": "themes/"
+      },
+      "Typed confirms (RESTORE, RESET, DELETE, ERASE) now accept lowercase and a trailing space from your keyboard's autocomplete. Restoring a full backup also tells you when it will erase a workout you haven't finished.",
+      "The rest chime now only plays while RepBunny is on screen, so turning notifications off keeps your phone quiet when it's locked. If alerts are off, the rest screen and Preferences tell you, with a button straight to your phone's notification settings.",
+      "Typo guard for sets: 0 reps now tells you \"Reps must be 1 or more.\" instead of a connection error, and a weight that looks off (0 lb, or way past last time) asks before it logs.",
+      "The Workout log tile on Progress keeps its last workout on one line, so a long name no longer stretches the tile.",
+      {
+        "text": "Report a bug in the Android and iPhone apps no longer attaches a file when you haven't picked any errors. The report goes right in the email for you to read.",
+        "platforms": [
+          "ios",
+          "android"
+        ]
+      },
+      "The stopwatch for timed sets now shows the bunny lifting a dumbbell instead of lounging, because you're working, not resting."
+    ]
+  },
+  {
+    "date": "2026-10-11",
+    "build": 588,
+    "items": [
+      {
+        "text": "The restore warning in the Android and iPhone apps no longer mentions a sign-in or passkey, since those apps don't have one.",
+        "platforms": [
+          "ios",
+          "android"
+        ]
+      },
+      {
+        "text": "Fixed Premium on the Android and iPhone apps: the price now shows, buying works, and Restore Purchases reaches the store again.",
+        "platforms": [
+          "ios",
+          "android"
+        ]
+      },
+      "Your first workout now lets you pick several exercises before you start, like every workout after it. Tapping a library exercise shows its details right in the Add exercise list, and mid-workout the add button now reads \"+ Exercise\".",
+      "After a freeform workout, the finish recap now offers Save as routine every time while you have a free routine slot. Not now skips it once, and Don't ask again turns it off."
+    ]
+  },
+  {
+    "date": "2026-10-10",
+    "build": 582,
+    "items": [
+      {
+        "text": "Trained without your phone? Tap + Log a past workout on the Workout log to add it on the day it happened, and tap any workout's date there to move it.",
+        "guide": "edit-past-workouts/"
+      },
+      "Got the same exercise twice? Open one, tap Merge into another exercise, and its history and routine spots move to the one you keep. New exercises with a name you already use now say so.",
+      {
+        "text": "Workout log cards now show how long each workout took, like \"Tue, Oct 7 · 52 min\". It starts with your next finished workout.",
+        "platforms": [
+          "ios",
+          "android"
+        ]
+      },
+      "Changed a routine mid-workout? The finish recap now offers to update it: tick the changes to keep (an added exercise, a different set count, a swap, or a skipped lift) and tap Update routine. Nothing changes unless you do.",
+      {
+        "text": "On Android (Play Store) you can now unlock Premium with a one-time purchase, and Restore Purchases brings it back on a new phone.",
+        "platforms": [
+          "android"
+        ]
+      },
+      {
+        "text": "On iPhone you can now unlock Premium with a one-time purchase, and Restore Purchases brings it back on a new phone.",
+        "platforms": [
+          "ios"
+        ]
+      },
+      "The finish recap no longer calls a routine's first run your first workout, and planks and other core holds no longer count as cardio minutes.",
+      "RepBunny no longer contacts Google when it opens: its fonts now ship inside the app, so the first launch works offline too.",
+      "Deleting an exercise now names it (\"Remove Bench Press?\"), and the Add exercise list is titled \"Your exercises\" when it includes ones you haven't logged yet.",
+      "Templates are now called Routines: the workouts you repeat. Nothing else changed, and your saved routines are all still there.",
+      "The routine editor and library exercise pages put Account beside the title, like the rest of the app, so you see more of the page.",
+      "Mid-workout, names like \"Barbell Bench Press\" show in full on the exercise card (the 1 / 3 count moved up beside the dots), and empty Time fields read \"0:00\" instead of a cut-off \"mm:ss\"."
+    ]
+  },
+  {
+    "date": "2026-10-09",
+    "build": 538,
+    "items": [
+      {
+        "text": "If something breaks, RepBunny now offers to send us a report, with the screens and buttons you used just before it. You see the whole report first, and nothing goes out until you send the email.",
+        "guide": "report-a-bug/"
+      },
+      "The timed-set stopwatch says more now: the exercise name big enough to read from your mat, which set you are on, and what you did on that set last time. The bunny waits with you on taller phones.",
+      {
+        "text": "Coming from Strong or Hevy? Bring your workouts with you. Account > Your data > Import from another app reads their export on your phone, asks you to confirm each exercise, and adds your history so records and charts work from day one.",
+        "guide": "import-from-strong-hevy/"
+      },
+      {
+        "text": "Starter programs are now free. Any program that fits in your 3 free routines, like Beginner full body or Push / pull / legs, is one tap away. The two 5-day splits come with Premium.",
+        "guide": "starter-programs/"
+      },
+      "New here? Home now gets you logging right away. Tap Start a workout and pick your first exercise from the library, or make your own. You can also build a routine or start from a program. No trip to the Exercises tab first.",
+      "Finished a freeform workout and have no routines yet? The recap offers to save it as one, already named for what you trained, like Upper body push or Full body. Saving a freeform workout from the Workout log picks the same kind of name."
+    ]
+  },
+  {
+    "date": "2026-10-07",
+    "build": 493,
+    "items": [
+      {
+        "text": "Four new starter programs. Just starting out at a big gym? Try Machine push / pull / legs or the Machine 6-day split. Neither needs a barbell or a spotter. Training at home? Dumbbell full body needs just dumbbells and a bench. If you want more volume, there's a 5-day Body-part split. Programs are grouped by the equipment they need now. They're part of Premium.",
+        "guide": "starter-programs/"
+      },
+      {
+        "text": "The bunny talks about your actual workout now. On the rest timer you'll see things like \"2 more reps than last time on Leg Press\" or \"One more set of Chest Press. Then you're done.\" The recap calls out your records and how many workouts you've done this week. With Premium, milestones unlock bunny personalities: Punny, Coach, and Hype. Picked Gym puns or Extra soft before? You've got Punny or Hype now.",
+        "guide": "extras/"
+      },
+      {
+        "text": "Unlocked an Extra? Now you get a proper moment for it. Right after you finish, the bunny shows what you earned and lets you hear or see it. Tap Use it now to put it on, or Not now to save it for later.",
+        "guide": "milestones/"
+      },
+      {
+        "text": "The Extras sounds are real recordings now. Rest chimes: a cartoon boing, a coach whistle, a bike bell, and a boxing bell. Record fanfares: an air horn, a crowd cheer, and a ta-da. Your first record unlocks the air horn, and 10 workouts unlocks the boing. They play offline too.",
+        "guide": "extras/"
+      },
+      "Almost there? When your next milestone reward is a few workouts away, the workout recap now tells you what it is and how close you are.",
+      "Rather not see milestones after a workout? Account > Preferences > Milestone moments turns off the recap card. They still count, and you'll find them under Progress > Milestones.",
+      {
+        "text": "Extras are part of Premium now, and you earn them by training: each milestone unlocks its week mark, confetti, chime, fanfare, or bunny lines. Without Premium, milestones earn you trial passes, and every milestone you've reached unlocks its Extra the moment you get Premium.",
+        "guide": "extras/"
+      },
+      "The session list under a lift's chart is tidier now. Each session is a card with your sets lined up in columns, its top set up top, and a gold paw on any set that was a record. It shows your last 10 sessions, and Show older loads more.",
+      "Tapping a day on the training calendar now opens that day's workout. Before, it could jump to your newest one instead. The calendar's note now matches its key, too: stronger color means more sets.",
+      "Wondering what the glowing dots on the Workout log mean? A small key now says it: a glowing dot is a workout where you set a record.",
+      "Need a hand? Account > About now has Help & guides, which opens step-by-step how-tos for things like the plate calculator, rest timer, and routines."
+    ]
+  },
+  {
+    "date": "2026-10-06",
+    "build": 472,
+    "items": [
+      "Balance now counts push and pull by exercise, so face pulls and curls land in pull and pushdowns in push. Set push or pull for your own exercises when you create or edit them. If Balance can't tell, it says how many it left out and links you to a quick screen to sort them.",
+      "Your workout notes now show up on Routine progress. A workout with a note gets a little pencil on its point. Tap it and the note sits right above that session's lifts, so you remember why that day dipped.",
+      {
+        "text": "Milestones now unlock Extras: stars, hearts, or dumbbells for your week tracker, heart, star, or plate confetti for records, new rest chimes, a record fanfare, and new things for the bunny to say. Find them under Theme > Extras. Locked ones show what unlocks them. Free for everyone.",
+        "guide": "extras/"
+      },
+      {
+        "text": "Home screen widgets on Android: This week shows your week tracker, Next workout starts the routine you'd do next in one tap, and Latest record shows your newest PR. They match your theme. Part of Premium; iPhone widgets are on the way.",
+        "guide": "home-screen-widgets/",
+        "platforms": [
+          "android"
+        ]
+      },
+      "On the free App Store version, the first time a lift reaches 5 workouts, the finish recap shows you a blurred peek at its est. 1RM chart. It only shows once, and Not now closes it.",
+      "Charts now explain the odd dip. When you swap a lift, skip one, or finish with sets left, that workout gets a small speech-bubble marker on your charts. Tap the point to see what happened, like \"Leg Press was taken, so you did Hack Squat.\" The Workout log shows it on that workout's card too.",
+      {
+        "text": "Track more than the scale: log your waist, chest, hips, arms, thighs, and neck on the Body weight screen, in inches or cm, and see a chart for each. Not sure where to put the tape? Tap How to measure. Part of Premium; weigh-ins stay free.",
+        "guide": "body-measurements/"
+      },
+      {
+        "text": "Share your progress with a coach or physio: tap Share as PDF on any monthly report, pick the last 4 weeks, 3 months, or your own dates, and send a printable report of your lifts, sets per muscle, body weight, and records. Made on your phone. Part of Premium.",
+        "guide": "progress-reports/"
+      },
+      "Muscle groups now ends with a Balance card: your push vs pull and upper vs lower body sets over the last 4 weeks. When one side gets well ahead, it suggests a few moves to even things out. Part of Premium.",
+      {
+        "text": "The finish recap now asks how the workout felt: your sleep, energy, and stress, one tap each and all optional. Change them later from the Workout log. Once 10 workouts are tagged, a What helps you lift card on Progress shows which ones line up with your best sessions. The card is part of Premium; tagging stays free.",
+        "guide": "workout-feel/"
+      },
+      {
+        "text": "Every theme now has a matching app icon. Scroll to App icon on the Theme screen and pick one for your home screen, even if it isn't the theme you use inside. Part of Premium, and you keep it if Premium ends.",
+        "guide": "themes/"
+      },
+      {
+        "text": "The bunny's outfit is now its own pick. Under Outfit on the Theme screen, put the Halloween costumes on any theme, or choose Holidays and the bunny dresses for the month on its own. Part of Premium.",
+        "guide": "themes/"
+      },
+      "New bunny art for Halloween and Autumn. Every screen gets its own costume now: a vampire, a pirate, and a ghost napping between sets for Halloween, and apple picking, a pumpkin wagon, and a nap in the leaves for Autumn."
+    ]
+  },
+  {
+    "date": "2026-10-05",
+    "build": 449,
+    "items": [
+      {
+        "text": "Targets now come with a warm-up: tap Warm-up above your sets for a few lighter sets that build to your target, rounded to plates you can load. And the first time you log a new lift, you get a starting weight that says where it came from: a similar lift you've done, your body weight, or a test set. Part of Premium.",
+        "guide": "next-set-targets/"
+      },
+      "Training calendar: your last 12 months on one screen, a square for every day, stronger color the more sets you logged. Find it on Progress, and tap any day to open that workout. Part of Premium.",
+      {
+        "text": "Next-set targets now cover every set, not just the next one. Each open row shows its own target, worked out from that same set last time, so drop sets and back-off sets get their own numbers. Tap Why? on any row to see the rule. Part of Premium.",
+        "guide": "next-set-targets/"
+      },
+      "Routine progress: see how each routine's total volume has moved session by session. Find it on Progress, then tap a point on the chart to see what you lifted that day. The latest total is free; the chart is part of Premium.",
+      {
+        "text": "Starter programs: not sure what to train? Routines now offers beginner full body, upper / lower, and push / pull / legs. Read what each one is for and what a week looks like, then add it as routines you can change however you like. Part of Premium.",
+        "guide": "starter-programs/"
+      },
+      {
+        "text": "On Android, lock your phone while the rest screen is up and pressing power shows the countdown right there, no unlock needed, with -15s, +15s, and Skip. Leaving the rest screen asks you to unlock first. Part of Premium.",
+        "platforms": [
+          "android"
+        ]
+      },
+      {
+        "text": "On Android, your rest timer now counts down on the lock screen, with what's next and +15s and Skip buttons, so you can adjust it without unlocking. It tells you when rest is over, too. Part of Premium.",
+        "platforms": [
+          "android"
+        ]
+      },
+      "Maxed out the stack and switched to one leg or one arm? Strength levels now counts a Single Leg Press, One-Arm Chest Press, and similar machine lifts as the two-sided lift, since one side moves about 55% of both, and shows the weight to your next level per side.",
+      {
+        "text": "Link your own exercises to the library. If a name looks like a library exercise, like Flat DB Bench for Dumbbell Bench Press, the Exercises tab and Strength levels ask once whether it's the same. Say yes and it counts for strength levels and swap suggestions, with your name and history unchanged. Or link one by hand from its edit screen, under Library match.",
+        "guide": "strength-levels/"
+      },
+      "Train at Planet Fitness? The exercise library now knows the names printed on the machines, like Tricep Press, Pec Fly, Rear Delt, Torso Rotation, and Abdominal, so typing what you see finds the right exercise. New in the library: Seated Dip Machine (the Tricep Press), Rotary Torso Machine, and Captain's Chair Knee Raise.",
+      {
+        "text": "Strength levels: Progress now rates your main lifts for your body weight, from Beginner to Elite: squats, presses, deadlifts, rows, and pull-ups, with barbells, dumbbells, common machines, or body weight. Each shows how far it is from the next level, and one overall score sums it up. It asks one question first, and you can skip it. Part of Premium.",
+        "guide": "strength-levels/"
+      },
+      {
+        "text": "Milestones now earn Premium trial passes: one at 10, 50, and 150 workouts, and one at 12 strong weeks. Pick any Premium feature to use free for 7 days, right from the recap or later from Progress > Milestones. When it ends, what you set up waits for you if you unlock Premium.",
+        "guide": "milestones/"
+      },
+      {
+        "text": "Stuck at a weight? Miss your target two sessions in a row and it holds the weight for one more rep. Miss three, or go flat, and it offers a lighter week: about 10% off for one session, then right back to where you were. Take it or skip it. Part of Premium.",
+        "guide": "next-set-targets/"
+      },
+      {
+        "text": "Next-set targets: while you log, a target sits above your sets, worked out from last time and how hard it felt (RPE). Easy last time? It asks for more. A grinder? It holds the weight until you hit 12 reps. Tap Why this? for the math, or tap the target to fill your next row. Part of Premium, and you can turn it off per exercise.",
+        "guide": "next-set-targets/"
+      },
+      {
+        "text": "Progress now shows this week's workouts, sets, and records at a glance. On the 1st of each month, a report tile sums up the month you just finished next to the one before, with your records, biggest est. 1RM gains, and most-trained muscles, plus a recap of your year from January. The reports are part of Premium.",
+        "guide": "progress-reports/"
+      },
+      "Stuck on a lift? Lift progress now marks one that hasn't beaten its best in 3+ weeks with a Flat since chip, and its chart suggests one change to try. Part of Premium.",
+      "On a lift's chart, Est. 1RM, Volume, the 1Y and All ranges, and Best reps at each weight are now part of Premium. Tap any of them for a preview. Heaviest over 1 or 3 months, the Lift progress list, and Next time stay free.",
+      "Lift progress now lists lifts you've done just once, like a swap, marked 1 session until there's a trend to show. The recap also notes which exercise a swap stood in for.",
+      "Muscle groups now shades 10 to 20 sets a week, a common target for building muscle, and quietly notes any muscle that got fewer than 10 sets last week.",
+      {
+        "text": "Milestones: your training now unlocks them, starting with your first workout and first record. They show on the recap when you cross one, and Progress > Milestones shows how close the next one is. They're never taken away, and a missed week never costs you anything.",
+        "guide": "milestones/"
+      },
+      {
+        "text": "Machine taken? Tap the arrows on the exercise card to see close swaps that work the same muscle (triceps for triceps, not curls), with what you lifted last time. A swap keeps your remaining sets and rest timer and lasts for this workout only, so your routine doesn't change. Part of Premium.",
+        "guide": "swap-exercises/"
+      },
+      "A second workout without closing the app now pre-fills last time's numbers for lifts you did in the first one.",
+      "Progress charts and Lift progress now show where you are today: the big number is your latest session, and the arrow compares it to the start of the range. Your best still shows under the number."
+    ]
+  },
+  {
+    "date": "2026-10-04",
+    "build": 421,
+    "items": [
+      "New theme: Sunrise, a second light one. Warm peach and apricot with a morning-sky blue, for light mode without the pink.",
+      "New theme: Carrot Patch. Carrot orange and leafy green on dark garden soil, carrots on your This week tracker, and a shower of carrots when you set a record.",
+      "A theme's bunny art now downloads only when you pick that theme, and it's much smaller, so app updates go easier on your data. Your theme still works offline at the gym.",
+      "New theme: Autumn. Maple, rust, and gold on dark bark, a bunny bundled up for fall, maple leaves on your This week tracker, and falling leaves when you set a record.",
+      "New theme: Chalk. Chalk white on dark graphite with a steel-blue accent, and not a speck of pink. Pairs nicely with the Minimal bunny.",
+      "New theme: Cotton Candy, our first light one. Cream and soft pink with a berry accent, easy on the eyes in a bright gym.",
+      {
+        "text": "New in Preferences: Theme. The first one is Halloween: pumpkin orange, and a bunny in a witch hat on your rest timer and record screens. Or switch the bunny to Minimal for a calmer screen.",
+        "guide": "themes/"
+      },
+      "Halloween also hangs a few spider webs, puts candy corn on your This week tracker, and rains candy corn when you set a record.",
+      "Each theme on the Theme screen shows a little preview of itself. Tap Preview to see it full screen on Home, the rest timer, and a record before you pick it.",
+      "The Body tab no longer flashes the empty \"Add your stats\" card for a moment before your weigh-ins load.",
+      "Fixed: on a slow connection, the height you just saved on the Body tab could disappear and take your BMI with it."
+    ]
+  },
+  {
+    "date": "2026-10-03",
+    "build": 400,
+    "items": [
+      "The Muscle groups tile on Progress fits on two lines, the same height as its neighbors.",
+      "On the free App Store version, Routines shows how many of your 3 free routines you've used, and Account has a Premium section with what's included."
+    ]
+  },
+  {
+    "date": "2026-10-02",
+    "build": 395,
+    "items": [
+      "A What's new list in Account > About, plus this one-time note after updates. Turn the note off in Preferences.",
+      {
+        "text": "Report a bug from Account. Pick which errors to include and send them from your email app.",
+        "guide": "report-a-bug/"
+      },
+      "Account is now three short screens: Preferences, Your data, and Account & privacy.",
+      {
+        "text": "Back up just your preferences, routines, or history. Restoring a partial backup adds to what's there.",
+        "guide": "partial-backups/"
+      },
+      "Restoring the same routines twice no longer makes copies.",
+      "Sheets scroll even when your drag starts on a button.",
+      "Some What's new notes now have a How to use it link to a step-by-step guide with screenshots.",
+      "What's new keeps Back and Close at the top while you scroll.",
+      "Report a bug has an Email me when it's fixed box. Leave it off and you still get a reply.",
+      "Have an idea? Account > About > Request a feature sends it straight to us from your email app."
+    ]
+  },
+  {
+    "date": "2026-10-01",
+    "build": 371,
+    "items": [
+      {
+        "text": "Your rest timer keeps counting when you leave the workout screen.",
+        "guide": "rest-timer/"
+      },
+      {
+        "text": "Set a default rest timer in Account for exercises that don't have their own.",
+        "guide": "rest-timer/"
+      },
+      {
+        "text": "Timed sets get a stopwatch that chimes when you hit your goal time.",
+        "guide": "load-types/"
+      },
+      "Add or edit an exercise's setup notes right from the workout screen.",
+      "Edit an exercise in a sheet, and create one from the Library when it isn't there.",
+      "The Workout log groups sets under each exercise.",
+      "Every screen has the same large title, with Account in the corner.",
+      "The privacy policy and support page are linked from Account.",
+      {
+        "text": "\"Not now\" on the passkey banner now sticks.",
+        "platforms": [
+          "pwa"
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-09-30",
+    "build": 331,
+    "items": [
+      "Pick lb or kg once. New exercises, charts, and totals use it.",
+      "Switching an exercise between lb and kg converts its weights instead of relabeling them.",
+      "See sets, volume, and time per muscle group under Progress. Weeks now start on Sunday.",
+      {
+        "text": "Exercise history shows a Next time target and your best reps at each weight.",
+        "guide": "exercise-history/"
+      },
+      "Reset my data clears your training data and keeps your account.",
+      "New bunny poses in the record celebration.",
+      "Fixed: reordering a routine could bring back an exercise you removed."
+    ]
+  },
+  {
+    "date": "2026-09-29",
+    "build": 316,
+    "items": [
+      "Browse a starter exercise library by muscle group.",
+      {
+        "text": "Add several exercises to a workout without reopening the list.",
+        "guide": "log-a-workout/"
+      },
+      {
+        "text": "History is now Progress, with an estimated 1RM chart for each exercise.",
+        "guide": "exercise-history/"
+      },
+      {
+        "text": "A plate calculator for barbell exercises.",
+        "guide": "plate-calculator/"
+      },
+      "Back up, restore, and export your sets as CSV from Account.",
+      "Exercises have a muscle group.",
+      {
+        "text": "Routines open in a full-screen editor.",
+        "guide": "routines/"
+      },
+      "Your current exercise stays picked when you switch tabs mid-workout."
+    ]
+  },
+  {
+    "date": "2026-09-28",
+    "build": 292,
+    "items": [
+      {
+        "text": "Rename a routine, and pick a category for it.",
+        "guide": "routines/"
+      },
+      {
+        "text": "A quieter Finish button that checks before you finish early.",
+        "guide": "log-a-workout/"
+      },
+      "Exercise lists stay in alphabetical order.",
+      "Fixed: notes from the finish recap sometimes didn't show up in History."
+    ]
+  }
+]

@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Save as Routine Label</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --highlight: #f2c069; --danger: #e0687a; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .page { display: flex; gap: 26px; padding: 26px; align-items: flex-start; }
+  .col { width: 375px; }
+  .tag { display: inline-block; margin-bottom: 8px; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+  .tag-pick { background: rgba(242,192,105,0.16); color: var(--highlight); border-color: transparent; }
+  .col-title { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; margin: 0 0 2px; }
+  .col-note { color: var(--text-dim); font-size: 0.8rem; margin: 0 0 12px; line-height: 1.45; min-height: 58px; }
+  .phone { height: 640px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 18px 16px; }
+  .title { font-family: 'Baloo 2', sans-serif; font-size: 1.5rem; margin: 0 0 12px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; position: relative; }
+  .card.dim { opacity: 0.65; }
+  .hdr { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 4px; }
+  .hdr h3 { margin: 0; font-size: 1rem; }
+  .len { color: var(--text-dim); font-weight: 500; }
+  .acts { display: flex; align-items: center; gap: 6px; }
+  .tpl { font-size: 0.72rem; font-weight: 800; color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); border-radius: 999px; padding: 4px 10px; }
+  .ib { width: 30px; height: 30px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); display: grid; place-items: center; }
+  .pill { height: 30px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); color: var(--text); font: inherit; font-size: 0.78rem; font-weight: 700; }
+  .ghost { min-height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: var(--radius); background: transparent; border: 1px solid var(--border); color: var(--text-dim); font: inherit; font-size: 0.85rem; font-weight: 700; }
+  .ghost.on { color: var(--text); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .story { font-size: 0.82rem; color: var(--text-dim); margin: 8px 0 0; }
+  .grp { margin: 10px 0 0; font-weight: 800; font-size: 0.9rem; }
+  .set { display: flex; gap: 10px; padding: 8px 10px; margin-top: 6px; background: var(--surface-2); border-radius: 10px; font-size: 0.85rem; }
+  .set b { color: var(--text-dim); width: 14px; }
+  .sum { margin: 8px 0 0; font-size: 0.8rem; color: var(--text-dim); }
+  .menu { position: absolute; right: 52px; top: 50px; width: 190px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2; }
+  .menu div { display: flex; align-items: center; gap: 8px; padding: 10px; font-size: 0.88rem; font-weight: 700; border-radius: 8px; }
+  .menu div.hl { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  .menu div.del { color: var(--danger); }
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- A -->
+  <div class="col">
+    <span class="tag">Option A</span>
+    <h2 class="col-title">Labeled button in the header</h2>
+    <p class="col-note">The bookmark becomes a small "Save as routine" pill next to collapse and delete. Crowds the header: with a long routine name it wraps onto its own line.</p>
+    <div class="phone">
+      <h1 class="title">Workout log</h1>
+      <div class="card">
+        <div class="hdr">
+          <h3>Mon, Oct 13, 6:42 PM<span class="len"> · 52 min</span></h3>
+          <div class="acts">
+            <span class="tpl">Upper Body Hypertrophy</span>
+            <span class="pill"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>Save as routine</span>
+            <span class="ib">⌃</span>
+            <span class="ib" style="color:var(--text-dim)">🗑</span>
+          </div>
+        </div>
+        <p class="story">Bench press up 5 lb from last time.</p>
+        <div class="row"><span class="ghost">Add notes</span></div>
+        <p class="grp">Barbell Bench Press</p>
+        <div class="set"><b>1</b>185 lb × 8</div>
+        <div class="set"><b>2</b>185 lb × 7</div>
+      </div>
+      <div class="card dim"><div class="hdr"><h3>Sat, Oct 11, 9:05 AM<span class="len"> · 38 min</span></h3></div><p class="sum">Squat, Romanian Deadlift, Leg Press</p></div>
+    </div>
+  </div>
+  <!-- B -->
+  <div class="col">
+    <span class="tag tag-pick">Option B · picked</span>
+    <h2 class="col-title">Action row in the card</h2>
+    <p class="col-note">Header keeps just collapse and delete. "Save as routine" sits as a named button with the bookmark icon at the top of the card body, next to the other card actions. One tap opens the name form as today.</p>
+    <div class="phone">
+      <h1 class="title">Workout log</h1>
+      <div class="card">
+        <div class="hdr">
+          <h3>Mon, Oct 13, 6:42 PM<span class="len"> · 52 min</span></h3>
+          <div class="acts">
+            <span class="tpl">Upper Body Hypertrophy</span>
+            <span class="ib">⌃</span>
+            <span class="ib">🗑</span>
+          </div>
+        </div>
+        <p class="story">Bench press up 5 lb from last time.</p>
+        <div class="row"><span class="ghost on"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>Save as routine</span></div>
+        <div class="row" style="margin-top:0"><span class="ghost">Add notes</span></div>
+        <p class="grp">Barbell Bench Press</p>
+        <div class="set"><b>1</b>185 lb × 8</div>
+        <div class="set"><b>2</b>185 lb × 7</div>
+      </div>
+      <div class="card dim"><div class="hdr"><h3>Sat, Oct 11, 9:05 AM<span class="len"> · 38 min</span></h3></div><p class="sum">Squat, Romanian Deadlift, Leg Press</p></div>
+    </div>
+  </div>
+  <!-- C -->
+  <div class="col">
+    <span class="tag">Option C</span>
+    <h2 class="col-title">"…" menu</h2>
+    <p class="col-note">One "More actions" button opens a menu with Save as routine and Delete. Names everything, but hides it one tap deeper: the issue asks to keep the one-tap flow.</p>
+    <div class="phone">
+      <h1 class="title">Workout log</h1>
+      <div class="card">
+        <div class="hdr">
+          <h3>Mon, Oct 13, 6:42 PM<span class="len"> · 52 min</span></h3>
+          <div class="acts">
+            <span class="tpl">Upper Body Hypertrophy</span>
+            <span class="ib">⌃</span>
+            <span class="ib">⋯</span>
+          </div>
+        </div>
+        <div class="menu"><div class="hl">🔖 Save as routine</div><div class="del">🗑 Delete workout</div></div>
+        <p class="story">Bench press up 5 lb from last time.</p>
+        <div class="row"><span class="ghost">Add notes</span></div>
+        <p class="grp">Barbell Bench Press</p>
+        <div class="set"><b>1</b>185 lb × 8</div>
+        <div class="set"><b>2</b>185 lb × 7</div>
+      </div>
+      <div class="card dim"><div class="hdr"><h3>Sat, Oct 11, 9:05 AM<span class="len"> · 38 min</span></h3></div><p class="sum">Squat, Romanian Deadlift, Leg Press</p></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

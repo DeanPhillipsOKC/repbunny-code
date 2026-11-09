@@ -1,0 +1,218 @@
+<title>Onboarding Look Picker</title>
+
+
+<style>@font-face { font-family: "Baloo 2"; font-weight: 500 800; src: url(../../public/fonts/baloo2-latin.woff2) format("woff2"); } @font-face { font-family: "Manrope"; font-weight: 400 800; src: url(../../public/fonts/manrope-latin.woff2) format("woff2"); }</style>
+<style>
+  /* Layout: three phone-sized options side by side (stacked on a phone), each a
+     working version of setup step 2, drawn in the app's own tokens. Single dark
+     look on purpose: the app's setup is dark in both default themes. */
+  :root {
+    color-scheme: dark;
+    --page: #0f0b13; --ink: #f5edf2; --ink-dim: #b9a8c2; --note: #f2c069;
+    --display: 'Baloo 2', 'Trebuchet MS', sans-serif;
+    --body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  }
+  /* Classic and Chalk, from src/lib/theme.ts */
+  .classic { --bg: #17111c; --surface: #211829; --surface-2: #2a1f33; --border: #3a2b40; --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c; }
+  .chalk { --bg: #121417; --surface: #1b1e23; --surface-2: #22262c; --border: #343a42; --text: #eef1f4; --text-dim: #a3acb6; --accent: #8fb4d9; --accent-text: #121417; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--body); }
+  .wrap { padding-block: 28px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 1240px; margin: 0 auto; }
+  h1 { font-family: var(--display); font-size: 1.9rem; margin: 0 0 6px; text-wrap: balance; }
+  .intro { color: var(--ink-dim); line-height: 1.55; max-width: 72ch; margin: 0 0 6px; }
+  .intro b { color: var(--ink); }
+  .options { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 22px; }
+  .opt { width: 360px; max-width: 100%; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .label { color: var(--note); font-size: .74rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 800; margin: 0; }
+  .opt h2 { font-family: var(--display); font-size: 1.25rem; margin: 0; }
+  .why { color: var(--ink-dim); font-size: .86rem; line-height: 1.5; margin: 0; }
+  .why b { color: var(--ink); }
+
+  /* The phone */
+  .phone { background: var(--bg); color: var(--text); border-radius: 34px; border: 1px solid #3a2b40; padding: 18px 16px 16px; display: flex; flex-direction: column; gap: 12px; min-height: 690px; transition: background .25s; }
+  .steps { display: flex; gap: 6px; justify-content: center; }
+  .steps i { width: 22px; height: 5px; border-radius: 3px; background: var(--border); }
+  .steps i.on { background: var(--accent); }
+  .ptitle { font-family: var(--display); font-size: 1.6rem; line-height: 1.1; margin: 4px 0 0; }
+  .lede { color: var(--text-dim); font-size: .9rem; margin: 0; }
+  .more { color: var(--text-dim); font-size: .76rem; text-align: center; margin: auto 0 0; line-height: 1.45; }
+  .more b { color: var(--text); }
+  .go { border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-text); font: 800 1rem var(--body); padding: 14px; cursor: pointer; }
+  button:focus-visible, .pick:focus-visible { outline: 3px solid var(--note); outline-offset: 2px; }
+
+  /* A small Home in a look's own theme */
+  .mini { position: relative; display: block; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; flex-shrink: 0; }
+  .mini .h { position: absolute; left: 10%; top: 6%; width: 50%; height: 5%; border-radius: 3px; background: var(--text); opacity: .85; }
+  .mini .c { position: absolute; left: 8%; right: 8%; border-radius: 8px; background: var(--surface-2); }
+  .mini .c1 { top: 16%; height: 18%; }
+  .mini .c2 { top: 38%; height: 18%; }
+  .mini .b { position: absolute; left: 8%; right: 8%; bottom: 7%; height: 9%; border-radius: 8px; background: var(--accent); }
+  .mini .art { position: absolute; left: 50%; transform: translateX(-50%); top: 34%; width: 72%; }
+  .mini .mark { position: absolute; right: 9%; top: 5%; width: 13%; border-radius: 22%; filter: saturate(0) brightness(1.2); opacity: .9; }
+  .mini.chalk .c2 { display: block; }
+
+  /* Tile picker (A) */
+  .pick { display: flex; gap: 14px; align-items: center; width: 100%; text-align: left; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); border-radius: 18px; padding: 12px; cursor: pointer; position: relative; font: inherit; }
+  .pick.on { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+  .pick .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .pick .n { font-family: var(--display); font-size: 1.15rem; line-height: 1.1; }
+  .pick .d { color: var(--text-dim); font-size: .8rem; line-height: 1.4; }
+  .check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border); display: grid; place-items: center; font-size: .8rem; font-weight: 800; flex-shrink: 0; }
+  .on .check { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+
+  /* Heart-eyes sticker */
+  .sticker { position: absolute; width: 58px; transform: rotate(-12deg); filter: drop-shadow(0 4px 8px rgba(0,0,0,.45)); pointer-events: none; }
+  .sticker img { width: 100%; display: block; }
+  .more-link { display: block; width: 100%; margin: 4px 0 0; padding: 10px 12px; border-radius: 12px; border: 1px dashed currentColor; background: transparent; color: inherit; opacity: .8; font: inherit; font-size: .78rem; text-align: left; cursor: pointer; }
+  .tag { position: absolute; font-size: .62rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; background: #f2c069; color: #241a2c; border-radius: 999px; padding: 3px 8px; transform: rotate(-6deg); pointer-events: none; }
+
+  /* Side by side (B) */
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .duo .pick { flex-direction: column; align-items: stretch; gap: 10px; padding: 8px 8px 12px; }
+  .duo .mini { width: 100%; aspect-ratio: 3 / 4.6; max-width: 100%; }
+  .duo .n { text-align: center; }
+  .duo .d { text-align: center; }
+  .duo .check { position: absolute; right: 16px; bottom: 76px; background: var(--surface); }
+
+  /* Switch (C) */
+  .stage { position: relative; display: grid; place-items: center; padding: 6px 0 2px; }
+  .stage .mini { width: 170px; aspect-ratio: 3 / 4.6; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 12px 14px; }
+  .row .t { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .row .n { font-weight: 800; font-size: .95rem; }
+  .row .d { color: var(--text-dim); font-size: .76rem; line-height: 1.35; }
+  .swatches { display: flex; gap: 8px; }
+  .sw { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--border); cursor: pointer; padding: 0; }
+  .sw.on { border-color: var(--text); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+  .sw.pink { background: linear-gradient(135deg, #17111c 50%, #f2879c 50%); }
+  .sw.blue { background: linear-gradient(135deg, #121417 50%, #8fb4d9 50%); }
+  .toggle { width: 52px; height: 30px; border-radius: 999px; border: 0; background: var(--border); position: relative; cursor: pointer; flex-shrink: 0; }
+  .toggle::after { content: ''; position: absolute; left: 3px; top: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .2s; }
+  .toggle[aria-checked="true"] { background: var(--accent); }
+  .toggle[aria-checked="true"]::after { transform: translateX(22px); }
+
+  .verdict { margin-top: 30px; border-top: 1px solid #2a2030; padding-top: 18px; max-width: 80ch; color: var(--ink-dim); line-height: 1.6; font-size: .92rem; }
+  .verdict b { color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <h1>Setup step 2: picking a look</h1>
+  <p class="intro"><b>Chosen: option A</b> (owner, 2026-10-31, #886), with the link row from <code>issue-886-theme-discovery.html</code> option S1 in place of the line under the tiles.</p>
+  <p class="intro">Today the step offers three looks: <b>Classic</b> with the bunny (the default), <b>Classic, no bunny</b>, and <b>Chalk</b>. These options make it a clearer choice between playful and all business. Each phone works, so tap to try them.</p>
+
+  <div class="options">
+    <!-- A -->
+    <section class="opt">
+      <p class="label">Option A</p>
+      <h2>Two big tiles</h2>
+      <div class="phone classic" id="a-phone">
+        <div class="steps"><i></i><i class="on"></i><i></i><i></i></div>
+        <p class="ptitle">Pick your look</p>
+        <p class="lede">Cute or all business. It's your call.</p>
+        <button type="button" class="pick on" id="a-play" aria-pressed="true">
+          <span class="mini classic" style="width:104px;height:142px"><span class="h"></span><span class="c c1"></span><img class="art" src="../../public/celebration-bunny.png" alt=""><span class="b"></span></span>
+          <span class="t"><span class="n">Playful</span><span class="d">Pink, with the bunny cheering you on and confetti for records.</span></span>
+          <span class="check" aria-hidden="true">✓</span>
+          <span class="sticker" style="right:-2px;top:-24px"><img src="../../public/heart-eyes-sticker.webp" alt=""></span>
+        </button>
+        <button type="button" class="pick chalk" id="a-plain" aria-pressed="false">
+          <span class="mini chalk" style="width:104px;height:142px"><span class="h"></span><img class="mark" src="../../public/icon-512.png" alt=""><span class="c c1"></span><span class="c c2"></span><span class="b"></span></span>
+          <span class="t"><span class="n">Just your numbers</span><span class="d">Steel blue on graphite. No bunny art, no confetti.</span></span>
+          <span class="check" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="more-link">See every theme, seasonal ones too ›</button>
+        <button type="button" class="go">Continue</button>
+      </div>
+      <p class="why"><b>Closest to today.</b> Same tile layout, cut to two, with bigger previews. The no-bunny tile is drawn in Chalk so it reads as its own sharp look, not the leftover option. "Classic, no bunny" moves to Preferences.</p>
+    </section>
+
+    <!-- B -->
+    <section class="opt">
+      <p class="label">Option B</p>
+      <h2>Side by side</h2>
+      <div class="phone classic" id="b-phone">
+        <div class="steps"><i></i><i class="on"></i><i></i><i></i></div>
+        <p class="ptitle">Pick your look</p>
+        <p class="lede">Cute or all business. It's your call.</p>
+        <div class="duo">
+          <button type="button" class="pick on classic" id="b-play" aria-pressed="true">
+            <span class="mini classic"><span class="h"></span><span class="c c1"></span><img class="art" src="../../public/celebration-bunny.png" alt=""><span class="b"></span></span>
+            <span class="n">Playful</span><span class="d">Bunny and confetti</span>
+            <span class="check" aria-hidden="true">✓</span>
+            <span class="tag" style="right:-6px;top:-10px">Fan favorite</span>
+          </button>
+          <button type="button" class="pick chalk" id="b-plain" aria-pressed="false">
+            <span class="mini chalk"><span class="h"></span><img class="mark" src="../../public/icon-512.png" alt=""><span class="c c1"></span><span class="c c2"></span><span class="b"></span></span>
+            <span class="n">Just your numbers</span><span class="d">No bunny art</span>
+            <span class="check" aria-hidden="true"></span>
+          </button>
+        </div>
+        <p class="more">More themes, and the bunny on or off with any of them, in <b>Preferences › Theme</b>.</p>
+        <button type="button" class="go">Continue</button>
+      </div>
+      <p class="why"><b>The most visual.</b> Two tall previews you can compare at a glance, like picking a phone wallpaper. The previews are smaller per look, and the label carries the "fan favorite" nudge instead of a sticker. A sticker fits here too.</p>
+    </section>
+
+    <!-- C -->
+    <section class="opt">
+      <p class="label">Option C</p>
+      <h2>Colors plus a bunny switch</h2>
+      <div class="phone classic" id="c-phone">
+        <div class="steps"><i></i><i class="on"></i><i></i><i></i></div>
+        <p class="ptitle">Pick your look</p>
+        <p class="lede">Cute or all business. It's your call.</p>
+        <div class="stage">
+          <span class="mini classic" id="c-mini" style="width:170px"><span class="h"></span><img class="mark" id="c-mark" src="../../public/icon-512.png" alt="" hidden><span class="c c1"></span><span class="c c2" id="c-c2" hidden></span><img class="art" id="c-art" src="../../public/celebration-bunny.png" alt=""><span class="b"></span></span>
+          <span class="sticker" id="c-sticker" style="left:calc(50% + 52px);top:-8px"><img src="../../public/heart-eyes-sticker.webp" alt=""></span>
+        </div>
+        <div class="row">
+          <span class="t"><span class="n">Colors</span><span class="d">Classic pink or Chalk blue</span></span>
+          <span class="swatches"><button type="button" class="sw pink on" id="c-pink" aria-label="Classic pink" aria-pressed="true"></button><button type="button" class="sw blue" id="c-blue" aria-label="Chalk blue" aria-pressed="false"></button></span>
+        </div>
+        <div class="row">
+          <span class="t"><span class="n">Bunny art and confetti</span><span class="d">The bunny cheers you on and celebrates records</span></span>
+          <button type="button" class="toggle" id="c-bunny" role="switch" aria-checked="true" aria-label="Bunny art and confetti"></button>
+        </div>
+        <p class="more">More themes in <b>Preferences › Theme</b>.</p>
+        <button type="button" class="go">Continue</button>
+      </div>
+      <p class="why"><b>The clearest about what the bunny is.</b> Colors and the bunny are two separate choices, the way the app already stores them, so all four combinations are one tap away. It's the least like a "pick one" moment, and a switch reads as a setting, which makes the bunny feel optional rather than the brand.</p>
+    </section>
+  </div>
+
+  <div class="verdict">
+    <p><b>My pick is A.</b> It's the smallest change from today's step: two tiles instead of three, bigger previews, and a no-bunny tile that looks deliberate. The sticker sits on the Playful tile, so the bunny stays the default and the playful look is still the one being shown off. B is the strongest visually, but its previews are half as wide. C is the most flexible, but it's the one most likely to make people turn the bunny off without trying it.</p>
+    <p>In all three, the bunny stays on by default, and Preferences keeps every combination.</p>
+  </div>
+</div>
+
+<script>
+  const pair = (onId, offId, phoneId) => {
+    const on = document.getElementById(onId), off = document.getElementById(offId), phone = document.getElementById(phoneId)
+    const choose = (pick) => {
+      for (const b of [on, off]) { const sel = b === pick; b.classList.toggle('on', sel); b.setAttribute('aria-pressed', String(sel)); b.querySelector('.check').textContent = sel ? '✓' : '' }
+      phone.classList.toggle('chalk', pick === off); phone.classList.toggle('classic', pick === on)
+    }
+    on.addEventListener('click', () => choose(on)); off.addEventListener('click', () => choose(off))
+  }
+  pair('a-play', 'a-plain', 'a-phone')
+  pair('b-play', 'b-plain', 'b-phone')
+
+  const c = { pink: document.getElementById('c-pink'), blue: document.getElementById('c-blue'), bunny: document.getElementById('c-bunny'),
+    phone: document.getElementById('c-phone'), mini: document.getElementById('c-mini'), art: document.getElementById('c-art'),
+    mark: document.getElementById('c-mark'), c2: document.getElementById('c-c2'), sticker: document.getElementById('c-sticker') }
+  let chalk = false, bunny = true
+  const paint = () => {
+    for (const el of [c.phone, c.mini]) { el.classList.toggle('chalk', chalk); el.classList.toggle('classic', !chalk) }
+    c.pink.classList.toggle('on', !chalk); c.pink.setAttribute('aria-pressed', String(!chalk))
+    c.blue.classList.toggle('on', chalk); c.blue.setAttribute('aria-pressed', String(chalk))
+    c.bunny.setAttribute('aria-checked', String(bunny))
+    c.art.hidden = !bunny; c.sticker.hidden = !bunny; c.mark.hidden = bunny; c.c2.hidden = bunny
+  }
+  c.pink.addEventListener('click', () => { chalk = false; paint() })
+  c.blue.addEventListener('click', () => { chalk = true; paint() })
+  c.bunny.addEventListener('click', () => { bunny = !bunny; paint() })
+  paint()
+</script>

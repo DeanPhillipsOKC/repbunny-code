@@ -1,0 +1,320 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Training Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1240px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; }
+  .col.narrow { width: 322px; }
+  .opt-title { font-family: 'Baloo 2', sans-serif; color: var(--accent); font-size: 1.2rem; margin: 0 0 2px 4px; min-height: 1.5em; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 58px; }
+  .capnote b { color: var(--text); }
+  .phone { position: relative; width: 377px; height: 760px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 20px 16px 0; }
+  .narrow .phone { width: 322px; }
+
+  .back-link { color: var(--text-dim); font-size: 0.86rem; font-weight: 700; margin-bottom: 6px; display: block; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 2px; line-height: 1.1; }
+  .lede { color: var(--text-dim); font-size: 0.84rem; margin: 0 0 14px; }
+  .week-line { margin: 0 0 14px; font-size: 0.82rem; color: var(--text-dim); }
+  .week-line b { color: var(--text); }
+
+  /* hub hero + tiles, same as ProgressHub.vue */
+  .hero { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; padding: 12px 14px; background: color-mix(in srgb, var(--accent) 9%, var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border)); border-radius: 16px; }
+  .hero img { width: 62px; height: 62px; object-fit: contain; }
+  .hero-title { font-size: 0.95rem; font-weight: 800; }
+  .stats { display: flex; gap: 14px; margin-top: 6px; }
+  .stats div { font-size: 0.7rem; font-weight: 700; color: var(--text-dim); }
+  .stats b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; color: var(--accent); }
+  .tile { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+  .tile-icon { flex-shrink: 0; width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); }
+  .tile-icon svg { width: 28px; height: 28px; }
+  .tile-body { flex: 1; min-width: 0; }
+  .tile-title { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; font-weight: 700; line-height: 1.15; display: flex; align-items: center; gap: 6px; }
+  .tile-sub { margin-top: 2px; font-size: 0.78rem; line-height: 1.35; color: var(--text-dim); }
+  .tile-sub b { color: var(--text); }
+  .chev { color: var(--text-dim); flex-shrink: 0; }
+  .spark-mini { flex-shrink: 0; }
+  .pmark { color: var(--secondary); font-size: 0.8rem; }
+
+  /* heatmap */
+  .cal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 12px 12px 10px; margin-bottom: 12px; }
+  .cal-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .cal-title { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; }
+  .cal-sub { font-size: 0.74rem; color: var(--text-dim); }
+  .cal { display: flex; gap: 4px; }
+  .days { flex-shrink: 0; display: grid; grid-template-rows: 16px repeat(7, var(--cell)); row-gap: var(--gap); font-size: 0.62rem; font-weight: 700; color: var(--text-dim); width: 24px; }
+  .days span { line-height: var(--cell); }
+  .scroller { overflow-x: auto; scrollbar-width: none; min-width: 0; flex: 1; }
+  .grid { display: grid; grid-auto-flow: column; grid-template-rows: 16px repeat(7, var(--cell)); grid-auto-columns: var(--cell); gap: var(--gap); width: max-content; padding-right: 2px; }
+  .mlabel { font-size: 0.62rem; font-weight: 700; color: var(--text-dim); white-space: nowrap; overflow: visible; line-height: 14px; }
+  .c { width: var(--cell); height: var(--cell); border-radius: 3px; background: color-mix(in srgb, var(--text-dim) 12%, var(--surface)); }
+  .c.l1 { background: color-mix(in srgb, var(--accent) 30%, var(--surface)); }
+  .c.l2 { background: color-mix(in srgb, var(--accent) 55%, var(--surface)); }
+  .c.l3 { background: color-mix(in srgb, var(--accent) 78%, var(--surface)); }
+  .c.l4 { background: var(--accent); }
+  .c.future { background: transparent; }
+  .c.today { outline: 2px solid var(--text); outline-offset: 1px; }
+  .c.sel { outline: 2px solid var(--secondary); outline-offset: 1px; }
+  .legend { display: flex; align-items: center; justify-content: flex-end; gap: 3px; margin-top: 8px; font-size: 0.66rem; color: var(--text-dim); }
+  .legend .c { width: 10px; height: 10px; border-radius: 2px; }
+  .legend span.t { margin: 0 3px; }
+  .legend .today-key { display: inline-flex; align-items: center; gap: 5px; margin-right: auto; }
+  .legend .today-key i { width: 10px; height: 10px; border-radius: 2px; outline: 2px solid var(--text); outline-offset: 1px; background: color-mix(in srgb, var(--text-dim) 12%, var(--surface)); }
+
+  .totals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .stat { padding: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+  .stat-label { font-size: 0.66rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); }
+  .stat-value { font-family: 'Baloo 2', sans-serif; font-size: 1.45rem; line-height: 1.1; }
+  .hint { font-size: 0.76rem; color: var(--text-dim); margin: 0 2px 10px; }
+
+  /* picker sheet */
+  .scrim { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--border); border-radius: 22px 22px 0 0; padding: 10px 16px 22px; }
+  .grab { width: 40px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto 12px; }
+  .sheet h3 { font-family: 'Baloo 2', sans-serif; font-size: 1.25rem; margin: 0 0 2px; }
+  .sheet p { margin: 0 0 12px; font-size: 0.8rem; color: var(--text-dim); }
+  .pick { display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 8px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; }
+  .pick .n { font-weight: 800; font-size: 0.95rem; }
+  .pick .m { font-size: 0.76rem; color: var(--text-dim); margin-top: 2px; }
+  .pick .chev { margin-left: auto; }
+  .cancel { margin-top: 4px; height: 44px; border-radius: 12px; border: 1px solid var(--border); display: grid; place-items: center; font-weight: 700; font-size: 0.88rem; }
+
+  /* premium preview */
+  .blurred { filter: blur(5px); opacity: 0.7; }
+  .overlay { position: absolute; left: 16px; right: 16px; display: flex; justify-content: center; }
+  .panel { width: min(100%, 300px); padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,0.35); display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+  .eyebrow { padding: 2px 9px; border-radius: 999px; background: color-mix(in srgb, var(--secondary) 16%, transparent); color: var(--secondary); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+  .panel .t { margin: 4px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 1.05rem; }
+  .panel .b { margin: 0; font-size: 0.8rem; line-height: 1.45; color: var(--text-dim); }
+  .acts { align-self: stretch; display: flex; gap: 8px; margin-top: 8px; }
+  .keep { flex: 1; min-height: 42px; border-radius: 12px; background: var(--accent); color: var(--accent-text); font-weight: 800; font-size: 0.86rem; display: grid; place-items: center; }
+  .goback { min-height: 42px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--border); font-weight: 700; font-size: 0.86rem; display: grid; place-items: center; }
+
+  .tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; font-size: 0.68rem; font-weight: 700; color: var(--text-dim); }
+  .tabbar .on { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#137 Training calendar: the last 12 months as a heatmap (Premium, 2026-10-05)</h1>
+  <p class="note">One square per day for the last 53 weeks, Sunday-start columns like the rest of Progress. Shade = <b>sets logged that day</b> in 4 steps (1 to 9, 10 to 19, 20 to 29, 30+), mixed from the <b>accent</b> and <b>surface</b> tokens so light themes work too. Today has an outline. Month labels on top, Mon/Wed/Fri on the left. <b>No streaks</b>, ever.</p>
+  <p class="note">The grid scrolls sideways on its own, starting at today (right edge); the page never scrolls sideways. Squares are 14px with a 3px gap: 18 weeks show at 375px, 14 at 320px. <b>Tap a day</b>: one workout opens it in the Workout log (expanded and scrolled to); two or more opens the picker. Empty and future days do nothing.</p>
+</div>
+<div class="page">
+
+  <!-- A1 -->
+  <div class="col">
+    <p class="opt-title">Option A: a card on the Progress hub</p>
+    <p class="cap">Progress, Premium</p>
+    <p class="capnote">The calendar sits right under "This week", above the tiles. No extra tap to see it, but it pushes the tiles down by ~190px.</p>
+    <div class="phone">
+      <h2>Progress</h2>
+      <p class="lede">How your training is going.</p>
+      <div class="hero"><img src="../../public/celebration-bunny.png" alt="" /><div><div class="hero-title">You're on a roll!</div><div class="stats"><div><b>1</b>this week</div><div><b>3</b>this month</div><div><b>2</b>new bests</div></div></div></div>
+      <p class="week-line">This week: <b>1 workout</b>, <b>22 sets</b>, <b>1 record</b></p>
+      <div class="cal-card">
+        <div class="cal-head"><span class="cal-title">Training calendar</span><span class="cal-sub">Last 12 months</span></div>
+        <div class="heat" data-seed="1"></div>
+      </div>
+      <div class="tile" style="--c: var(--secondary)"><span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4h6v3H9z"/><path d="M8.5 11.5h7M8.5 15h5"/></svg></span><span class="tile-body"><span class="tile-title">Workout log</span><span class="tile-sub">Last: <b>Push Day</b> · Mon, Oct 5<br/>Review or fix past workouts</span></span><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="tabbar"><span>Home</span><span class="on">Progress</span><span>Templates</span><span>Exercises</span></div>
+    </div>
+  </div>
+
+  <!-- A2 -->
+  <div class="col">
+    <p class="opt-title">&nbsp;</p>
+    <p class="cap">Progress, free</p>
+    <p class="capnote">The card is blurred with a slim Premium panel over it. It's on the main Progress screen every visit, so it's the most visible nudge we'd have.</p>
+    <div class="phone">
+      <h2>Progress</h2>
+      <p class="lede">How your training is going.</p>
+      <div class="hero"><img src="../../public/celebration-bunny.png" alt="" /><div><div class="hero-title">You're on a roll!</div><div class="stats"><div><b>1</b>this week</div><div><b>3</b>this month</div><div><b>2</b>new bests</div></div></div></div>
+      <p class="week-line">This week: <b>1 workout</b>, <b>22 sets</b>, <b>1 record</b></p>
+      <div style="position:relative">
+        <div class="cal-card blurred">
+          <div class="cal-head"><span class="cal-title">Training calendar</span><span class="cal-sub">Last 12 months</span></div>
+          <div class="heat" data-seed="1"></div>
+        </div>
+        <div class="overlay" style="top:22px;left:0;right:0"><div class="panel"><span class="eyebrow">Premium</span><p class="t">Your training calendar is part of Premium</p><div class="acts"><span class="keep">Keep it with Premium</span><span class="goback">Hide</span></div></div></div>
+      </div>
+      <div class="tabbar"><span>Home</span><span class="on">Progress</span><span>Templates</span><span>Exercises</span></div>
+    </div>
+  </div>
+
+  <!-- B1 -->
+  <div class="col">
+    <p class="opt-title">Option B: its own screen (recommended)</p>
+    <p class="cap">Progress hub tile</p>
+    <p class="capnote">A <b>Training calendar</b> tile like Strength levels and Template progress, with the last 8 weeks as a tiny preview. Free users see the Premium sparkle on the title.</p>
+    <div class="phone">
+      <h2>Progress</h2>
+      <p class="lede">How your training is going.</p>
+      <div class="hero"><img src="../../public/celebration-bunny.png" alt="" /><div><div class="hero-title">You're on a roll!</div><div class="stats"><div><b>1</b>this week</div><div><b>3</b>this month</div><div><b>2</b>new bests</div></div></div></div>
+      <p class="week-line">This week: <b>1 workout</b>, <b>22 sets</b>, <b>1 record</b></p>
+      <div class="tile" style="--c: var(--secondary)"><span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4h6v3H9z"/><path d="M8.5 11.5h7M8.5 15h5"/></svg></span><span class="tile-body"><span class="tile-title">Workout log</span><span class="tile-sub">Last: <b>Push Day</b> · Mon, Oct 5<br/>Review or fix past workouts</span></span><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="tile" style="--c: var(--accent)"><span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/><path d="M8 14h2M11 14h2M14 14h2M8 17h2M11 17h2"/></svg></span><span class="tile-body"><span class="tile-title">Training calendar <span class="pmark">✦</span></span><span class="tile-sub"><b>142 workouts</b> in 12 months<br/>Every training day at a glance</span></span><div class="heat mini" data-seed="1" data-mini="1"></div></div>
+      <div class="tile" style="--c: var(--highlight)"><span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 16v-3M12 16V9M16 16v-5"/></svg></span><span class="tile-body"><span class="tile-title">Template progress</span><span class="tile-sub"><b>Push Day</b> · 12,450 lb<br/>Volume per session over time</span></span><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="tabbar"><span>Home</span><span class="on">Progress</span><span>Templates</span><span>Exercises</span></div>
+    </div>
+  </div>
+
+  <!-- B2 -->
+  <div class="col">
+    <p class="opt-title">&nbsp;</p>
+    <p class="cap">Training calendar, Premium</p>
+    <p class="capnote">Grid card, then two plain totals for the 12 months (workouts, training days). Neutral numbers, no streak or "days in a row".</p>
+    <div class="phone">
+      <span class="back-link">‹ Progress</span>
+      <h2>Training calendar</h2>
+      <p class="lede">The last 12 months. Tap a day to open it.</p>
+      <div class="cal-card">
+        <div class="heat" data-seed="1" data-today="1"></div>
+      </div>
+      <div class="totals">
+        <div class="stat"><div class="stat-label">Workouts</div><div class="stat-value">142</div></div>
+        <div class="stat"><div class="stat-label">Training days</div><div class="stat-value">139</div></div>
+      </div>
+      <p class="hint">Stronger color means more sets. Swipe the calendar to see earlier months.</p>
+      <div class="tabbar"><span>Home</span><span class="on">Progress</span><span>Templates</span><span>Exercises</span></div>
+    </div>
+  </div>
+
+  <!-- B3 -->
+  <div class="col">
+    <p class="opt-title">&nbsp;</p>
+    <p class="cap">Tapped a day with two workouts</p>
+    <p class="capnote">The day gets a lavender ring and a sheet lists both. Tapping one opens it in the Workout log. A day with one workout skips this and opens it right away.</p>
+    <div class="phone">
+      <span class="back-link">‹ Progress</span>
+      <h2>Training calendar</h2>
+      <p class="lede">The last 12 months. Tap a day to open it.</p>
+      <div class="cal-card">
+        <div class="heat" data-seed="1" data-sel="1"></div>
+      </div>
+      <div class="scrim"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3>Sat, Sep 26</h3>
+        <p>2 workouts that day</p>
+        <div class="pick"><div><div class="n">Leg Day</div><div class="m">8:05 AM · 21 sets</div></div><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="pick"><div><div class="n">Freeform workout</div><div class="m">6:40 PM · 6 sets</div></div><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="cancel">Cancel</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B4 -->
+  <div class="col">
+    <p class="opt-title">&nbsp;</p>
+    <p class="cap">Training calendar, free</p>
+    <p class="capnote">Same as the monthly report: the screen blurred under the Premium panel. Go back returns to Progress. The Workout log stays free.</p>
+    <div class="phone">
+      <span class="back-link">‹ Progress</span>
+      <h2>Training calendar</h2>
+      <p class="lede">The last 12 months. Tap a day to open it.</p>
+      <div style="position:relative">
+        <div class="blurred">
+          <div class="cal-card"><div class="heat" data-seed="1"></div></div>
+          <div class="totals"><div class="stat"><div class="stat-label">Workouts</div><div class="stat-value">142</div></div><div class="stat"><div class="stat-label">Training days</div><div class="stat-value">139</div></div></div>
+        </div>
+        <div class="overlay" style="top:60px;left:0;right:0"><div class="panel"><span class="eyebrow">Premium</span><p class="t">The training calendar is part of Premium</p><p class="b">Your Workout log and this week's numbers on Progress stay free.</p><div class="acts"><span class="keep">Keep it with Premium</span><span class="goback">Go back</span></div></div></div>
+      </div>
+      <div class="tabbar"><span>Home</span><span class="on">Progress</span><span>Templates</span><span>Exercises</span></div>
+    </div>
+  </div>
+
+  <!-- B5 -->
+  <div class="col narrow">
+    <p class="opt-title">&nbsp;</p>
+    <p class="cap">320px wide</p>
+    <p class="capnote">14 weeks show; the rest is a swipe away. The totals still fit side by side.</p>
+    <div class="phone">
+      <span class="back-link">‹ Progress</span>
+      <h2>Training calendar</h2>
+      <p class="lede">The last 12 months. Tap a day to open it.</p>
+      <div class="cal-card"><div class="heat" data-seed="1" data-today="1"></div></div>
+      <div class="totals"><div class="stat"><div class="stat-label">Workouts</div><div class="stat-value">142</div></div><div class="stat"><div class="stat-label">Training days</div><div class="stat-value">139</div></div></div>
+      <div class="tabbar"><span>Home</span><span class="on">Progress</span><span>Templates</span><span>Exercises</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Today is Mon Oct 5 2026. 53 Sunday-start weeks ending with this one.
+  const today = new Date(2026, 9, 5)
+  const start = new Date(today); start.setDate(today.getDate() - today.getDay() - 52 * 7)
+  function rand(seed) { let s = seed * 9301 + 49297; return () => (s = (s * 9301 + 49297) % 233280) / 233280 }
+  const r = rand(7)
+  const sets = []
+  for (let i = 0; i < 53 * 7; i++) {
+    const d = new Date(start); d.setDate(start.getDate() + i)
+    const dow = d.getDay()
+    let n = 0
+    if (d > today) n = -1
+    else if ([1, 3, 5].includes(dow) ? r() < 0.82 : dow === 6 ? r() < 0.3 : r() < 0.06) n = Math.floor(6 + r() * 28)
+    if (d.getMonth() === 11 && d.getDate() > 20 && d.getDate() < 31) n = d > today ? -1 : 0 // holiday gap
+    sets.push({ d, n })
+  }
+  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  const level = (n) => n <= 0 ? '' : n < 10 ? 'l1' : n < 20 ? 'l2' : n < 30 ? 'l3' : 'l4'
+  document.querySelectorAll('.heat').forEach((el) => {
+    const mini = el.dataset.mini
+    const weeks = mini ? 8 : 53
+    const first = 53 - weeks
+    const cell = mini ? 7 : 14, gap = mini ? 2 : 3
+    if (mini) {
+      el.style.cssText = `display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,${cell}px);grid-auto-columns:${cell}px;gap:${gap}px;flex-shrink:0`
+      for (let w = first; w < 53; w++) for (let dd = 0; dd < 7; dd++) {
+        const s = sets[w * 7 + dd]; const c = document.createElement('i')
+        c.className = 'c ' + (s.n < 0 ? 'future' : level(s.n)); c.style.cssText = 'width:7px;height:7px;border-radius:2px'
+        el.appendChild(c)
+      }
+      return
+    }
+    el.style.setProperty('--cell', cell + 'px'); el.style.setProperty('--gap', gap + 'px')
+    const wrap = document.createElement('div'); wrap.className = 'cal'
+    wrap.style.setProperty('--cell', cell + 'px'); wrap.style.setProperty('--gap', gap + 'px')
+    const days = document.createElement('div'); days.className = 'days'
+    days.innerHTML = '<span></span>' + ['', 'Mon', '', 'Wed', '', 'Fri', ''].map((t) => `<span>${t}</span>`).join('')
+    const sc = document.createElement('div'); sc.className = 'scroller'
+    const grid = document.createElement('div'); grid.className = 'grid'
+    let lastMonth = -1
+    for (let w = 0; w < 53; w++) {
+      const firstDay = sets[w * 7].d
+      const lab = document.createElement('span'); lab.className = 'mlabel'
+      const m = sets.slice(w * 7, w * 7 + 7).find((s) => s.d.getDate() === 1)
+      if (w === 0) lastMonth = firstDay.getMonth()
+      if (m && m.d.getMonth() !== lastMonth) { lab.textContent = MON[m.d.getMonth()]; lastMonth = m.d.getMonth() }
+      grid.appendChild(lab)
+      for (let dd = 0; dd < 7; dd++) {
+        const s = sets[w * 7 + dd]; const c = document.createElement('i')
+        c.className = 'c ' + (s.n < 0 ? 'future' : level(s.n))
+        if (s.d.getTime() === today.getTime()) { c.classList.add('today', 'l3') }
+        if (el.dataset.sel && s.d.getMonth() === 8 && s.d.getDate() === 26) c.classList.add('sel', 'l3')
+        grid.appendChild(c)
+      }
+    }
+    sc.appendChild(grid); wrap.appendChild(days); wrap.appendChild(sc); el.appendChild(wrap)
+    const leg = document.createElement('div'); leg.className = 'legend'
+    leg.innerHTML = '<span class="today-key"><i></i>Today</span><span class="t">Fewer</span><i class="c"></i><i class="c l1"></i><i class="c l2"></i><i class="c l3"></i><i class="c l4"></i><span class="t">More sets</span>'
+    el.appendChild(leg)
+    requestAnimationFrame(() => { sc.scrollLeft = sc.scrollWidth })
+  })
+</script>
+</body>
+</html>

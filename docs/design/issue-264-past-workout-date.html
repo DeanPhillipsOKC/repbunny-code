@@ -1,0 +1,237 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Issue 264: Log a past workout and change a workout's date</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --success: #a9cb8d; --highlight: #f2c069; --danger: #e0687a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; font-size: 15px; }
+  .page { display: flex; flex-wrap: wrap; gap: 26px; padding: 26px; align-items: flex-start; width: 1660px; }
+  .col { width: 375px; }
+  .tag { display: inline-block; margin-bottom: 8px; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(242,192,105,0.16); color: var(--highlight); }
+  .tag-alt { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+  .col-title { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; margin: 0 0 2px; }
+  .col-note { color: var(--text-dim); font-size: 0.8rem; margin: 0 0 12px; line-height: 1.45; min-height: 58px; }
+
+  .phone { height: 760px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 20px 16px 0; }
+  .back-link { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; color: var(--text-dim); font-size: 0.85rem; font-weight: 700; }
+  .back-link span { font-size: 1.2rem; line-height: 1; }
+  h1 { margin: 0 0 6px; font-family: 'Baloo 2', sans-serif; font-size: 1.7rem; line-height: 1.2; }
+  .lede-row { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin: 0 0 16px; }
+  .lede { margin: 0; color: var(--text-dim); font-size: 0.9rem; }
+  .ghost { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 12px; font: inherit; font-weight: 700; min-height: 44px; padding: 0 14px; font-size: 0.9rem; white-space: nowrap; }
+  .ghost.small { min-height: 36px; padding: 0 12px; font-size: 0.82rem; }
+  .primary { background: var(--accent); color: var(--accent-text); border: none; border-radius: 12px; font: inherit; font-weight: 800; min-height: 44px; padding: 0 14px; font-size: 0.9rem; }
+
+  .timeline-row { display: flex; gap: 14px; margin-bottom: 16px; }
+  .rail { width: 2px; flex-shrink: 0; position: relative; }
+  .dot { position: absolute; top: 6px; left: -4px; width: 10px; height: 10px; border-radius: 50%; background: rgba(245,237,242,0.2); }
+  .rail-line { display: block; width: 2px; height: 100%; background: var(--border); }
+  .card { flex: 1; min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .card.condensed { opacity: 0.65; }
+  .entry-header { display: flex; align-items: center; justify-content: space-between; gap: 8px 24px; flex-wrap: wrap; margin-bottom: 4px; }
+  h3 { margin: 0; font-size: 1rem; }
+  .actions { display: flex; align-items: center; gap: 6px; }
+  .icon { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); }
+  .ttag { font-size: 0.72rem; font-weight: 800; color: var(--accent); background: rgba(242,135,156,0.14); border-radius: 999px; padding: 4px 10px; }
+  .summary { margin: 8px 0 0; font-size: 0.8rem; color: var(--text-dim); }
+  .date-btn { display: inline-flex; align-items: center; gap: 6px; padding: 0; background: none; border: none; color: var(--text); font: inherit; font-weight: 700; font-size: 1rem; }
+  .date-btn svg { color: var(--text-dim); }
+  .row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin: 12px 0; }
+  .form { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
+  .form-card { background: var(--surface); border: 1px solid var(--accent); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .form-card h2 { margin: 0 0 4px; font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; }
+  .form-card .hint { margin: 0 0 8px; color: var(--text-dim); font-size: 0.82rem; line-height: 1.4; }
+  label { font-size: 0.85rem; font-weight: 700; color: var(--text-dim); }
+  .input { display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: 0 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); color: var(--text); font-size: 0.95rem; }
+  .input.bad { border-color: var(--danger); }
+  .input small { color: var(--text-dim); }
+  .error { color: var(--danger); font-size: 0.82rem; margin: 0; }
+  .btns { display: flex; gap: 8px; margin-top: 8px; }
+  .btns > * { flex: 1 1 0; }
+  .group { padding: 10px 0 6px; border-top: 1px solid var(--border); }
+  .group:first-child { border-top: none; }
+  .gtitle { margin: 0 0 4px; font-weight: 700; }
+  .set { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 8px; border-radius: 12px; }
+  .num { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: var(--surface-2); color: var(--text-dim); font-size: 0.7rem; font-weight: 700; }
+  .detail { flex: 1; font-size: 0.9rem; }
+  .pen { color: var(--text-dim); }
+  .another { margin: 2px 0 0 8px; background: none; border: none; color: var(--accent); font: inherit; font-weight: 700; font-size: 0.82rem; min-height: 36px; padding: 0; }
+  .sep { height: 1px; background: var(--border); margin: 12px 0; }
+  .callout { margin: 10px 0 0; padding: 8px 10px; border-radius: 10px; background: rgba(183,156,240,0.12); color: var(--text); font-size: 0.78rem; line-height: 1.4; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 1. Workout log entry point + form -->
+  <div class="col">
+    <span class="tag">New</span>
+    <p class="col-title">1 · Log a past workout</p>
+    <p class="col-note">A secondary "Log a past workout" button sits on the Workout log's lede row. It opens a form card above the timeline: when (not later than now) and an optional routine. "Add exercises" creates the workout and opens the exercise picker. No live logger, rest timer, or clock.</p>
+    <div class="phone">
+      <div class="back-link"><span>‹</span>Progress</div>
+      <h1>Workout log</h1>
+      <div class="lede-row">
+        <p class="lede">Tap a workout to review or fix it.</p>
+      </div>
+      <div class="form-card">
+        <h2>Log a past workout</h2>
+        <p class="hint">For a session you didn't track live. You'll add its exercises and sets next.</p>
+        <div class="form" style="margin:0">
+          <label>When</label>
+          <div class="input">Thu, Oct 9, 2026 · 6:00 PM <small>▾</small></div>
+          <label style="margin-top:6px">Routine (optional)</label>
+          <div class="input">Upper Body Power — Week 3 Heavy <small>▾</small></div>
+          <div class="btns">
+            <button class="ghost">Cancel</button>
+            <button class="primary">Add exercises</button>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="rail"><span class="dot"></span><span class="rail-line"></span></div>
+        <div class="card condensed">
+          <div class="entry-header"><h3>Fri, Oct 10, 7:12 AM</h3><span class="ttag">Legs</span></div>
+          <p class="summary">Back Squat, Romanian Deadlift + 2 more</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="rail"><span class="dot"></span></div>
+        <div class="card condensed">
+          <div class="entry-header"><h3>Tue, Oct 7, 6:40 PM</h3></div>
+          <p class="summary">Bench Press, Cable Row</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. The new past workout, filled in -->
+  <div class="col">
+    <span class="tag">New</span>
+    <p class="col-title">2 · Filling it in</p>
+    <p class="col-note">The new workout lands in the timeline on its date, expanded, using History's own editing. Each exercise gets "+ Another set" (prefilled from its last set) so a whole session doesn't mean re-picking the exercise every set.</p>
+    <div class="phone">
+      <div class="back-link"><span>‹</span>Progress</div>
+      <h1>Workout log</h1>
+      <div class="lede-row">
+        <p class="lede">Tap a workout to review or fix it.</p>
+        <button class="ghost small">+ Log a past workout</button>
+      </div>
+      <div class="timeline-row">
+        <div class="rail"><span class="dot"></span><span class="rail-line"></span></div>
+        <div class="card condensed">
+          <div class="entry-header"><h3>Fri, Oct 10, 7:12 AM</h3><span class="ttag">Legs</span></div>
+          <p class="summary">Back Squat, Romanian Deadlift + 2 more</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="rail"><span class="dot"></span><span class="rail-line"></span></div>
+        <div class="card">
+          <div class="entry-header">
+            <button class="date-btn">Thu, Oct 9, 6:00 PM <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <div class="actions"><span class="icon">▢</span><span class="icon">⌃</span><span class="icon">🗑</span></div>
+          </div>
+          <div class="row"><button class="ghost small">Add notes</button></div>
+          <div class="group">
+            <p class="gtitle">Incline Dumbbell Bench Press</p>
+            <div class="set"><span class="num">1</span><span class="detail">10 × 27.5 kg</span><span class="pen">✎</span></div>
+            <div class="set"><span class="num">2</span><span class="detail">8 × 30 kg · RPE 8.5</span><span class="pen">✎</span></div>
+            <button class="another">+ Another set</button>
+          </div>
+          <div class="group">
+            <p class="gtitle">Pull-up</p>
+            <div class="set"><span class="num">1</span><span class="detail">8 reps · bodyweight</span><span class="pen">✎</span></div>
+            <button class="another">+ Another set</button>
+          </div>
+          <div style="margin-top:8px"><button class="ghost small">+ Add set</button></div>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="rail"><span class="dot"></span></div>
+        <div class="card condensed">
+          <div class="entry-header"><h3>Tue, Oct 7, 6:40 PM</h3></div>
+          <p class="summary">Bench Press, Cable Row</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3A. Change date: tappable date -->
+  <div class="col">
+    <span class="tag">Option A</span>
+    <p class="col-title">3A · Change date: tap the date</p>
+    <p class="col-note">On an expanded card the date itself is the button (pencil after it, like set lines). It opens an inline "When" field with the current value. A future time is refused in place. No new icon in the already-busy header.</p>
+    <div class="phone">
+      <div class="back-link"><span>‹</span>Progress</div>
+      <h1>Workout log</h1>
+      <div class="lede-row">
+        <p class="lede">Tap a workout to review or fix it.</p>
+        <button class="ghost small">+ Log a past workout</button>
+      </div>
+      <div class="timeline-row">
+        <div class="rail"><span class="dot"></span><span class="rail-line"></span></div>
+        <div class="card">
+          <div class="entry-header">
+            <button class="date-btn">Fri, Oct 10, 12:41 AM <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <div class="actions"><span class="ttag">Push Day</span><span class="icon">▢</span><span class="icon">⌃</span><span class="icon">🗑</span></div>
+          </div>
+          <div class="form">
+            <label>When</label>
+            <div class="input bad">Oct 11, 2026 · 9:00 PM <small>▾</small></div>
+            <p class="error">That's still to come. Pick a time that's already happened.</p>
+            <div class="btns">
+              <button class="ghost">Cancel</button>
+              <button class="primary">Save</button>
+            </div>
+          </div>
+          <div class="group">
+            <p class="gtitle">Overhead Press</p>
+            <div class="set"><span class="num">1</span><span class="detail">5 × 95 lb</span><span class="pen">✎</span></div>
+            <div class="set"><span class="num">2</span><span class="detail">5 × 95 lb</span><span class="pen">✎</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3B. Change date: row like notes -->
+  <div class="col">
+    <span class="tag tag-alt">Option B</span>
+    <p class="col-title">3B · Change date: its own row</p>
+    <p class="col-note">A "Change date" ghost button next to "Add notes". More discoverable as a word, but adds a third button row to every expanded card.</p>
+    <div class="phone">
+      <div class="back-link"><span>‹</span>Progress</div>
+      <h1>Workout log</h1>
+      <div class="lede-row">
+        <p class="lede">Tap a workout to review or fix it.</p>
+        <button class="ghost small">+ Log a past workout</button>
+      </div>
+      <div class="timeline-row">
+        <div class="rail"><span class="dot"></span><span class="rail-line"></span></div>
+        <div class="card">
+          <div class="entry-header">
+            <h3>Fri, Oct 10, 12:41 AM</h3>
+            <div class="actions"><span class="ttag">Push Day</span><span class="icon">▢</span><span class="icon">⌃</span><span class="icon">🗑</span></div>
+          </div>
+          <div class="row" style="justify-content:flex-start"><button class="ghost small">Change date</button><button class="ghost small">Add notes</button></div>
+          <div class="row" style="justify-content:flex-start"><button class="ghost small">Add how it felt</button></div>
+          <div class="group">
+            <p class="gtitle">Overhead Press</p>
+            <div class="set"><span class="num">1</span><span class="detail">5 × 95 lb</span><span class="pen">✎</span></div>
+            <div class="set"><span class="num">2</span><span class="detail">5 × 95 lb</span><span class="pen">✎</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
