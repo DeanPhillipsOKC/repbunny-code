@@ -110,7 +110,7 @@ needs `npm run build` and the guide specs (`docs/architecture/commit-policy.md`)
   `site/img/guides/` (encoded by Chromium's canvas, no extra image tooling), so one run
   regenerates every guide image. A failed screen leaves `logs/guides/<timestamp>/fail-*.png` and
   exits 1.
-- **Deploy:** its own Cloudflare Pages project connected to this repo, build command empty,
+- **Deploy:** its own Cloudflare Pages project (`repbunny-code-site` since the #946 cutover) connected to this repo, build command empty,
   output directory `site`, custom domain `repbunny.app`. Setting that up, and Email Routing for
   `hello@repbunny.app`, are dashboard steps for the user. Once connected, pushes to `main`
   redeploy it the same way the app redeploys.
