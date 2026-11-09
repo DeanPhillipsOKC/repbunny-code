@@ -15,6 +15,7 @@
 import { execFileSync } from 'node:child_process'
 import { pathToFileURL } from 'node:url'
 import { backlogApi } from './backlog-repo.mjs'
+import { commitBuild } from './lib/history.mjs'
 
 export const LABEL = 'android-qa-batch'
 export const ASKED_MARKER = '<!-- qa-batch-asked -->'
@@ -111,7 +112,7 @@ async function add(args) {
   if (!batch) {
     // A shallow clone (cloud sessions) can't count commits, so the title drops the build then.
     const shallow = execFileSync('git', ['rev-parse', '--is-shallow-repository'], { encoding: 'utf8' }).trim() === 'true'
-    const build = shallow ? '' : execFileSync('git', ['rev-list', '--count', 'origin/main'], { encoding: 'utf8' }).trim()
+    const build = shallow ? '' : String(commitBuild('origin/main'))
     body = upsertCase('', entry)
     const title = build ? `Android QA batch: since build ${build}` : `Android QA batch: started ${today}`
     const labels = [LABEL, 'human', 'tooling', 'status:needs-review'].flatMap((l) => ['-f', `labels[]=${l}`])

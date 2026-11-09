@@ -14,6 +14,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { AREAS, JOURNEYS, RELEASE_CHECKS, STANDARD_UX, TAP_COUNTS, TEST_CASES } from './procedure.mjs'
 import { fixtureManifest, journeyManifest } from './fixtures.mjs'
+import { commitBuild } from '../lib/history.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const args = process.argv.slice(2)
@@ -23,7 +24,7 @@ const out = outIndex >= 0 ? args[outIndex + 1] : join(tmpdir(), 'repbunny-qa', '
 const git = (...a) => execFileSync('git', a, { encoding: 'utf8' }).trim()
 const buildOf = new Map()
 const buildNumber = (hash) => {
-  if (!buildOf.has(hash)) buildOf.set(hash, Number(git('rev-list', '--count', hash)))
+  if (!buildOf.has(hash)) buildOf.set(hash, commitBuild(hash))
   return buildOf.get(hash)
 }
 
@@ -43,7 +44,7 @@ const areas = AREAS.map((area) => {
 
 const data = {
   generatedAt: new Date().toISOString(),
-  currentBuild: Number(git('rev-list', '--count', 'HEAD')),
+  currentBuild: commitBuild('HEAD'),
   areas,
   testCases: TEST_CASES,
   journeys: JOURNEYS,

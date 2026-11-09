@@ -6,11 +6,11 @@
 // refresh replaces files in place and removes ones no test case uses any more.
 //
 //   node scripts/qa/generate-fixtures.mjs [--out <folder>]
-import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { AREAS, JOURNEYS, TEST_CASES } from './procedure.mjs'
 import { buildFixtureFiles, buildJourneyFiles } from './fixtures.mjs'
+import { commitBuild } from '../lib/history.mjs'
 
 function findDriveRoot() {
   if (process.platform !== 'win32') return null
@@ -31,7 +31,7 @@ if (!qaRoot) {
 const dataRoot = outIndex >= 0 ? qaRoot : join(qaRoot, 'Test data')
 
 const now = new Date()
-const build = Number(execFileSync('git', ['rev-list', '--count', 'HEAD'], { encoding: 'utf8' }).trim())
+const build = commitBuild('HEAD')
 const files = [...buildFixtureFiles(TEST_CASES, AREAS, now), ...buildJourneyFiles(JOURNEYS, now)]
 
 // Built in full first, then written, so a failure never leaves half a set.

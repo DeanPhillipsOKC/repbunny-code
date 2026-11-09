@@ -1,6 +1,7 @@
 // Issue #216: store release notes from release-notes/ (#558). A store/vX.Y.Z
 // tag builds the iPhone and Play apps (#215); this collects the notes shipped
-// since the previous store/v* tag, by build number (`git rev-list --count`).
+// since the previous store/v* tag, by build number (scripts/lib/history.mjs: the commit count plus
+// the #946 offset, and the builds of the store tags cut before the code moved to this repo).
 //
 //   node scripts/collect-release-notes.mjs --tag store/v1.0.3 --store android --out whatsnew/whatsnew-en-US
 //   node scripts/collect-release-notes.mjs --tag store/v1.0.3 --store ios --out release_notes.json
@@ -14,6 +15,7 @@ import { dirname } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { loadReleaseNotes } from './lib/release-notes.mjs'
 import { backlogApi } from './backlog-repo.mjs'
+import { commitBuild, sinceTagRange, storeTags, tagBuild } from './lib/history.mjs'
 
 // Play's "What's new" limit. TestFlight's "What to Test" allows 4000.
 export const LIMITS = { android: 500, ios: 4000 }
@@ -205,9 +207,9 @@ function main(argv) {
     return i >= 0 ? argv[i + 1] : undefined
   }
   const tag = arg('tag')
-  const prev = previousTag(git('tag', '--list', 'store/v*').split('\n').filter(Boolean), tag)
-  const to = Number(git('rev-list', '--count', tag ?? 'HEAD'))
-  const from = prev ? Number(git('rev-list', '--count', prev)) : null
+  const prev = previousTag(storeTags(), tag)
+  const to = commitBuild(tag ?? 'HEAD')
+  const from = prev ? tagBuild(prev) : null
   const releaseNotes = loadReleaseNotes()
   const notes = (store) => storeNotes(releaseNotes, store, from, to)
 
@@ -218,7 +220,7 @@ function main(argv) {
       ios: notes('ios'),
       android: notes('android'),
       runUrl: arg('run-url'),
-      iphoneChecks: prev ? iphoneChecksIn(`${prev}..${tag ?? 'HEAD'}`) : [],
+      iphoneChecks: prev ? iphoneChecksIn(sinceTagRange(prev, tag ?? 'HEAD')) : [],
     })
     write(email, html)
     console.log(subject)

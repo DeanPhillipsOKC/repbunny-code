@@ -10,6 +10,7 @@
 // docs/architecture.md > Native apps > Releasing.
 import { execFileSync } from 'node:child_process'
 import { pathToFileURL } from 'node:url'
+import { withPreCutoverTags } from './lib/history.mjs'
 
 export const BUMPS = ['patch', 'minor', 'major']
 const TAG = /^store\/v(\d+)\.(\d+)\.(\d+)$/
@@ -68,7 +69,7 @@ function main(argv) {
   try {
     console.log(
       nextTag({
-        tags: list(git('tag', '--list', 'store/v*')),
+        tags: withPreCutoverTags(list(git('tag', '--list', 'store/v*'))),
         headTags: list(git('tag', '--points-at', 'HEAD', '--list', 'store/v*')),
         bump: arg('bump') ?? 'patch',
         version: arg('version') ?? '',

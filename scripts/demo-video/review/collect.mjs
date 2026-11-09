@@ -20,6 +20,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { backlogApi } from '../../backlog-repo.mjs'
+import { isPreCutoverTag, PRE_CUTOVER_NOTES, sinceTagRange, storeTags, tagBuild } from '../../lib/history.mjs'
 
 export const WORK = join('logs', 'demo-video', 'review')
 export const ASSETS = 'claude/issue-assets'
@@ -50,11 +51,22 @@ export function clipLine(bodies) {
   return null
 }
 
+// Pure: the notes the cutover's snapshot commit brought over that shipped after a pre-cutover
+// store tag's build, oldest first (#946). Their adding commit isn't in this repo.
+export function preCutoverNotesAfter(build, notes = PRE_CUTOVER_NOTES) {
+  return Object.entries(notes)
+    .filter(([, n]) => n.build > build)
+    .sort(([a, x], [b, y]) => x.build - y.build || a.localeCompare(b))
+    .map(([file]) => file)
+}
+
 // release-notes/<issue>.json and <issue>-2.json added since `tag`, grouped by issue, in the order
 // they shipped.
 export function notesSince(tag) {
-  const files = git('log', '--reverse', '--no-renames', '--diff-filter=A', '--format=', '--name-only', `${tag}..HEAD`, '--', 'release-notes/')
+  const before = isPreCutoverTag(tag) ? preCutoverNotesAfter(tagBuild(tag)) : []
+  const added = git('log', '--reverse', '--no-renames', '--diff-filter=A', '--format=', '--name-only', sinceTagRange(tag), '--', 'release-notes/')
     .split('\n')
+  const files = [...before, ...added]
     .filter((f) => f && basename(f) !== 'archive.json' && existsSync(f))
   const byIssue = new Map()
   for (const file of [...new Set(files)]) {
@@ -67,8 +79,11 @@ export function notesSince(tag) {
   return byIssue
 }
 
+// The highest store tag, counting the ones cut before the move (#946).
 function latestTag() {
-  return git('tag', '--list', 'store/v*', '--sort=-v:refname').split('\n')[0] || null
+  const parse = (t) => t.replace('store/v', '').split('.').map(Number)
+  const cmp = (a, b) => parse(a).reduce((d, x, i) => d || x - parse(b)[i], 0)
+  return storeTags().sort(cmp).at(-1) ?? null
 }
 
 export function nextVersion(tag, minor) {
