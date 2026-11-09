@@ -1,0 +1,369 @@
+<title>Theme Discovery Options</title>
+
+
+<style>@font-face { font-family: "Baloo 2"; font-weight: 500 800; src: url(../../public/fonts/baloo2-latin.woff2) format("woff2"); } @font-face { font-family: "Manrope"; font-weight: 400 800; src: url(../../public/fonts/manrope-latin.woff2) format("woff2"); }</style>
+<style>
+  /* Two questions, each with phone-sized options in the app's own tokens
+     (src/lib/theme.ts). Single dark page on purpose: Classic and Halloween,
+     the looks shown, are both dark. */
+  :root {
+    color-scheme: dark;
+    --page: #0f0b13; --ink: #f5edf2; --ink-dim: #b9a8c2; --note: #f2c069;
+    --display: 'Baloo 2', 'Trebuchet MS', sans-serif;
+    --body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  }
+  .classic { --bg: #17111c; --surface: #211829; --surface-2: #2a1f33; --border: #3a2b40; --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c; --secondary: #b79cf0; }
+  .chalk { --bg: #121417; --surface: #1b1e23; --surface-2: #22262c; --border: #343a42; --text: #eef1f4; --text-dim: #a3acb6; --accent: #8fb4d9; --accent-text: #121417; --secondary: #b8c4d0; }
+  .halloween { --bg: #151019; --surface: #211a29; --surface-2: #2a2133; --border: #3d3048; --text: #f6efe6; --text-dim: #bfb1c9; --accent: #ff9a3c; --accent-text: #1d1418; --secondary: #b48cf0; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--body); }
+  .wrap { padding-block: 28px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 1240px; margin: 0 auto; }
+  h1 { font-family: var(--display); font-size: 1.9rem; margin: 0 0 6px; text-wrap: balance; }
+  .q { font-family: var(--display); font-size: 1.45rem; margin: 40px 0 4px; }
+  .q:first-of-type { margin-top: 18px; }
+  .intro { color: var(--ink-dim); line-height: 1.55; max-width: 74ch; margin: 0 0 6px; }
+  .intro b { color: var(--ink); }
+  .options { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 18px; }
+  .opt { width: 360px; max-width: 100%; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .label { color: var(--note); font-size: .74rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 800; margin: 0; }
+  .label .pickme { background: var(--note); color: #241a2c; border-radius: 999px; padding: 2px 8px; margin-left: 6px; letter-spacing: .04em; }
+  .opt h2 { font-family: var(--display); font-size: 1.25rem; margin: 0; }
+  .why { color: var(--ink-dim); font-size: .86rem; line-height: 1.5; margin: 0; }
+  .why b { color: var(--ink); }
+  .reset { align-self: flex-start; background: none; border: 1px solid #3a2b40; color: var(--ink-dim); border-radius: 999px; padding: 6px 12px; font: 700 .76rem var(--body); cursor: pointer; }
+
+  /* The phone */
+  .phone { position: relative; overflow: hidden; background: var(--bg); color: var(--text); border-radius: 34px; border: 1px solid #3a2b40; padding: 18px 16px 16px; display: flex; flex-direction: column; gap: 12px; height: 700px; transition: background .3s, color .3s; }
+  .steps { display: flex; gap: 6px; justify-content: center; }
+  .steps i { width: 22px; height: 5px; border-radius: 3px; background: var(--border); }
+  .steps i.on { background: var(--accent); }
+  .ptitle { font-family: var(--display); font-size: 1.6rem; line-height: 1.1; margin: 4px 0 0; }
+  .lede { color: var(--text-dim); font-size: .9rem; margin: 0; }
+  .go { border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-text); font: 800 1rem var(--body); padding: 14px; cursor: pointer; margin-top: auto; }
+  button:focus-visible { outline: 3px solid var(--note); outline-offset: 2px; }
+
+  /* Mini Home previews */
+  .mini { position: relative; display: block; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; flex-shrink: 0; }
+  .mini .h { position: absolute; left: 10%; top: 6%; width: 50%; height: 5%; border-radius: 3px; background: var(--text); opacity: .85; }
+  .mini .c { position: absolute; left: 8%; right: 8%; border-radius: 6px; background: var(--surface-2); }
+  .mini .c1 { top: 16%; height: 18%; } .mini .c2 { top: 38%; height: 18%; }
+  .mini .b { position: absolute; left: 8%; right: 8%; bottom: 7%; height: 9%; border-radius: 6px; background: var(--accent); }
+  .mini .art { position: absolute; left: 50%; transform: translateX(-50%); top: 34%; width: 72%; }
+  .mini .mark { position: absolute; right: 9%; top: 5%; width: 13%; border-radius: 22%; filter: saturate(0) brightness(1.2); opacity: .9; }
+
+  /* Setup tiles */
+  .pick { display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); border-radius: 18px; padding: 10px 12px; cursor: pointer; position: relative; font: inherit; }
+  .pick.on { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+  .pick .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .pick .n { font-family: var(--display); font-size: 1.1rem; line-height: 1.1; }
+  .pick .d { color: var(--text-dim); font-size: .76rem; line-height: 1.35; }
+  .check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border); display: grid; place-items: center; font-size: .8rem; font-weight: 800; flex-shrink: 0; }
+  .on .check { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  .sticker { position: absolute; width: 54px; transform: rotate(-12deg); filter: drop-shadow(0 4px 8px rgba(0,0,0,.45)); pointer-events: none; }
+  .sticker img { width: 100%; display: block; }
+  .more-link { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--border); background: transparent; color: var(--text-dim); font: 700 .78rem var(--body); text-align: left; cursor: pointer; }
+  .more-link .dots { display: flex; }
+  .more-link .dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bg); margin-left: -5px; }
+  .more-link .dots i:first-child { margin-left: 0; }
+  .fan { position: relative; width: 74px; height: 64px; flex-shrink: 0; }
+  .fan .sw { position: absolute; width: 36px; height: 54px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,.18); top: 5px; }
+  .pill { font-size: .6rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; border-radius: 999px; padding: 2px 7px; background: color-mix(in srgb, var(--secondary) 22%, transparent); color: var(--secondary); align-self: flex-start; }
+
+  /* Bottom sheet: the theme gallery */
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--border); border-radius: 24px 24px 0 0; padding: 10px 16px 18px; transform: translateY(105%); transition: transform .3s ease; z-index: 5; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 -20px 40px rgba(0,0,0,.4); }
+  .sheet.open { transform: none; }
+  .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.5); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 4; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .grab { width: 40px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto 2px; }
+  .sheet h3 { font-family: var(--display); font-size: 1.2rem; margin: 0; }
+  .sheet .sub { color: var(--text-dim); font-size: .76rem; margin: -6px 0 0; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .th { border: 1.5px solid var(--border); background: transparent; border-radius: 12px; padding: 5px 5px 6px; cursor: pointer; color: var(--text); font: 700 .62rem var(--body); display: flex; flex-direction: column; gap: 4px; align-items: center; position: relative; }
+  .th.on { border-color: var(--accent); }
+  .th .mini { width: 100%; aspect-ratio: 3 / 4.4; }
+  .th .lock { position: absolute; top: 5px; right: 5px; width: 15px; height: 15px; border-radius: 50%; background: #f2c069; color: #241a2c; font-size: .55rem; display: grid; place-items: center; z-index: 1; }
+  .th .new { position: absolute; top: -6px; left: -4px; font-size: .5rem; background: var(--accent); color: var(--accent-text); border-radius: 999px; padding: 1px 5px; font-weight: 800; }
+  .ghost { border: 1px solid var(--border); background: transparent; color: var(--text); border-radius: 12px; padding: 11px; font: 800 .86rem var(--body); cursor: pointer; }
+
+  /* Home */
+  .top { display: flex; align-items: center; justify-content: space-between; }
+  .top .ptitle { margin: 0; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border); }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tile { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; }
+  .tile p, .card p { margin: 0; }
+  .tile .k { color: var(--text-dim); font-size: .68rem; font-weight: 700; }
+  .tile .v { font-family: var(--display); font-size: 1.35rem; line-height: 1.1; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 12px 14px; }
+  .card .k { color: var(--text-dim); font-size: .7rem; font-weight: 700; margin: 0 0 6px; }
+  .bar { height: 10px; border-radius: 5px; background: var(--surface-2); margin: 6px 0; }
+  .homeart { width: 120px; align-self: center; margin-top: 2px; }
+  .start { border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-text); font: 800 1rem var(--body); padding: 14px; margin-top: auto; }
+  .nav { display: flex; justify-content: space-around; padding-top: 6px; border-top: 1px solid var(--border); }
+  .nav i { width: 22px; height: 22px; border-radius: 6px; background: var(--surface-2); }
+
+  /* Banner (today's What's new banner, plus a Try it) */
+  .banner { display: flex; gap: 10px; align-items: flex-start; padding: 11px 8px 11px 12px; border-radius: 14px; background: color-mix(in srgb, var(--secondary) 10%, var(--surface)); border: 1px solid color-mix(in srgb, var(--secondary) 45%, var(--border)); }
+  .banner .ic { width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0; display: grid; place-items: center; background: color-mix(in srgb, var(--secondary) 20%, transparent); color: var(--secondary); }
+  .banner .bt { flex: 1; min-width: 0; }
+  .banner .t1 { font-weight: 800; font-size: .84rem; margin: 0; }
+  .banner .t2 { color: var(--text-dim); font-size: .76rem; margin: 2px 0 6px; line-height: 1.35; }
+  .banner .acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .try { border: 0; border-radius: 999px; background: var(--accent); color: var(--accent-text); font: 800 .74rem var(--body); padding: 6px 12px; cursor: pointer; }
+  .lnk { border: 0; background: none; color: var(--secondary); font: 700 .74rem var(--body); padding: 6px 2px; cursor: pointer; }
+  .x { border: 0; background: none; color: var(--text-dim); cursor: pointer; padding: 4px; font-size: 1rem; line-height: 1; }
+
+  /* Modal (pop-up at launch) */
+  .modal { position: absolute; left: 22px; right: 22px; top: 50%; transform: translateY(-50%) scale(.96); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 6; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 18px 16px 14px; display: flex; flex-direction: column; gap: 10px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,.6); }
+  .modal.open { opacity: 1; pointer-events: auto; transform: translateY(-50%); }
+  .modal h3 { font-family: var(--display); font-size: 1.35rem; margin: 0; line-height: 1.1; }
+  .modal p { color: var(--text-dim); font-size: .8rem; margin: 0; line-height: 1.4; }
+  .modal .pair { display: flex; gap: 10px; justify-content: center; }
+  .modal .pair .mini { width: 84px; aspect-ratio: 3 / 4.4; }
+  .modal .pair .ico { width: 64px; height: 64px; border-radius: 16px; align-self: center; }
+
+  /* Finish recap */
+  .recap-h { text-align: center; }
+  .recap-h .ptitle { margin: 0; }
+  .recap-h p:not(.ptitle) { color: var(--text-dim); font-size: .8rem; margin: 2px 0 0; }
+  .recap-art { width: 96px; align-self: center; }
+  .newlook { display: flex; gap: 12px; align-items: center; background: var(--surface); border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border)); border-radius: 16px; padding: 10px 12px; }
+  .newlook .mini { width: 56px; aspect-ratio: 3 / 4.4; }
+  .newlook .bt { flex: 1; min-width: 0; }
+  .newlook .t1 { font-weight: 800; font-size: .86rem; margin: 0; }
+  .newlook .t2 { color: var(--text-dim); font-size: .74rem; margin: 2px 0 6px; line-height: 1.35; }
+
+  /* Preview bar, shown while trying a Premium theme (today's try-before-you-buy) */
+  .pbar { position: absolute; left: 12px; right: 12px; top: 12px; z-index: 3; display: none; align-items: center; gap: 8px; background: #f2c069; color: #241a2c; border-radius: 14px; padding: 9px 10px 9px 12px; font-size: .74rem; font-weight: 700; box-shadow: 0 10px 24px rgba(0,0,0,.4); }
+  .pbar.show { display: flex; }
+  .pbar span { flex: 1; }
+  .pbar button { border: 0; border-radius: 999px; padding: 6px 10px; font: 800 .7rem var(--body); cursor: pointer; }
+  .pbar .keep { background: #241a2c; color: #f2c069; }
+  .pbar .back { background: transparent; color: #241a2c; text-decoration: underline; }
+
+  .hidden { display: none !important; }
+  .verdict { margin-top: 30px; border-top: 1px solid #2a2030; padding-top: 18px; max-width: 80ch; color: var(--ink-dim); line-height: 1.6; font-size: .92rem; }
+  .verdict b { color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <h1>Getting people to the themes</h1>
+  <p class="intro"><b>Chosen: S1</b> for setup (#886) and <b>N2</b> for announcing a new theme (#887). Owner, 2026-10-31.</p>
+  <p class="intro">Two separate choices. Pick one option from each, or "neither". Every phone works: tap the theme links, <b>Try it</b>, and the theme tiles. Tapping a Premium theme previews it, the way free users can try themes today, with a <b>Keep it with Premium</b> bar.</p>
+
+  <h2 class="q">1. In setup, how do themes show up?</h2>
+  <p class="intro">Both build on option A from the look picker. Halloween is the "new" seasonal theme in these mockups.</p>
+  <div class="options">
+    <section class="opt">
+      <p class="label">Option S1 <span class="pickme">My pick</span></p>
+      <h2>A link row under the two tiles</h2>
+      <div class="phone classic" data-phone>
+        <div class="steps"><i></i><i class="on"></i><i></i><i></i></div>
+        <p class="ptitle">Pick your look</p>
+        <p class="lede">Cute or all business. It's your call.</p>
+        <button type="button" class="pick on" data-look="classic">
+          <span class="mini classic" style="width:84px;height:116px"><span class="h"></span><span class="c c1"></span><img class="art" src="../../public/celebration-bunny.png" alt=""><span class="b"></span></span>
+          <span class="t"><span class="n">Playful</span><span class="d">Pink, with the bunny cheering you on and confetti for records.</span></span>
+          <span class="check" aria-hidden="true">✓</span>
+          <span class="sticker" style="right:-2px;top:-22px"><img src="../../public/heart-eyes-sticker.webp" alt=""></span>
+        </button>
+        <button type="button" class="pick" data-look="chalk">
+          <span class="mini chalk" style="width:84px;height:116px"><span class="h"></span><img class="mark" src="../../public/icon-512.png" alt=""><span class="c c1"></span><span class="c c2"></span><span class="b"></span></span>
+          <span class="t"><span class="n">Just your numbers</span><span class="d">Steel blue on graphite. No bunny art, no confetti.</span></span>
+          <span class="check" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="more-link" data-open-sheet>
+          <span class="dots"><i style="background:#ff9a3c"></i><i style="background:#e9a23b"></i><i style="background:#bf3a65"></i><i style="background:#f28c3a"></i></span>
+          <span style="flex:1">See every theme, seasonal ones too</span><span aria-hidden="true">›</span>
+        </button>
+        <button type="button" class="go">Continue</button>
+        <div class="scrim" data-scrim></div>
+        <div class="sheet" data-sheet></div>
+        <div class="pbar" data-pbar></div>
+      </div>
+      <p class="why"><b>Quiet, and still easy to find.</b> The choice is still two tiles, so it stays simple. The colored dots hint that there's more without asking for a decision. Anyone curious taps it, and everyone else just hits Continue.</p>
+    </section>
+
+    <section class="opt">
+      <p class="label">Option S2</p>
+      <h2>A third tile: "More looks"</h2>
+      <div class="phone classic" data-phone>
+        <div class="steps"><i></i><i class="on"></i><i></i><i></i></div>
+        <p class="ptitle">Pick your look</p>
+        <p class="lede">Cute or all business. It's your call.</p>
+        <button type="button" class="pick on" data-look="classic">
+          <span class="mini classic" style="width:62px;height:86px"><span class="h"></span><span class="c c1"></span><img class="art" src="../../public/celebration-bunny.png" alt=""><span class="b"></span></span>
+          <span class="t"><span class="n">Playful</span><span class="d">Pink, the bunny, confetti for records.</span></span>
+          <span class="check" aria-hidden="true">✓</span>
+          <span class="sticker" style="right:-2px;top:-22px;width:46px"><img src="../../public/heart-eyes-sticker.webp" alt=""></span>
+        </button>
+        <button type="button" class="pick" data-look="chalk">
+          <span class="mini chalk" style="width:62px;height:86px"><span class="h"></span><img class="mark" src="../../public/icon-512.png" alt=""><span class="c c1"></span><span class="c c2"></span><span class="b"></span></span>
+          <span class="t"><span class="n">Just your numbers</span><span class="d">Steel blue on graphite. No bunny.</span></span>
+          <span class="check" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="pick" data-open-sheet>
+          <span class="fan" aria-hidden="true">
+            <span class="sw" style="left:0;background:linear-gradient(#151019 60%,#ff9a3c 60%);transform:rotate(-10deg)"></span>
+            <span class="sw" style="left:18px;background:linear-gradient(#1a1210 60%,#e9a23b 60%)"></span>
+            <span class="sw" style="left:36px;background:linear-gradient(#fff7f4 60%,#bf3a65 60%);transform:rotate(10deg)"></span>
+          </span>
+          <span class="t"><span class="n">More looks</span><span class="d">Halloween, Autumn, Cotton Candy, and more.</span><span class="pill">Premium</span></span>
+          <span aria-hidden="true" style="color:var(--text-dim)">›</span>
+        </button>
+        <button type="button" class="go">Continue</button>
+        <div class="scrim" data-scrim></div>
+        <div class="sheet" data-sheet></div>
+        <div class="pbar" data-pbar></div>
+      </div>
+      <p class="why"><b>The most visible.</b> Themes get a tile as big as the main choice. That costs a few things: the first two tiles shrink, the step stops being a plain yes or no, and a Premium label shows up before anyone has logged a set. That's the closest of these four to a nag.</p>
+    </section>
+  </div>
+
+  <h2 class="q">2. When a release brings a new theme, how does anyone hear about it?</h2>
+  <p class="intro">Today, a release with a seasonal theme ships that season's icon as the app's default (decision #857), and the one-time "RepBunny just updated" banner shows on Home. Nothing points at the theme itself. Every option here shows once per release, and a single dismissal ends it.</p>
+  <div class="options">
+    <section class="opt">
+      <p class="label">Option N1</p>
+      <h2>Pop-up at launch</h2>
+      <div class="phone classic" data-phone>
+        <div data-home></div>
+        <div class="scrim open" data-scrim data-modal-scrim></div>
+        <div class="modal open" data-modal>
+          <div class="pair">
+            <img class="ico" src="../../public/app-icons/season-halloween.webp" alt="">
+            <span class="mini halloween"><span class="h"></span><span class="c c1"></span><img class="art" src="../../public/celebration-bunny.png" alt=""><span class="b"></span></span>
+          </div>
+          <h3>New for October: Halloween</h3>
+          <p>A new home-screen icon came with this update, plus a matching theme with candy-corn confetti.</p>
+          <button type="button" class="go" data-try style="margin-top:4px">Try the theme</button>
+          <button type="button" class="ghost" data-close-modal>Not now</button>
+        </div>
+        <div class="sheet" data-sheet></div>
+        <div class="pbar" data-pbar></div>
+      </div>
+      <button type="button" class="reset" data-reset>Show the pop-up again</button>
+      <p class="why"><b>Impossible to miss, and it gets in the way.</b> It covers Start workout right when someone opens the app to train, and it shows to everyone on the update, including people who turned off update notes. It's the format people learn to dismiss without reading.</p>
+    </section>
+
+    <section class="opt">
+      <p class="label">Option N2 <span class="pickme">My pick</span></p>
+      <h2>Today's update banner, with Try it</h2>
+      <div class="phone classic" data-phone>
+        <div data-home data-banner></div>
+        <div class="scrim" data-scrim></div>
+        <div class="sheet" data-sheet></div>
+        <div class="pbar" data-pbar></div>
+      </div>
+      <button type="button" class="reset" data-reset>Show the banner again</button>
+      <p class="why"><b>Uses what's already there.</b> It's the same one-time banner, in the same spot. When the release has a theme, the banner's first line talks about it and picks up a Try it button. Start workout stays reachable, and the existing "turn off update notes" setting covers it.</p>
+    </section>
+
+    <section class="opt">
+      <p class="label">Option N3</p>
+      <h2>A card on the finish recap</h2>
+      <div class="phone classic" data-phone>
+        <div class="recap-h"><p class="ptitle">Nice work</p><p>Full body · 42 min · 3 exercises</p></div>
+        <img class="recap-art" src="../../public/celebration-bunny.png" alt="">
+        <div class="tiles"><div class="tile"><p class="k">Volume moved</p><p class="v">6,240 lb</p></div><div class="tile"><p class="k">Time moving</p><p class="v">31 min</p></div></div>
+        <div class="newlook" data-card>
+          <span class="mini halloween"><span class="h"></span><span class="c c1"></span><img class="art" src="../../public/celebration-bunny.png" alt=""><span class="b"></span></span>
+          <span class="bt"><p class="t1">New look: Halloween</p><p class="t2">Came with this update, along with a new icon.</p>
+            <span class="acts" style="display:flex;gap:8px"><button type="button" class="try" data-try>Try it</button><button type="button" class="lnk" data-hide-card>No thanks</button></span></span>
+        </div>
+        <div class="card"><p class="k" style="margin-bottom:6px">Vs last time</p><div class="bar" style="width:80%"></div><div class="bar" style="width:62%"></div></div>
+        <button type="button" class="go">Done</button>
+        <div class="scrim" data-scrim></div>
+        <div class="sheet" data-sheet></div>
+        <div class="pbar" data-pbar></div>
+      </div>
+      <button type="button" class="reset" data-reset>Show the card again</button>
+      <p class="why"><b>The best moment, and the busiest screen.</b> They just finished, they feel good, and nothing is waiting on them. But the recap already carries the trial pick, the rating ask, the auto-copy prompt, and milestones, so this card would compete with those. It would need a rule like "only when nothing else is on the recap".</p>
+    </section>
+  </div>
+
+  <div class="verdict">
+    <p><b>My picks are S1 and N2.</b> Both make the themes findable without ever asking a new user for anything before their first workout. S1 is one quiet row in setup. N2 reuses a banner people already know how to close, and adds nothing new to turn off.</p>
+    <p>If you want a stronger push, N3 is the one I'd add next. It reaches people right after a workout, and I'd show it only when the recap has nothing else on it.</p>
+  </div>
+</div>
+
+<script>
+  const THEMES = [
+    { id: 'classic', name: 'Classic', free: true },
+    { id: 'chalk', name: 'Chalk', free: true },
+    { id: 'halloween', name: 'Halloween', isNew: true, colors: ['#151019', '#2a2133', '#ff9a3c'] },
+    { id: 'autumn', name: 'Autumn', colors: ['#1a1210', '#2e211b', '#e9a23b'] },
+    { id: 'cotton-candy', name: 'Cotton Candy', colors: ['#fff7f4', '#f6e6ea', '#bf3a65', '#2b1d2a'] },
+    { id: 'carrot-patch', name: 'Carrot Patch', colors: ['#121710', '#232d1f', '#f28c3a'] },
+    { id: 'sunrise', name: 'Sunrise', colors: ['#fff8f0', '#f6e8da', '#b8501c', '#2a1e16'] },
+  ]
+  const miniFor = (t) => {
+    const style = t.colors ? `style="--bg:${t.colors[0]};--surface-2:${t.colors[1]};--accent:${t.colors[2]};--text:${t.colors[3] ?? '#f5edf2'};--border:rgba(255,255,255,.12)"` : ''
+    const cls = t.colors ? '' : t.id
+    const art = t.id === 'chalk' ? '<img class="mark" src="../../public/icon-512.png" alt=""><span class="c c2"></span>' : '<img class="art" src="../../public/celebration-bunny.png" alt="">'
+    return `<span class="mini ${cls}" ${style}><span class="h"></span><span class="c c1"></span>${art}<span class="b"></span></span>`
+  }
+  const sheetHtml = () => `
+    <div class="grab"></div>
+    <h3>Themes</h3><p class="sub">Classic and Chalk are free. ★ themes are Premium: tap one to try it.</p>
+    <div class="grid">${THEMES.map(t => `<button type="button" class="th" data-theme="${t.id}">${t.isNew ? '<span class="new">NEW</span>' : ''}${t.free ? '' : '<span class="lock" title="Premium">★</span>'}${miniFor(t)}${t.name}</button>`).join('')}</div>
+    <button type="button" class="ghost" data-close-sheet>Done</button>`
+  const homeHtml = (banner) => `
+    <div class="top"><p class="ptitle">Hi, Dean</p><span class="avatar"></span></div>
+    ${banner ? `<div class="banner" data-card>
+      <span class="ic" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.2L19 9l-4 3.6L16.2 18 12 15.2 7.8 18 9 12.6 5 9l4.8-.8z"/></svg></span>
+      <div class="bt"><p class="t1">RepBunny just updated</p><p class="t2">New Halloween theme and icon, with candy-corn confetti for your records.</p>
+        <div class="acts"><button type="button" class="try" data-try>Try it</button><button type="button" class="lnk">See what's new ›</button></div></div>
+      <button type="button" class="x" aria-label="Close" data-hide-card>✕</button></div>` : ''}
+    <div class="tiles"><div class="tile"><p class="k">This week</p><p class="v">2 workouts</p></div><div class="tile"><p class="k">Streak</p><p class="v">3 weeks</p></div></div>
+    <div class="card"><p class="k" style="margin-bottom:6px">Next time</p><div class="bar" style="width:78%"></div><div class="bar" style="width:55%"></div></div>
+    <img class="homeart" src="../../public/celebration-bunny.png" alt="">
+    <button type="button" class="start">Start workout</button>
+    <div class="nav"><i></i><i></i><i></i><i></i></div>`
+
+  for (const phone of document.querySelectorAll('[data-phone]')) {
+    const home = phone.querySelector('[data-home]')
+    const renderHome = () => { if (home) home.outerHTML; if (home) { home.innerHTML = homeHtml(home.hasAttribute('data-banner')); home.style.cssText = 'display:flex;flex-direction:column;gap:12px;height:100%' } }
+    renderHome()
+    const sheet = phone.querySelector('[data-sheet]'), scrim = phone.querySelector('[data-scrim]'), pbar = phone.querySelector('[data-pbar]')
+    const modal = phone.querySelector('[data-modal]'), modalScrim = phone.querySelector('[data-modal-scrim]')
+    sheet.innerHTML = sheetHtml()
+    const base = phone.classList.contains('chalk') ? 'chalk' : 'classic'
+    let look = base
+    const setLook = (id) => {
+      phone.classList.remove('classic', 'chalk', 'halloween'); phone.removeAttribute('style')
+      const t = THEMES.find(x => x.id === id)
+      if (id === 'classic' || id === 'chalk' || id === 'halloween') phone.classList.add(id)
+      else { phone.classList.add('classic'); phone.style.cssText = `--bg:${t.colors[0]};--surface:${t.colors[1]};--surface-2:${t.colors[1]};--accent:${t.colors[2]};--accent-text:${t.colors[3] ? '#fff' : '#1d1418'};--text:${t.colors[3] ?? '#f5edf2'};--text-dim:${t.colors[3] ? '#6e5868' : '#c4b2a3'};--border:${t.colors[3] ? '#ead2c6' : '#44322a'}` }
+      for (const b of sheet.querySelectorAll('.th')) b.classList.toggle('on', b.dataset.theme === id)
+      if (t.free) { look = id; pbar.classList.remove('show') }
+      else { pbar.innerHTML = `<span>Previewing ${t.name}</span><button type="button" class="keep">Keep it with Premium</button><button type="button" class="back" data-back>Back</button>`; pbar.classList.add('show') }
+    }
+    const openSheet = () => { sheet.classList.add('open'); scrim.classList.add('open') }
+    const closeSheet = () => { sheet.classList.remove('open'); if (!modal || !modal.classList.contains('open')) scrim.classList.remove('open') }
+    const closeModal = () => { modal.classList.remove('open'); modalScrim.classList.remove('open') }
+    phone.addEventListener('click', (e) => {
+      const el = e.target.closest('button'); if (!el) { if (e.target === scrim && sheet.classList.contains('open')) closeSheet(); return }
+      if (el.matches('[data-open-sheet]')) openSheet()
+      else if (el.matches('[data-close-sheet]')) closeSheet()
+      else if (el.matches('.th')) { setLook(el.dataset.theme); if (!THEMES.find(t => t.id === el.dataset.theme).free) closeSheet() }
+      else if (el.matches('[data-try]')) { if (modal) closeModal(); setLook('halloween') }
+      else if (el.matches('[data-close-modal]')) closeModal()
+      else if (el.matches('[data-hide-card]')) phone.querySelector('[data-card]')?.classList.add('hidden')
+      else if (el.matches('[data-back]')) setLook(look)
+      else if (el.matches('.pick[data-look]')) {
+        for (const p of phone.querySelectorAll('.pick[data-look]')) { const on = p === el; p.classList.toggle('on', on); p.querySelector('.check').textContent = on ? '✓' : '' }
+        setLook(el.dataset.look)
+      }
+    })
+    const reset = phone.parentElement.querySelector('[data-reset]')
+    reset?.addEventListener('click', () => {
+      setLook(base); look = base; closeSheet()
+      phone.querySelector('[data-card]')?.classList.remove('hidden')
+      if (modal) { modal.classList.add('open'); modalScrim.classList.add('open') }
+    })
+  }
+</script>

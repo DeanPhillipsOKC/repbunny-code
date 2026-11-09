@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Redeem a code</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 24px 24px 0; max-width: 860px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.5rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.86rem; margin: 0 0 8px; line-height: 1.5; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 20px 24px 36px; align-items: flex-start; }
+  .col { width: 375px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 64px; }
+  .phone { width: 375px; height: 780px; background: #0f0b13; border: 1px solid var(--border); border-radius: 28px; position: relative; overflow: hidden; display: flex; align-items: flex-end; }
+  .dim { position: absolute; inset: 0; background: rgba(0,0,0,.5); }
+  .sheet { position: relative; width: 100%; background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 10px 18px 18px; display: flex; flex-direction: column; gap: 12px; }
+  .handle { align-self: center; width: 36px; height: 4px; border-radius: 2px; background: var(--border); }
+  .head { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+  .eyebrow { padding: 2px 9px; border-radius: 999px; background: color-mix(in srgb, var(--secondary) 16%, transparent); color: var(--secondary); font-size: .7rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  .title { margin: 2px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; line-height: 1.15; }
+  .sub { margin: 0; font-size: .86rem; line-height: 1.45; color: var(--text-dim); }
+  .includes { padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; }
+  .includes h4 { margin: 0 0 8px; font-size: .8rem; font-weight: 800; color: var(--text-dim); }
+  .includes ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .includes li { display: flex; gap: 10px; font-size: .88rem; align-items: center; }
+  .includes svg { color: var(--secondary); flex-shrink: 0; }
+  .free { margin: 10px 0 0; font-size: .76rem; color: var(--text-dim); }
+  .unlock { min-height: 50px; border-radius: var(--radius); background: var(--accent); color: var(--accent-text); font-weight: 800; display: grid; place-items: center; font-size: 1rem; }
+  .links { display: flex; justify-content: center; align-items: center; gap: 6px; }
+  .link { min-height: 36px; padding: 0 8px; display: grid; place-items: center; color: var(--secondary); font-size: .86rem; font-weight: 800; text-decoration: underline; }
+  .dot { color: var(--text-dim); }
+  .caption { margin: -6px 0 0; text-align: center; font-size: .76rem; color: var(--text-dim); }
+  .ghost { min-height: 44px; border: 1px solid var(--border); border-radius: var(--radius); display: grid; place-items: center; color: var(--text-dim); font-weight: 700; }
+  .new { outline: 2px dashed color-mix(in srgb, var(--highlight) 70%, transparent); outline-offset: 3px; border-radius: 8px; }
+
+  /* Account > Premium card */
+  .scr { position: absolute; inset: 0; padding: 22px 16px; display: flex; flex-direction: column; gap: 12px; background: var(--bg); }
+  .dlabel { margin: 6px 0 0 4px; font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .dtitle { font-weight: 800; }
+  .dcap { font-size: .8rem; color: var(--text-dim); }
+  .pill-btn { min-height: 44px; border-radius: var(--radius); display: grid; place-items: center; font-weight: 800; }
+  .pri { background: var(--accent); color: var(--accent-text); }
+  .sec { border: 1px solid var(--border); color: var(--text); }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>Redeem a code (Android)</h1>
+  <p class="note">A small <b>Redeem a code</b> link beside <b>Restore Purchases</b>. It opens Google Play's own redeem screen for this app, so the code becomes a real purchase and Restore, reinstall, and refunds work as they do today. <b>No code is typed into RepBunny</b>, so there is no code system of our own. Shown only on the Play build, and only while Premium is locked.</p>
+</div>
+<div class="page">
+
+  <div class="col">
+    <p class="cap">A. Premium sheet (recommended)</p>
+    <p class="capnote">Next to Restore Purchases: same quiet link style, no new buttons competing with Unlock. The dashed box marks what is new.</p>
+    <div class="phone">
+      <div class="dim"></div>
+      <div class="sheet">
+        <div class="handle"></div>
+        <div class="head">
+          <span class="eyebrow">Premium</span>
+          <h3 class="title">Unlock Premium</h3>
+          <p class="sub">One purchase, yours for good. Here is what it adds.</p>
+        </div>
+        <section class="includes">
+          <h4>Premium includes</h4>
+          <ul>
+            <li><svg viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited routines</li>
+            <li><svg viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Plate calculator</li>
+            <li><svg viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Est. 1RM, volume, and all-time lift charts</li>
+            <li><svg viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Monthly reports and a year recap</li>
+          </ul>
+          <p class="free">One-time unlock. Logging, history, backup, restore, and export stay free forever.</p>
+        </section>
+        <div class="unlock">Unlock Premium · $9.99</div>
+        <div class="links">
+          <span class="link">Restore Purchases</span>
+          <span class="dot">·</span>
+          <span class="link new">Redeem a code</span>
+        </div>
+        <p class="caption">Bought Premium on another phone? Restore checks your Google account.</p>
+        <div class="ghost">Not now</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">B. Account &gt; Premium</p>
+    <p class="capnote">Same link as a third row in the Premium card, for people who go looking in Account. Same Play redeem screen.</p>
+    <div class="phone">
+      <div class="scr">
+        <div class="dlabel">Premium</div>
+        <div class="card">
+          <div class="dtitle">RepBunny Premium</div>
+          <div class="dcap">One-time unlock. Logging, history, backup, restore, and export stay free forever.</div>
+          <div class="pill-btn pri">Unlock Premium · $9.99</div>
+          <div class="pill-btn sec">Restore Purchases</div>
+          <div class="pill-btn sec new">Redeem a code</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">What happens on tap</p>
+    <p class="capnote">1. Opens Google Play's redeem page for RepBunny.<br/>2. Person enters the code there.<br/>3. Back in RepBunny, Premium turns on within a moment (same check as Restore). If it does not, Restore Purchases still works.</p>
+    <p class="note" style="margin-left:4px">Not shown on iPhone. The App Store has its own redeem flow, handled when iPhone testing resumes.</p>
+  </div>
+
+</div>
+</body>
+</html>

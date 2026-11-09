@@ -1,0 +1,200 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Per-Set Targets</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1180px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; }
+  .opt-title { font-family: 'Baloo 2', sans-serif; color: var(--accent); font-size: 1.2rem; margin: 0 0 2px 4px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 58px; }
+  .capnote b { color: var(--text); }
+  .phone { width: 377px; height: 720px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 20px 16px 0; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.45rem; margin: 0 0 2px; }
+  .lede { color: var(--text-dim); font-size: 0.82rem; margin: 0 0 12px; }
+  .ex-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; }
+  .ex-card .n { font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; }
+  .ex-card .m { font-size: 0.76rem; color: var(--text-dim); margin-top: 2px; }
+
+  /* set card: 343px wide, 8px padding, rows 8px padding + 1px border */
+  .set-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 8px; }
+  .unit-row { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 4px 4px 10px; }
+  .unit-row .lbl { font-size: 0.9rem; font-weight: 700; color: var(--text-dim); }
+  .toggle { display: flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .toggle span { padding: 8px 14px; font-weight: 800; font-size: 0.85rem; color: var(--text-dim); }
+  .toggle span.on { background: var(--accent); color: var(--accent-text); }
+  .hdr, .line { display: grid; grid-template-columns: 28px minmax(0, 1fr) 54px 44px 88px; gap: 6px; align-items: center; }
+  .hdr { font-size: 0.92rem; font-weight: 700; color: var(--text-dim); padding: 0 9px 6px; }
+  .hdr span:first-child { text-align: center; }
+  .row { border: 1px solid transparent; border-radius: 12px; padding: 8px; margin-bottom: 6px; }
+  .row.draft { background: var(--surface-2); border-color: var(--border); }
+  .row.next { border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+  .num { color: var(--text-dim); font-weight: 800; text-align: center; font-size: 1rem; }
+  .row.next .num { color: var(--accent); }
+  .cell { font-weight: 800; font-size: 1.15rem; }
+  .cell small { color: var(--text-dim); font-size: 0.72rem; margin-left: 2px; }
+  .field { height: 52px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem; min-width: 0; }
+  .field.ph { color: var(--text-dim); font-weight: 600; }
+  .acts { display: flex; gap: 4px; justify-content: flex-end; }
+  .ib { width: 36px; height: 52px; border-radius: 10px; display: grid; place-items: center; border: 1px solid var(--border); color: var(--text-dim); font-weight: 800; }
+  .ib.ok { width: 48px; background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  .ib.edit { border-color: transparent; width: 36px; }
+  .ib.done { color: var(--success); border-color: transparent; width: 48px; }
+
+  /* #140 card (option A keeps it, relabelled) */
+  .hint { margin: 0 4px 10px; padding: 6px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border)); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+  .hint-line { display: flex; align-items: center; gap: 6px; }
+  .fill { flex: 1; min-height: 44px; display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 8px; padding: 6px 8px; }
+  .kicker { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+  .value { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; }
+  .tap { font-size: 0.72rem; color: var(--text-dim); }
+  .why-btn { min-height: 44px; padding: 0 10px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface); color: var(--text-dim); font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; }
+  .why-btn.open { color: var(--text); border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+  .why { padding: 2px 8px 4px; }
+  .why p { margin: 4px 0 0; font-size: 0.8rem; line-height: 1.4; color: var(--text-dim); }
+  .then { margin: 0; padding: 0 8px 4px; font-size: 0.78rem; color: var(--text-dim); }
+  .then b { color: var(--text); font-weight: 700; }
+
+  /* option B: per-row chip line under the inputs, starting at the weight column */
+  .chip-line { display: flex; align-items: center; gap: 6px; margin: 6px 0 0 34px; }
+  .chip { flex: 1; min-width: 0; height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border)); background: color-mix(in srgb, var(--accent) 8%, transparent); white-space: nowrap; }
+  .chip .kicker { font-size: 0.62rem; }
+  .chip .value { font-size: 1.02rem; }
+  .chip .tap { margin-left: auto; font-size: 0.7rem; }
+  .chip.changed { border-color: var(--accent); }
+  .why-mini { flex-shrink: 0; height: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--border); color: var(--text-dim); font-size: 0.76rem; font-weight: 700; display: flex; align-items: center; background: var(--surface); }
+  .why-mini.open { color: var(--text); border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+  .row-why { margin: 6px 0 0 34px; font-size: 0.78rem; line-height: 1.4; color: var(--text-dim); }
+  .row-why p { margin: 0 0 3px; }
+  .legend { margin: 10px 4px 0; font-size: 0.72rem; color: var(--text-dim); line-height: 1.45; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#160 Per-set targets that adjust after each logged set (2026-10-05)</h1>
+  <p class="note">Barbell Bench Press with Premium. <b>Last time:</b> 180 × 12 at RPE 8, 180 × 11 at RPE 9, 180 × 10 at RPE 9.5. Each set gets its own target from the same set last time. Once you log a set, the sets after it follow it: <b>RPE 9.5+</b> holds the weight with 1 fewer rep, <b>RPE 7 or less</b> goes up a step, anything else repeats it. Rows still start from last time, and nothing fills until you tap.</p>
+  <p class="note">The width is the hard part: a 375px row already uses all 307px (Set 28 + Weight ~69 + Reps 54 + RPE 44 + buttons 88), so a per-row target can't sit inside the row. It goes on its own line (B), or stays in the one card above the rows (A).</p>
+</div>
+<div class="page">
+
+  <!-- A1 -->
+  <div class="col">
+    <p class="opt-title">Option A: one card that follows you</p>
+    <p class="cap">Before any set</p>
+    <p class="capnote">The #140 card stays put and names the set it fills: <b>Set 1 target</b>. The row it fills gets a pink outline. A small line under it previews the sets after.</p>
+    <div class="phone">
+      <h2>Push day</h2>
+      <p class="lede">Exercise 1 of 4 · 6 min</p>
+      <div class="ex-card"><div class="n">Barbell Bench Press</div><div class="m">Last time: 180 × 12, 11, 10</div></div>
+      <div class="set-card">
+        <div class="unit-row"><span class="lbl">Weight in</span><span class="toggle"><span class="on">lb</span><span>kg</span></span></div>
+        <div class="hint">
+          <div class="hint-line">
+            <div class="fill"><span class="kicker">Set 1 target</span><span class="value">185 lb × 8</span><span class="tap">Tap to fill</span></div>
+            <span class="why-btn">Why this?</span>
+          </div>
+          <p class="then">Then <b>180 × 12</b>, <b>180 × 11</b></p>
+        </div>
+        <div class="hdr"><span>Set</span><span>Weight</span><span>Reps</span><span>RPE</span><span></span></div>
+        <div class="row draft next"><div class="line"><span class="num">1</span><span class="field">180</span><span class="field">12</span><span class="field ph">–</span><span class="acts"><span class="ib">✕</span><span class="ib ok">✓</span></span></div></div>
+        <div class="row draft"><div class="line"><span class="num">2</span><span class="field">180</span><span class="field">11</span><span class="field ph">–</span><span class="acts"><span class="ib">✕</span><span class="ib ok">✓</span></span></div></div>
+        <div class="row draft"><div class="line"><span class="num">3</span><span class="field">180</span><span class="field">10</span><span class="field ph">–</span><span class="acts"><span class="ib">✕</span><span class="ib ok">✓</span></span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A2 -->
+  <div class="col">
+    <p class="opt-title">&nbsp;</p>
+    <p class="cap">After set 1 at RPE 10</p>
+    <p class="capnote">The card moves on to <b>Set 2 target</b> and drops a rep. Why this? names the rule. Tapping fills set 2 only.</p>
+    <div class="phone">
+      <h2>Push day</h2>
+      <p class="lede">Exercise 1 of 4 · 9 min</p>
+      <div class="ex-card"><div class="n">Barbell Bench Press</div><div class="m">Last time: 180 × 12, 11, 10</div></div>
+      <div class="set-card">
+        <div class="unit-row"><span class="lbl">Weight in</span><span class="toggle"><span class="on">lb</span><span>kg</span></span></div>
+        <div class="hint">
+          <div class="hint-line">
+            <div class="fill"><span class="kicker">Set 2 target</span><span class="value">185 lb × 7</span><span class="tap">Tap to fill</span></div>
+            <span class="why-btn open">Why this?</span>
+          </div>
+          <div class="why"><p>Set 1 was RPE 10 at 8 reps, so hold 185 lb and expect about 7.</p></div>
+        </div>
+        <div class="hdr"><span>Set</span><span>Weight</span><span>Reps</span><span>RPE</span><span></span></div>
+        <div class="row"><div class="line"><span class="num">1</span><span class="cell">185<small>lb</small></span><span class="cell">8</span><span class="cell">10</span><span class="acts"><span class="ib edit">✎</span><span class="ib done">✓</span></span></div></div>
+        <div class="row draft next"><div class="line"><span class="num">2</span><span class="field">180</span><span class="field">11</span><span class="field ph">–</span><span class="acts"><span class="ib">✕</span><span class="ib ok">✓</span></span></div></div>
+        <div class="row draft"><div class="line"><span class="num">3</span><span class="field">180</span><span class="field">10</span><span class="field ph">–</span><span class="acts"><span class="ib">✕</span><span class="ib ok">✓</span></span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B1 -->
+  <div class="col">
+    <p class="opt-title">Option B: a chip under each open row</p>
+    <p class="cap">Before any set</p>
+    <p class="capnote">No card. Every open row gets its own target line under the inputs, lined up with the Weight column. Tap the chip to fill that row. Costs about 46px per open row.</p>
+    <div class="phone">
+      <h2>Push day</h2>
+      <p class="lede">Exercise 1 of 4 · 6 min</p>
+      <div class="ex-card"><div class="n">Barbell Bench Press</div><div class="m">Last time: 180 × 12, 11, 10</div></div>
+      <div class="set-card">
+        <div class="unit-row"><span class="lbl">Weight in</span><span class="toggle"><span class="on">lb</span><span>kg</span></span></div>
+        <div class="hdr"><span>Set</span><span>Weight</span><span>Reps</span><span>RPE</span><span></span></div>
+        <div class="row draft">
+          <div class="line"><span class="num">1</span><span class="field">180</span><span class="field">12</span><span class="field ph">–</span><span class="acts"><span class="ib">✕</span><span class="ib ok">✓</span></span></div>
+          <div class="chip-line"><span class="chip"><span class="kicker">Target</span><span class="value">185 lb × 8</span><span class="tap">Tap to fill</span></span><span class="why-mini">Why?</span></div>
+        </div>
+        <div class="row draft">
+          <div class="line"><span class="num">2</span><span class="field">180</span><span class="field">11</span><span class="field ph">–</span><span class="acts"><span class="ib">✕</span><span class="ib ok">✓</span></span></div>
+          <div class="chip-line"><span class="chip"><span class="kicker">Target</span><span class="value">180 lb × 12</span><span class="tap">Tap to fill</span></span><span class="why-mini">Why?</span></div>
+        </div>
+        <div class="row draft">
+          <div class="line"><span class="num">3</span><span class="field">180</span><span class="field">10</span><span class="field ph">–</span><span class="acts"><span class="ib">✕</span><span class="ib ok">✓</span></span></div>
+          <div class="chip-line"><span class="chip"><span class="kicker">Target</span><span class="value">180 lb × 11</span><span class="tap">Tap to fill</span></span><span class="why-mini">Why?</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B2 -->
+  <div class="col">
+    <p class="opt-title">&nbsp;</p>
+    <p class="cap">After set 1 at RPE 10</p>
+    <p class="capnote">Sets 2 and 3 now follow set 1. Why? opens under its own row. The logged row keeps no chip.</p>
+    <div class="phone">
+      <h2>Push day</h2>
+      <p class="lede">Exercise 1 of 4 · 9 min</p>
+      <div class="ex-card"><div class="n">Barbell Bench Press</div><div class="m">Last time: 180 × 12, 11, 10</div></div>
+      <div class="set-card">
+        <div class="unit-row"><span class="lbl">Weight in</span><span class="toggle"><span class="on">lb</span><span>kg</span></span></div>
+        <div class="hdr"><span>Set</span><span>Weight</span><span>Reps</span><span>RPE</span><span></span></div>
+        <div class="row"><div class="line"><span class="num">1</span><span class="cell">185<small>lb</small></span><span class="cell">8</span><span class="cell">10</span><span class="acts"><span class="ib edit">✎</span><span class="ib done">✓</span></span></div></div>
+        <div class="row draft">
+          <div class="line"><span class="num">2</span><span class="field">180</span><span class="field">11</span><span class="field ph">–</span><span class="acts"><span class="ib">✕</span><span class="ib ok">✓</span></span></div>
+          <div class="chip-line"><span class="chip changed"><span class="kicker">Target</span><span class="value">185 lb × 7</span><span class="tap">Tap to fill</span></span><span class="why-mini open">Why?</span></div>
+          <div class="row-why"><p>Set 1 was RPE 10 at 8 reps, so hold 185 lb and expect about 7.</p></div>
+        </div>
+        <div class="row draft">
+          <div class="line"><span class="num">3</span><span class="field">180</span><span class="field">10</span><span class="field ph">–</span><span class="acts"><span class="ib">✕</span><span class="ib ok">✓</span></span></div>
+          <div class="chip-line"><span class="chip changed"><span class="kicker">Target</span><span class="value">185 lb × 7</span><span class="tap">Tap to fill</span></span><span class="why-mini">Why?</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+# The one switch that pauses all automation (#682). The owner runs it from the GitHub app
+# (Actions > Pause automation > Run workflow), picks pause or resume, and gives a reason. It sets the
+# repo variable AUTOMATION_PAUSED, which the dispatchers, dean-replied.yml, fire-review.mjs, and
+# every headless skill check, and logs who/when/why as a comment on the standing `automation-log`
+# issue (also adding or removing the `automation:paused` label there, for cloud sessions, #700). Runbook: docs/backlog-runner.md > Pausing automation.
+#
+# Needs the repo secret AUTOMATION_ADMIN_TOKEN: a fine-grained personal access token for this repo
+# with Variables (read and write) and Issues (read and write). The workflow's own token can't write
+# variables. Without it the run fails and says so; set the variable by hand in Settings > Secrets
+# and variables > Actions > Variables instead.
+name: Pause automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Pause or resume all automation
+        type: choice
+        options:
+          - pause
+          - resume
+        required: true
+      reason:
+        description: Why (goes in the automation-log issue)
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: automation-pause
+  cancel-in-progress: false
+
+jobs:
+  switch:
+    if: github.actor == github.repository_owner
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_REPO: ${{ github.repository }}
+      ADMIN_TOKEN: ${{ secrets.AUTOMATION_ADMIN_TOKEN }}
+      ACTION: ${{ inputs.action }}
+      REASON: ${{ inputs.reason }}
+      ACTOR: ${{ github.actor }}
+    steps:
+      - name: Set the variable
+        run: |
+          if [ -z "$ADMIN_TOKEN" ]; then
+            echo "AUTOMATION_ADMIN_TOKEN isn't set; set the AUTOMATION_PAUSED variable by hand (see docs/backlog-runner.md > Pausing automation)" >&2
+            exit 1
+          fi
+          if [ "$ACTION" = pause ]; then
+            GH_TOKEN="$ADMIN_TOKEN" gh variable set AUTOMATION_PAUSED --body true
+          else
+            GH_TOKEN="$ADMIN_TOKEN" gh variable delete AUTOMATION_PAUSED
+          fi
+
+      - name: Log it on the automation-log issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create automation-log --color 6E7781 --description "Standing log of automation pauses and resumes" 2>/dev/null || true
+          N=$(gh api "repos/$GH_REPO/issues?labels=automation-log&state=open&per_page=1" --jq '.[0].number // empty')
+          if [ -z "$N" ]; then
+            N=$(gh api -X POST "repos/$GH_REPO/issues" -f title="Automation log" -f "labels[]=automation-log" \
+              -f body="Standing log of every pause and resume of the automation (#682). Do not close." --jq .number)
+          fi
+          # Cloud sessions can't read the variable (#700), so the label is their pause signal. It is set
+          # here with github.token so github-actions[bot] is the actor; scripts/automation-paused.mjs
+          # reads it from the issue timeline and treats a change by anyone else as paused.
+          gh label create automation:paused --color B60205 --description "Automation is paused; set only by the Pause automation workflow" 2>/dev/null || true
+          if [ "$ACTION" = pause ]; then
+            gh api -X POST "repos/$GH_REPO/issues/$N/labels" -f "labels[]=automation:paused"
+          else
+            gh api -X DELETE "repos/$GH_REPO/issues/$N/labels/automation:paused" || true
+          fi
+          VERB=Paused; [ "$ACTION" = resume ] && VERB=Resumed
+          printf '%s by @%s at %s.\n\nReason: %s\n' "$VERB" "$ACTOR" "$(date -u +%Y-%m-%dT%H:%MZ)" "$REASON" > "$RUNNER_TEMP/log.md"
+          gh api -X POST "repos/$GH_REPO/issues/$N/comments" -F body=@"$RUNNER_TEMP/log.md"

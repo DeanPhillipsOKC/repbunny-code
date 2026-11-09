@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>New Exercise Chip</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --success: #a9cb8d; --highlight: #f2c069;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: Manrope, sans-serif; }
+  .page { display: flex; gap: 28px; padding: 28px; align-items: flex-start; }
+  .col { width: 360px; }
+  .col-title { font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; margin: 0 0 2px; }
+  .col-note { color: var(--text-dim); font-size: 0.82rem; margin: 0 0 14px; line-height: 1.45; min-height: 48px; }
+  .phone { background: var(--bg); border: 1px solid var(--border); border-radius: 26px; padding: 18px 14px; display: flex; flex-direction: column; gap: 14px; }
+  .eyebrow { margin: 0; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--success); }
+  .title { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.7rem; line-height: 1.1; }
+  .meta { margin: 0; font-size: 0.88rem; color: var(--text-dim); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 16px; }
+  .section-label { margin: 0 0 10px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+  ul { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  li { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .name { font-weight: 600; }
+  .right { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; }
+  .detail { font-size: 0.875rem; color: var(--text-dim); }
+  .chip { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 58px; padding: 2px 9px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+  .chip-up { background: rgba(169, 203, 141, 0.16); color: var(--success); }
+  .chip-neutral { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+  .chip-new { background: rgba(242, 192, 105, 0.14); color: var(--highlight); }
+  .chip-text { min-width: 0; padding: 0; background: none; color: var(--highlight); font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; }
+  .chip-new svg, .chip-text svg { width: 12px; height: 12px; flex-shrink: 0; }
+  .celebrate { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 20px; background: linear-gradient(135deg, rgba(242,135,156,0.22), rgba(242,192,105,0.18)); border: 1px solid rgba(242,192,105,0.35); }
+  .celebrate img { width: 52px; height: 52px; object-fit: contain; }
+  .celebrate b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 1.1rem; }
+  .celebrate span { font-size: 0.82rem; color: var(--text-dim); }
+  .tag { display: inline-block; margin-bottom: 8px; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .tag-now { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+  .tag-new { background: rgba(242,192,105,0.16); color: var(--highlight); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="col">
+    <span class="tag tag-new">Option A: approved 2026-09-28</span>
+    <h2 class="col-title">Soft fill, no border</h2>
+    <p class="col-note">Same shape as the green "+10 lb" chip, just gold. Reads as a status, like the other results.</p>
+    <div class="phone" id="a"></div>
+  </div>
+  <div class="col">
+    <span class="tag tag-now">Option B: not chosen</span>
+    <h2 class="col-title">Just text</h2>
+    <p class="col-note">No pill at all: a small gold sparkle and NEW. The quietest; clearly not a button.</p>
+    <div class="phone" id="b"></div>
+  </div>
+</div>
+
+<script>
+  const sparkle = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1 L14.4 9.6 L23 12 L14.4 14.4 L12 23 L9.6 14.4 L1 12 L9.6 9.6 Z"/></svg>'
+  const header = (title, meta) =>
+    `<div><p class="eyebrow">Workout saved</p><h3 class="title">${title}</h3><p class="meta">${meta}</p></div>`
+  const card = (label, rows) =>
+    `<section class="card"><h4 class="section-label">${label}</h4><ul>${rows
+      .map(([n, d, c]) => `<li><span class="name">${n}</span><span class="right"><span class="detail">${d}</span>${c}</span></li>`)
+      .join('')}</ul></section>`
+  const up = (t) => `<span class="chip chip-up">${t}</span>`
+  const same = `<span class="chip chip-neutral">Same</span>`
+  const first = `<span class="chip chip-neutral">First time</span>`
+  const fresh = `<span class="chip chip-new">${sparkle}New</span>`
+
+  const rows = (newChip) => [
+    ['Bench Press', '8 × 155 lb', up('+10 lb')],
+    ['Cable Fly', '12 × 30 lb', newChip],
+    ['Tricep Pushdown', '12 × 50 lb', same],
+  ]
+  const text = `<span class="chip chip-text">${sparkle}New</span>`
+  for (const [id, chip] of [['a', fresh], ['b', text]]) {
+    document.getElementById(id).innerHTML =
+      header('Freeform workout, done.', 'Mon, Sep 28 · 41 min · 3 exercises') + card('Vs last time', rows(chip)) +
+      header('Leg Day, done.', 'First run of a template') +
+      card('All new today', [
+        ['Back Squat', '5 × 185 lb', chip],
+        ['Leg Press', '10 × 270 lb', chip],
+        ['Romanian Deadlift', '8 × 135 lb', chip],
+      ])
+  }
+</script>
+</body>
+</html>

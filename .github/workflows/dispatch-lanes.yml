@@ -1,0 +1,140 @@
+# Starts a backlog lane routine only when its lane has work (#250), so an empty backlog costs no
+# routine runs. scripts/dispatch-lanes.mjs claims each idle lane's top issue and fires that lane's
+# routine through its API trigger. No AI runs here. It runs when an issue closes (a run shipped, so
+# its lane is free for the next issue) or has `status:needs-review`, `status:blocked`, or
+# `interaction-required` removed (it may have just become eligible), plus every 2 hours, which
+# also catches misses and picks up issues opened since the last close (#259, #542). An opened issue
+# no longer triggers a run: at about 31 issues a day that was the biggest Actions minutes cost
+# (owner decision 2026-10-15). GitHub delays or skips scheduled runs when busy, so the schedule
+# alone isn't dependable. The job-level `if:` skips every other event, and a skipped job uses no
+# runner and no Actions minutes. See docs/backlog-runner.md > Backlog lanes.
+#
+# The owner's emails are one digest (#542), sent by the scheduled run after it dispatches: every
+# issue opened, and every issue closed as completed with its close-out comment, since the previous
+# successful scheduled run (scripts/issue-digest.py). Not planned or duplicate closes are left out.
+# It sends through Gmail SMTP with the repo secrets MAIL_USERNAME (the Gmail address, also the
+# recipient) and MAIL_PASSWORD (an app password), and does nothing without them. To test it, run
+# this workflow by hand from the Actions tab, optionally with `since_hours`.
+name: Dispatch backlog lanes
+
+on:
+  issues:
+    types: [closed, unlabeled]
+  schedule:
+    - cron: '7 */2 * * *'
+  workflow_dispatch:
+    inputs:
+      since_hours:
+        description: Also email a digest of the issues opened or shipped in the last N hours (to test it)
+        required: false
+
+# issues: write is required: dispatch-lanes.mjs labels each issue `status:dispatched` before it fires
+# the lane. With read only, every dispatch fails with a 403 and no lane starts. actions: read lets
+# the digest step list earlier runs of this workflow, and the Actions minutes guard list this
+# month's runs (the repo is private, so without it those calls get a 403). pull-requests: read lets
+# next-issue.mjs list open PRs (#944) to skip issues that already have one; without it the pulls
+# call gets a 403 and no lane starts.
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: read
+
+# One run at a time. The dispatch script marks an issue before firing, so queued runs only risk a
+# duplicate fire in a window of a second or so. GitHub keeps one pending run per group, so a
+# scheduled run waiting behind a running one is replaced when an issue closes; its items then land
+# in the next digest, whose window starts at the last successful scheduled run.
+concurrency:
+  group: dispatch-lanes
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    # An issue event counts only in the backlog repo (#944, #945): in the public code repo anyone can
+    # open and close their own issue, and that must not start a run.
+    if: >-
+      github.event_name != 'issues'
+      || (github.repository == (vars.BACKLOG_REPO || 'DeanPhillipsOKC/repbunny')
+          && (github.event.action != 'unlabeled'
+              || github.event.label.name == 'status:needs-review'
+              || github.event.label.name == 'status:blocked'
+              || github.event.label.name == 'interaction-required'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      # scripts/run-budget.mjs imports the published actions-minutes-estimator (#949). Only that
+      # package is installed (the version pinned in package.json), into a folder outside the project
+      # so npm doesn't resolve the app's whole tree, and no install scripts run.
+      - name: Install the minutes estimator
+        run: |
+          version="$(node -p "require('./package.json').devDependencies['actions-minutes-estimator']")"
+          npm install --prefix "$RUNNER_TEMP/ame" --ignore-scripts --no-audit --no-fund "actions-minutes-estimator@$version"
+          ln -s "$RUNNER_TEMP/ame/node_modules" node_modules
+
+      # The minutes guard's ledger of finished days (#904, scripts/run-budget.mjs > minutesThisMonth):
+      # restored from the newest saved copy, so a run reads only yesterday's and today's runs.
+      - name: Restore the minutes ledger
+        uses: actions/cache/restore@v6
+        with:
+          path: minutes-ledger.json
+          key: minutes-ledger-${{ github.run_id }}
+          restore-keys: minutes-ledger-
+
+      # A lane whose token secret isn't set is skipped: that's its off switch.
+      - name: Dispatch
+        run: node scripts/dispatch-lanes.mjs
+        env:
+          MINUTES_LEDGER: minutes-ledger.json
+          GH_TOKEN: ${{ github.token }}
+          AUTOMATION_PAUSED: ${{ vars.AUTOMATION_PAUSED }}
+          LANE_RUNS_PER_DAY: ${{ vars.LANE_RUNS_PER_DAY }}
+          ACTIONS_MINUTES_PER_MONTH: ${{ vars.ACTIONS_MINUTES_PER_MONTH }}
+          ROUTINE_TOKEN_UX_OPUS: ${{ secrets.ROUTINE_TOKEN_UX_OPUS }}
+          ROUTINE_TOKEN_FEATURES_SONNET: ${{ secrets.ROUTINE_TOKEN_FEATURES_SONNET }}
+          ROUTINE_TOKEN_FEATURES_OPUS: ${{ secrets.ROUTINE_TOKEN_FEATURES_OPUS }}
+          ROUTINE_TOKEN_BUGS_SONNET: ${{ secrets.ROUTINE_TOKEN_BUGS_SONNET }}
+          ROUTINE_TOKEN_BUGS_OPUS: ${{ secrets.ROUTINE_TOKEN_BUGS_OPUS }}
+          ROUTINE_TOKEN_TECH_SONNET: ${{ secrets.ROUTINE_TOKEN_TECH_SONNET }}
+          ROUTINE_TOKEN_TECH_OPUS: ${{ secrets.ROUTINE_TOKEN_TECH_OPUS }}
+
+      # Saved under a key made from its contents, so an unchanged ledger saves nothing new (GitHub
+      # reports the existing key as a warning, not a failure).
+      - name: Save the minutes ledger
+        if: always() && hashFiles('minutes-ledger.json') != ''
+        uses: actions/cache/save@v6
+        with:
+          path: minutes-ledger.json
+          key: minutes-ledger-${{ hashFiles('minutes-ledger.json') }}
+
+      # The digest still runs when Dispatch fails (a failed fire shouldn't cost the owner the
+      # email); the job still ends red then. Each digest covers the window from the previous
+      # scheduled run's start (one that ended green or red, since a failed dispatch still sends its digest;
+      # cancelled and skipped runs don't count) to this run's start, so windows meet with no gap and no
+      # overlap; if that lookup fails or finds nothing, it falls back to the last 3 hours. An issue
+      # whose close-out comment lands after its digest shows the link only.
+      - name: Issue digest email
+        if: always() && (github.event_name == 'schedule' || inputs.since_hours != '')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          SINCE_HOURS: ${{ inputs.since_hours }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+        run: |
+          UNTIL=$(gh api "repos/$REPO/actions/runs/$GITHUB_RUN_ID" --jq .created_at || true)
+          [ -n "$UNTIL" ] || UNTIL=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          SINCE=
+          if [ "$EVENT" = schedule ]; then
+            SINCE=$(gh api "repos/$REPO/actions/workflows/dispatch-lanes.yml/runs?event=schedule&status=completed&per_page=10" \
+              --jq '[.workflow_runs[] | select(.conclusion == "success" or .conclusion == "failure")][0].created_at // empty' || true)
+          fi
+          [ -n "$SINCE" ] || SINCE=$(date -u -d "${SINCE_HOURS:-3} hours ago" +%Y-%m-%dT%H:%M:%SZ)
+          export SINCE UNTIL
+          python3 scripts/issue-digest.py

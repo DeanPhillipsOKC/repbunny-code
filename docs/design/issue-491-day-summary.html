@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Calendar Day Summary</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1240px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; }
+  .opt-title { font-family: 'Baloo 2', sans-serif; color: var(--accent); font-size: 1.2rem; margin: 0 0 2px 4px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 40px; }
+  .phone { position: relative; width: 377px; height: 720px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 20px 16px 0; }
+  .back-link { color: var(--text-dim); font-size: 0.86rem; font-weight: 700; display: block; margin-bottom: 6px; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 2px; line-height: 1.1; }
+  .lede { color: var(--text-dim); font-size: 0.82rem; margin: 0 0 14px; }
+  .cal-card { height: 170px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 12px;
+    background-image: repeating-linear-gradient(90deg, transparent 0 14px, var(--bg) 14px 17px), repeating-linear-gradient(0deg, transparent 0 14px, var(--bg) 14px 17px);
+    background-color: color-mix(in srgb, var(--accent) 30%, var(--surface)); opacity: 0.55; }
+
+  .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: flex-end; }
+  .sheet { width: 100%; background: var(--bg); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 10px 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .handle { align-self: center; width: 36px; height: 4px; border-radius: 2px; background: var(--border); }
+  .title { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; line-height: 1.15; }
+  .sub { margin: -8px 0 2px; font-size: 0.84rem; color: var(--text-dim); }
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .tile { padding: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; min-width: 0; }
+  .tile-label { font-size: 0.64rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); }
+  .tile-value { font-family: 'Baloo 2', sans-serif; font-size: 1.25rem; line-height: 1.1; white-space: nowrap; }
+  .tile-value small { font-family: Manrope, sans-serif; font-size: 0.7rem; font-weight: 700; color: var(--text-dim); }
+  .tile.none .tile-value { color: var(--text-dim); }
+  .sec { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); margin: 2px 0 -4px; }
+  .records { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .records li { display: flex; align-items: center; gap: 10px; font-size: 0.86rem; }
+  .star { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--highlight) 20%, var(--surface)); color: var(--highlight); }
+  .rname { font-weight: 800; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .rset { color: var(--text-dim); font-weight: 700; white-space: nowrap; }
+  .picks { display: flex; flex-direction: column; gap: 8px; }
+  .pick { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); }
+  .pick-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .pick-name { font-weight: 800; color: var(--text); overflow-wrap: anywhere; }
+  .pick-meta { margin-top: 2px; font-size: 0.78rem; font-weight: 600; }
+  .pick .open { font-size: 0.78rem; font-weight: 800; color: var(--accent); white-space: nowrap; }
+  .close { padding: 12px; text-align: center; font-weight: 800; border-radius: 14px; border: 1px solid var(--border); }
+  .empty { text-align: center; padding: 8px 0 4px; }
+  .empty .big { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; }
+  .empty p { margin: 4px 0 0; color: var(--text-dim); font-size: 0.86rem; line-height: 1.45; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .card .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .card .meta { font-size: 0.78rem; color: var(--text-dim); font-weight: 600; }
+  .card .rec { font-size: 0.8rem; color: var(--highlight); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>Issue #491: a day summary on the Training calendar</h1>
+  <p class="note">Tapping any past day opens a sheet. A training day shows <b>sets, volume, and time</b> for the day, the <b>records</b> hit, and each workout as a link to <b>that</b> workout in the Workout log. A rest day (or a long gap) gets a short empty state instead. The heat map and legend stay as they are. Time only shows once a workout has a finish time; older ones show a dash.</p>
+</div>
+<div class="page">
+  <div class="col">
+    <div class="opt-title">Option A: day totals first</div>
+    <div class="cap">One workout, two records (lb)</div>
+    <div class="capnote">Three tiles for the day, then records, then the workout to open.</div>
+    <div class="phone">
+      <span class="back-link">‹ Progress</span><h2>Training calendar</h2><p class="lede">The last 12 months. Tap a day to see it.</p>
+      <div class="cal-card"></div>
+      <div class="overlay"><div class="sheet">
+        <div class="handle"></div>
+        <h3 class="title">Tue, Oct 7</h3>
+        <p class="sub">1 workout</p>
+        <div class="tiles">
+          <div class="tile"><div class="tile-label">Sets</div><div class="tile-value">21</div></div>
+          <div class="tile"><div class="tile-label">Volume</div><div class="tile-value">18,450 <small>lb</small></div></div>
+          <div class="tile"><div class="tile-label">Time</div><div class="tile-value">1 h 5 <small>min</small></div></div>
+        </div>
+        <div class="sec">Records</div>
+        <ul class="records">
+          <li><span class="star">★</span><span class="rname">Barbell Back Squat (High Bar)</span><span class="rset">225 lb × 5</span></li>
+          <li><span class="star">★</span><span class="rname">Romanian Deadlift</span><span class="rset">185 lb × 8</span></li>
+        </ul>
+        <div class="sec">Workouts</div>
+        <div class="picks">
+          <div class="pick"><span class="pick-body"><span class="pick-name">Lower Body Strength Day A</span><span class="pick-meta">8:02 AM · 21 sets</span></span><span class="open">Open ›</span></div>
+        </div>
+        <div class="close">Close</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="opt-title">Option A: two workouts (kg)</div>
+    <div class="cap">Totals add up both; no records</div>
+    <div class="capnote">Each workout opens itself, never the newest one (#179).</div>
+    <div class="phone">
+      <span class="back-link">‹ Progress</span><h2>Training calendar</h2><p class="lede">The last 12 months. Tap a day to see it.</p>
+      <div class="cal-card"></div>
+      <div class="overlay"><div class="sheet">
+        <div class="handle"></div>
+        <h3 class="title">Sat, Oct 11</h3>
+        <p class="sub">2 workouts</p>
+        <div class="tiles">
+          <div class="tile"><div class="tile-label">Sets</div><div class="tile-value">27</div></div>
+          <div class="tile"><div class="tile-label">Volume</div><div class="tile-value">9,120 <small>kg</small></div></div>
+          <div class="tile none"><div class="tile-label">Time</div><div class="tile-value">–</div></div>
+        </div>
+        <div class="sec">Workouts</div>
+        <div class="picks">
+          <div class="pick"><span class="pick-body"><span class="pick-name">Push</span><span class="pick-meta">8:00 AM · 21 sets</span></span><span class="open">Open ›</span></div>
+          <div class="pick"><span class="pick-body"><span class="pick-name">Freeform workout</span><span class="pick-meta">6:00 PM · 6 sets</span></span><span class="open">Open ›</span></div>
+        </div>
+        <div class="close">Close</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="opt-title">Rest day (both options)</div>
+    <div class="cap">Empty day or the holiday gap</div>
+    <div class="capnote">No link to follow, just a calm note and Close.</div>
+    <div class="phone">
+      <span class="back-link">‹ Progress</span><h2>Training calendar</h2><p class="lede">The last 12 months. Tap a day to see it.</p>
+      <div class="cal-card"></div>
+      <div class="overlay"><div class="sheet">
+        <div class="handle"></div>
+        <h3 class="title">Thu, Dec 25</h3>
+        <div class="empty"><div class="big">Rest day</div><p>Nothing logged this day. Rest is part of the plan.</p></div>
+        <div class="close">Close</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="opt-title">Option B: one card per workout</div>
+    <div class="cap">Same day as A's first frame</div>
+    <div class="capnote">Each card carries its own numbers. Busier on a two-workout day, no day total.</div>
+    <div class="phone">
+      <span class="back-link">‹ Progress</span><h2>Training calendar</h2><p class="lede">The last 12 months. Tap a day to see it.</p>
+      <div class="cal-card"></div>
+      <div class="overlay"><div class="sheet">
+        <div class="handle"></div>
+        <h3 class="title">Tue, Oct 7</h3>
+        <div class="card">
+          <div class="row"><span class="pick-name">Lower Body Strength Day A</span><span class="open" style="color:var(--accent);font-weight:800;font-size:.78rem">Open ›</span></div>
+          <div class="meta">8:02 AM · 1 h 5 min · 21 sets · 18,450 lb</div>
+          <div class="rec">★ Barbell Back Squat (High Bar) 225 lb × 5</div>
+          <div class="rec">★ Romanian Deadlift 185 lb × 8</div>
+        </div>
+        <div class="close">Close</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,96 @@
+# Full e2e run on a hosted runner (#677). Gates every store release: cut-release.yml calls it on
+# the exact commit about to be tagged. Run it by hand from the GitHub app (Actions > E2E > Run
+# workflow) for any ref. Every spec runs the app on its own empty on-device database, so it
+# needs no accounts or secrets and can run beside any other run (#940). See
+# docs/architecture/commit-policy.md > Release gate.
+name: E2E
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: The ref (branch, tag, or SHA) to test
+        type: string
+        default: main
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: The ref (branch, tag, or SHA) to test
+        type: string
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: e2e (${{ matrix.part }} of 2)
+    runs-on: ubuntu-latest
+    # #933: the run is split across two jobs that run at the same time, which roughly halves its
+    # wall clock for about one extra minute of setup per run. Each job runs half of the `local`
+    # project (the browser specs, nearly all of the run's time); the first also runs the
+    # browserless `unit` specs and the small `personal` and `build` projects. Playwright's own
+    # `--shard` splits by test count across all projects, which would put the 500-odd fast unit
+    # specs in one job and leave the other with nearly all the browser time.
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [1, 2]
+    timeout-minutes: 45
+    env:
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci --ignore-scripts
+
+      - name: Cache the Playwright browser
+        id: pw-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install the Playwright browser
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install the browser's system libraries
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # One worker per core on the hosted runner (#933): the specs are CPU-bound, and nproc
+      # follows whatever size GitHub gives ubuntu-latest.
+      - name: Pick the worker count
+        run: echo "PW_WORKERS=$(nproc)" >> "$GITHUB_ENV"
+
+      # Playwright's own retries (2 under CI, playwright.config.ts) are the only retry; a spec
+      # that still fails is real or gets a `Flaky:` issue, never a workflow-level re-run.
+      - name: Run half of the browser specs
+        run: npx playwright test --project=local --shard=${{ matrix.part }}/2
+
+      - name: Run the unit, personal, and build specs
+        if: matrix.part == 1 && (success() || failure())
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report-other
+        run: npx playwright test --project=unit --project=personal --project=build --output=test-results-other
+
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-${{ matrix.part }}
+          path: |
+            playwright-report/
+            playwright-report-other/
+            test-results/
+            test-results-other/
+          retention-days: 7
+          if-no-files-found: ignore

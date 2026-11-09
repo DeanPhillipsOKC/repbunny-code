@@ -1,0 +1,89 @@
+<!doctype html>
+<!--
+  Outro card for the narrated guide clips (#424). One template for every clip:
+  it takes only its two lines of words (?a=Ready for&b=Push day) and the clip's
+  last frame (?bg=...), which it fades in over. Rendered frame by frame by
+  cards.mjs, like intro.html. The TikTok handle is the one constant below.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: 'Baloo 2'; font-weight: 600 800; src: url(/site/fonts/baloo2-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 400 800; src: url(/site/fonts/manrope-latin.woff2) format('woff2'); }
+  :root { --bg: #17111c; --surface: #211829; --accent: #f2879c; --accent-text: #17111c; --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --text: #f5edf2; --text-soft: #cdbfca; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 480px; height: 1040px; overflow: hidden; background: #000; }
+  #bg { position: absolute; inset: 0; width: 480px; height: 1040px; object-fit: cover; }
+  .card {
+    position: absolute; inset: 0; overflow: hidden; background: var(--bg);
+    font-family: 'Baloo 2', sans-serif; color: var(--text); text-align: center;
+    animation: fade-in .3s ease-out both;
+  }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  .glow { position: absolute; left: 50%; top: 250px; width: 420px; height: 420px; margin-left: -210px; border-radius: 50%; background: radial-gradient(circle, rgba(183, 156, 240, .35), rgba(242, 135, 156, .12) 55%, transparent 70%); }
+
+  .bunny { position: absolute; left: 50%; top: 190px; width: 290px; margin-left: -145px; animation: drop .5s cubic-bezier(.5, 0, .9, .5) .15s both; }
+  .bunny .sq { transform-origin: 50% 100%; animation: bounce .7s ease-out .65s both; }
+  .bunny img { display: block; width: 100%; filter: drop-shadow(0 14px 24px rgba(0, 0, 0, .5)); }
+  @keyframes drop { from { transform: translateY(-900px); } to { transform: translateY(0); } }
+  @keyframes bounce { 0% { transform: scale(1.16, .82); } 30% { transform: scale(.94, 1.08) translateY(-26px); } 60% { transform: scale(1.04, .96); } 100% { transform: scale(1, 1); } }
+
+  .title { position: absolute; top: 560px; left: 0; right: 0; line-height: 1; }
+  .l1 { display: block; font-size: 48px; font-weight: 700; animation: up .45s cubic-bezier(.2, .9, .3, 1.2) .6s both; }
+  .l2 {
+    display: block; font-size: 76px; font-weight: 800; padding: 0 16px;
+    background: linear-gradient(90deg, var(--accent), var(--secondary), var(--highlight), var(--accent));
+    background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: up .45s cubic-bezier(.2, .9, .3, 1.2) .8s both, shimmer 3s linear .8s both;
+  }
+  @keyframes up { from { transform: translateY(40px) scale(.7); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes shimmer { from { background-position: 0% 0; } to { background-position: 100% 0; } }
+
+  .follow { position: absolute; top: 760px; left: 0; right: 0; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 21px; color: var(--text-soft); animation: up .4s ease-out 1.4s both; }
+  .pill { display: inline-block; margin-top: 12px; padding: 8px 22px; border-radius: 999px; background: var(--highlight); color: var(--accent-text); font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; animation: pop .4s cubic-bezier(.3, 1.6, .5, 1) 1.6s both; }
+  @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+  .name { position: absolute; bottom: 64px; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 30px; font-weight: 800; animation: up .4s ease-out 1.9s both; }
+  .name img { width: 42px; height: 42px; border-radius: 11px; }
+
+  .bit { position: absolute; top: -30px; width: 12px; height: 20px; border-radius: 3px; animation: fall 2.6s linear both; }
+  @keyframes fall { from { transform: translateY(0) rotate(0); } to { transform: translateY(1120px) rotate(var(--spin)); } }
+</style>
+</head>
+<body>
+  <img id="bg" alt="" />
+  <div class="card">
+    <div class="glow"></div>
+    <div id="confetti"></div>
+    <div class="bunny"><div class="sq"><img src="/site/img/bunny-thumbs.webp" alt="" /></div></div>
+    <h1 class="title"><span class="l1" id="a"></span><span class="l2" id="b"></span></h1>
+    <p class="follow">Follow along on TikTok<br /><span class="pill" id="handle"></span></p>
+    <div class="name"><img src="/site/img/icon.png" alt="" />RepBunny</div>
+  </div>
+  <script>
+    const TIKTOK_HANDLE = '@repbunny.app'
+    const q = new URLSearchParams(location.search)
+    document.getElementById('a').textContent = q.get('a') ?? ''
+    document.getElementById('b').textContent = q.get('b') ?? ''
+    document.getElementById('handle').textContent = TIKTOK_HANDLE
+    // ?follow=0 drops the TikTok line, for videos that live on other sites (the Play promo, #816).
+    if (q.get('follow') === '0') document.querySelector('.follow').remove()
+    if (q.get('bg')) document.getElementById('bg').src = q.get('bg')
+    // Confetti from a fixed seed, so every render is the same.
+    let seed = 7
+    const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
+    const colors = ['#f2879c', '#b79cf0', '#f2c069', '#a9cb8d', '#f5edf2']
+    const box = document.getElementById('confetti')
+    for (let i = 0; i < 46; i++) {
+      const bit = document.createElement('i')
+      bit.className = 'bit'
+      bit.style.cssText = `left:${(rand() * 470).toFixed(0)}px;background:${colors[i % colors.length]};` +
+        `animation-delay:${(0.35 + rand() * 1.3).toFixed(2)}s;animation-duration:${(1.8 + rand() * 1.4).toFixed(2)}s;` +
+        `--spin:${(rand() * 900 - 450).toFixed(0)}deg`
+      box.appendChild(bit)
+    }
+    window.CARD = { duration: 3.8, sounds: [['chime', 0.3]] }
+  </script>
+</body>
+</html>

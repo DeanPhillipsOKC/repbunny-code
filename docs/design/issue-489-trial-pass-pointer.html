@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Trial Pass Pointer</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .page { display: flex; gap: 26px; padding: 26px; align-items: flex-start; }
+  .col { width: 375px; }
+  .tag { display: inline-block; margin-bottom: 8px; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(242,192,105,0.16); color: var(--highlight); }
+  .col-title { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; margin: 0 0 2px; }
+  .col-note { color: var(--text-dim); font-size: 0.8rem; margin: 0 0 12px; line-height: 1.45; min-height: 58px; }
+  .phone { position: relative; height: 640px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 18px 16px; }
+  .back { color: var(--accent); font-weight: 700; font-size: 0.9rem; }
+  .title { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 4px 0 2px; }
+  .lede { color: var(--text-dim); font-size: 0.84rem; margin: 0 0 16px; }
+  .trial-card { display: flex; flex-direction: column; gap: 8px; padding: 14px; background: color-mix(in srgb, var(--secondary) 8%, var(--surface)); border: 1px solid color-mix(in srgb, var(--secondary) 35%, var(--border)); border-radius: 16px; margin-bottom: 12px; }
+  .trial-card h3 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; }
+  .line { margin: 0; font-size: 0.88rem; }
+  .dim { color: var(--text-dim); font-size: 0.8rem; }
+  .note { display: flex; justify-content: space-between; align-items: center; padding: 7px 12px; border-radius: 12px; background: color-mix(in srgb, var(--secondary) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--secondary) 35%, var(--border)); font-size: 0.8rem; }
+  .note b { font-weight: 700; } .note u { color: var(--secondary); font-weight: 800; }
+  .use-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .primary { min-height: 44px; padding: 0 16px; border-radius: 12px; background: var(--accent); border: 1px solid var(--accent); color: var(--accent-text); font: inherit; font-weight: 800; font-size: 0.95rem; display: inline-flex; align-items: center; }
+  .primary.wide { width: 100%; justify-content: center; min-height: 48px; }
+  .link { color: var(--secondary); font-weight: 800; font-size: 0.85rem; text-decoration: underline; text-underline-offset: 2px; }
+  .track { padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; }
+  .track h3 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; display: flex; justify-content: space-between; }
+  .track h3 span { font-family: Manrope; color: var(--accent); font-size: 0.95rem; }
+  .bar { height: 8px; border-radius: 99px; background: var(--border); margin-top: 8px; } .bar i { display: block; height: 100%; width: 40%; background: var(--accent); border-radius: 99px; }
+  .scrim { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: flex-end; }
+  .sheet { width: 100%; background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 10px 18px 22px; display: flex; flex-direction: column; gap: 12px; }
+  .handle { align-self: center; width: 36px; height: 4px; border-radius: 2px; background: var(--border); }
+  .eyebrow { align-self: flex-start; padding: 2px 9px; border-radius: 99px; background: color-mix(in srgb, var(--secondary) 16%, transparent); color: var(--secondary); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+  .sheet h3 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; line-height: 1.15; }
+  .sub { margin: 0; font-size: 0.86rem; line-height: 1.45; color: var(--text-dim); }
+  .ghost { width: 100%; min-height: 44px; border-radius: 12px; background: transparent; border: 1px solid var(--border); color: var(--text-dim); font: inherit; font-weight: 700; }
+  .center { text-align: center; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="col">
+    <span class="tag">1 · Right after the pick</span>
+    <h2 class="col-title">The sheet confirms, then points the way</h2>
+    <p class="col-note">Instead of closing on tap, the trial sheet says what's on and where it lives: one button straight to it (Theme screen here) and a link to the guide. Works the same from the finish recap.</p>
+    <div class="phone">
+      <span class="back">‹ Progress</span>
+      <h1 class="title">Milestones</h1>
+      <p class="lede">Training unlocks them. Nothing to keep up, and nothing to lose.</p>
+      <div class="track"><h3>Workouts <span>12</span></h3><div class="bar"><i></i></div></div>
+      <div class="scrim">
+        <div class="sheet">
+          <div class="handle"></div>
+          <span class="eyebrow">Trial pass</span>
+          <h3>Themes is on</h3>
+          <p class="sub">Free for 7 days, exactly like Premium. Pick a look on the Theme screen in Preferences.</p>
+          <span class="primary wide">Pick a theme</span>
+          <p class="center" style="margin:0"><span class="link">How themes work</span></p>
+          <span class="ghost" style="display:flex;align-items:center;justify-content:center">Done</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <span class="tag">2 · Coming back later</span>
+    <h2 class="col-title">The Milestones card keeps the route</h2>
+    <p class="col-note">While the trial runs, the card says where the feature is and keeps the same button and guide link under the days-left note.</p>
+    <div class="phone">
+      <span class="back">‹ Progress</span>
+      <h1 class="title">Milestones</h1>
+      <p class="lede">Training unlocks them. Nothing to keep up, and nothing to lose.</p>
+      <div class="trial-card">
+        <h3>Premium trial</h3>
+        <p class="line">Themes is on. Pick a look on the Theme screen in Preferences.</p>
+        <div class="note"><b>Trial: 7 days left</b><u>Keep it with Premium</u></div>
+        <div class="use-row"><span class="primary">Pick a theme</span><span class="link">How themes work</span></div>
+        <p class="line dim">Another pass waits until this one ends.</p>
+      </div>
+      <div class="track"><h3>Workouts <span>12</span></h3><div class="bar"><i></i></div></div>
+    </div>
+  </div>
+  <div class="col">
+    <span class="tag">3 · A feature with no screen</span>
+    <h2 class="col-title">Mid-workout features get a pointer</h2>
+    <p class="col-note">Plate calculator, Swap suggestions, and Next-set targets live inside a workout, so there's no button: the line says where to find it, and the guide link shows how.</p>
+    <div class="phone">
+      <span class="back">‹ Progress</span>
+      <h1 class="title">Milestones</h1>
+      <p class="lede">Training unlocks them. Nothing to keep up, and nothing to lose.</p>
+      <div class="trial-card">
+        <h3>Premium trial</h3>
+        <p class="line">Plate calculator is on. During a workout, tap the plate button on a barbell exercise.</p>
+        <div class="note"><b>Trial: 3 days left</b><u>Keep it with Premium</u></div>
+        <div class="use-row"><span class="link">How the plate calculator works</span></div>
+      </div>
+      <div class="track"><h3>Workouts <span>12</span></h3><div class="bar"><i></i></div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

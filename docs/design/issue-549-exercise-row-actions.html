@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Exercise Row Actions</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --danger: #e0687a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1220px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 390px; display: flex; flex-direction: column; gap: 10px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 0 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 6px 4px; line-height: 1.45; min-height: 58px; }
+  .capnote b { color: var(--text); }
+  .phone { width: 390px; height: 700px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 20px 16px 0; position: relative; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 12px; }
+  .seg { display: flex; padding: 3px; margin-bottom: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .seg span { flex: 1; height: 38px; display: grid; place-items: center; font-size: 0.85rem; font-weight: 700; color: var(--text-dim); border-radius: 9px; }
+  .seg span.on { background: var(--surface-2); color: var(--text); box-shadow: 0 0 0 1px var(--border); }
+  .new { height: 44px; border-radius: 12px; background: var(--accent); color: var(--accent-text); font-weight: 700; display: grid; place-items: center; margin-bottom: 14px; font-size: 0.95rem; }
+  .list { display: flex; flex-direction: column; gap: 8px; }
+  .rw { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .row { display: flex; align-items: center; gap: 4px; padding: 4px 4px 4px 0; }
+  .main { flex: 1; min-width: 0; display: flex; gap: 12px; align-items: flex-start; padding: 8px 0 8px 14px; }
+  .badge { width: 40px; height: 40px; border-radius: 11px; flex-shrink: 0; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); display: grid; place-items: center; font-weight: 800; }
+  .t { font-weight: 600; font-size: 1rem; line-height: 1.35; }
+  .s { font-size: 0.8rem; color: var(--text-dim); }
+  .pill { display: inline-block; margin-top: 6px; padding: 3px 9px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+  .more { width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px; display: grid; place-items: center; color: var(--text-dim); }
+  .more.open { background: var(--surface-2); color: var(--text); }
+  .strip { display: flex; gap: 8px; padding: 0 14px 12px; }
+  .strip span { flex: 1; height: 44px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 0.88rem; color: var(--text); }
+  .strip span.del { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); }
+  .chev { width: 44px; flex-shrink: 0; display: grid; place-items: center; color: var(--text-dim); font-size: 1.3rem; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--border); border-radius: 22px 22px 0 0; padding: 18px 16px 24px; }
+  .sheet h3 { font-family: 'Baloo 2', sans-serif; margin: 0 0 4px; font-size: 1.35rem; }
+  .sheet .acts { display: flex; gap: 8px; margin: 12px 0; }
+  .sheet .acts span { flex: 1; height: 44px; border-radius: 12px; border: 1px solid var(--border); display: grid; place-items: center; font-weight: 700; font-size: 0.88rem; }
+  .sheet .acts .del { color: var(--danger); }
+  .stub { height: 120px; border-radius: 12px; border: 1px dashed var(--border); color: var(--text-dim); font-size: 0.74rem; display: grid; place-items: center; }
+  .dim { position: absolute; inset: 0; background: rgba(0,0,0,.45); }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#549: Exercise rows, one trailing control</h1>
+  <p class="note">Today each row carries three 36&nbsp;px icons (History, Edit, Delete), so "Barbell Bench Press" wraps. Both options make <b>the whole row open the exercise's history</b> and leave one 44&nbsp;px control at the end, so names fit on one line at 390&nbsp;px.</p>
+</div>
+<div class="page">
+  <div class="col">
+    <p class="cap">Option A: ⋯ opens an action strip (chosen)</p>
+    <p class="capnote">Tap the row for history. <b>⋯</b> drops a strip with <b>Edit</b> and <b>Delete</b> under that row, both 44&nbsp;px with words, not icons. Delete still asks first, inline, as today.</p>
+    <div class="phone">
+      <h2>Exercises</h2>
+      <div class="seg"><span class="on">My exercises</span><span>Library</span></div>
+      <div class="new">+ New exercise</div>
+      <div class="list">
+        <div class="rw"><div class="row"><div class="main"><span class="badge" style="--c:#f2879c">C</span><div><div class="t">Barbell Bench Press</div><div class="s">Chest · also works Arms, Shoulders</div><span class="pill">Rest: 120s</span></div></div><span class="more open">⋯</span></div>
+          <div class="strip"><span>✎ Edit</span><span class="del">🗑 Delete</span></div></div>
+        <div class="rw"><div class="row"><div class="main"><span class="badge" style="--c:#b79cf0">B</span><div><div class="t">Barbell Row</div><div class="s">Back · also works Arms</div></div></div><span class="more">⋯</span></div></div>
+        <div class="rw"><div class="row"><div class="main"><span class="badge" style="--c:#f2879c">C</span><div><div class="t">Incline Dumbbell Press</div><div class="s">Chest · also works Shoulders</div></div></div><span class="more">⋯</span></div></div>
+        <div class="rw"><div class="row"><div class="main"><span class="badge" style="--c:#a9cb8d">L</span><div><div class="t">Leg Press</div><div class="s">Legs</div></div></div><span class="more">⋯</span></div></div>
+        <div class="rw"><div class="row"><div class="main"><span class="badge" style="--c:#f2c069">?</span><div><div class="t">Plank</div><div class="s">Core</div></div></div><span class="more">⋯</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <p class="cap">Option B: Edit and Delete move into history</p>
+    <p class="capnote">Rows show only a chevron. Edit and Delete live at the top of the history sheet. Fewer controls, but deleting takes a sheet open and is harder to find.</p>
+    <div class="phone">
+      <h2>Exercises</h2>
+      <div class="seg"><span class="on">My exercises</span><span>Library</span></div>
+      <div class="new">+ New exercise</div>
+      <div class="list">
+        <div class="rw"><div class="row"><div class="main"><span class="badge" style="--c:#f2879c">C</span><div><div class="t">Barbell Bench Press</div><div class="s">Chest · also works Arms, Shoulders</div></div></div><span class="chev">›</span></div></div>
+        <div class="rw"><div class="row"><div class="main"><span class="badge" style="--c:#b79cf0">B</span><div><div class="t">Barbell Row</div><div class="s">Back · also works Arms</div></div></div><span class="chev">›</span></div></div>
+      </div>
+      <div class="dim"></div>
+      <div class="sheet"><h3>Barbell Bench Press</h3><div class="s">Chest · also works Arms, Shoulders</div>
+        <div class="acts"><span>✎ Edit</span><span class="del">🗑 Delete</span></div><div class="stub">history chart and sessions</div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

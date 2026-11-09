@@ -1,0 +1,313 @@
+<title>Starter Programs Premium</title>
+<style>@font-face { font-family: "Baloo 2"; font-weight: 500 800; src: url(../../public/fonts/baloo2-latin.woff2) format("woff2"); } @font-face { font-family: "Manrope"; font-weight: 400 800; src: url(../../public/fonts/manrope-latin.woff2) format("woff2"); }</style>
+<style>
+  /* Starter programs on the Routines tab: making the Premium programs and the
+     3-routine free limit clear before a tap (owner, 2026-11-05). Drawn in the
+     Easter theme's tokens (src/lib/theme.ts), the theme in the owner's
+     screenshot. Free holds FREE_TEMPLATE_LIMIT = 3 routines. */
+  :root {
+    --page: #f4efe4; --ink: #2a2238; --ink-dim: #615873; --note: #a1501c;
+    --display: 'Baloo 2', 'Trebuchet MS', sans-serif;
+    --body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+    --bg: #fffaee; --surface: #ffffff; --surface-2: #f3eefc; --border: #e3d9f2;
+    --text: #2a2238; --text-dim: #615873; --accent: #7048c0; --accent-text: #ffffff; --secondary: #1f6f86;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--body); }
+  .wrap { padding: 28px 16px 48px; max-width: 2040px; margin: 0 auto; }
+  h1 { font-family: var(--display); font-size: 1.9rem; margin: 0 0 6px; }
+  .intro { color: var(--ink-dim); line-height: 1.55; max-width: 90ch; margin: 0 0 6px; }
+  .intro b { color: var(--ink); }
+  .option { margin-top: 34px; }
+  .option > h2 { font-family: var(--display); font-size: 1.5rem; margin: 0 0 4px; }
+  .option > .why { color: var(--ink-dim); max-width: 90ch; line-height: 1.5; margin: 0 0 14px; }
+  .option > .why b { color: var(--ink); }
+  .row { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+  .opt { width: 375px; max-width: 100%; display: flex; flex-direction: column; gap: 8px; }
+  .label { color: var(--note); font-size: .74rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 800; margin: 0; }
+  .cap { color: var(--ink-dim); font-size: .85rem; line-height: 1.45; margin: 0; }
+
+  .phone { background: var(--bg); color: var(--text); border-radius: 34px; border: 1px solid #d9cfbd; padding: 18px 16px 16px; display: flex; flex-direction: column; gap: 10px; min-height: 720px; position: relative; overflow: hidden; }
+  .section-title { font-size: .95rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); margin: 4px 0 0; }
+  .section-sub { font-size: .82rem; color: var(--text-dim); margin: 0; line-height: 1.4; }
+  .group-name { font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--secondary); margin: 8px 0 0; }
+  .group-sub { font-size: .78rem; color: var(--text-dim); margin: 0; }
+  .prow { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1.5px dashed var(--border); border-radius: 14px; padding: 10px 14px; }
+  .prow .b { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .prow .n { font-weight: 700; font-size: .98rem; }
+  .prow .s { font-size: .8rem; color: var(--text-dim); }
+  .prow .s .warn { color: var(--note); font-weight: 700; }
+  .prow .s .fits { color: var(--secondary); font-weight: 700; }
+  .prow .eq { font-size: .68rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--secondary); }
+  .chev { width: 16px; height: 16px; color: var(--text-dim); flex-shrink: 0; }
+  .ptag { display: inline-block; font-size: .62rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); background: var(--surface-2); border-radius: 99px; padding: 2px 7px; margin-left: 6px; vertical-align: 2px; }
+
+  .acc { border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); }
+  .acc-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+  .acc-head .x { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .acc-head .t { font-weight: 800; font-size: .95rem; }
+  .acc-head .d { font-size: .78rem; color: var(--text-dim); line-height: 1.35; }
+  .acc-body { padding: 0 10px 10px; display: flex; flex-direction: column; gap: 8px; }
+  .acc-body .prow { border-style: solid; }
+
+  .meter { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 10px 14px; }
+  .meter .dots { display: flex; gap: 5px; }
+  .meter .dots i { width: 12px; height: 12px; border-radius: 50%; background: var(--border); }
+  .meter .dots i.on { background: var(--accent); }
+  .meter .t { flex: 1; font-size: .82rem; line-height: 1.35; }
+  .meter .t b { font-weight: 800; }
+
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { border: 1.5px solid var(--border); background: var(--surface); border-radius: 99px; padding: 7px 12px; font-size: .82rem; font-weight: 700; color: var(--text); }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  .divider { display: flex; align-items: center; gap: 8px; font-size: .72rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--text-dim); margin-top: 4px; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .mine { display: flex; flex-direction: column; gap: 6px; }
+  .mine .r { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 9px 12px; font-weight: 700; font-size: .9rem; }
+
+  /* Program sheet */
+  .scrim { position: absolute; inset: 0; background: rgba(42,34,56,.35); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-radius: 22px 22px 0 0; padding: 18px 18px 22px; display: flex; flex-direction: column; gap: 8px; }
+  .eyebrow { font-size: .7rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--secondary); }
+  .sheet h3 { font-family: var(--display); font-size: 1.3rem; margin: 0; }
+  .days { color: var(--accent); font-weight: 700; font-size: .88rem; margin: 0; }
+  .tmpl { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font-weight: 700; font-size: .88rem; }
+  .fitnote { background: #fff4e6; border: 1px solid #f0d2a8; border-radius: 12px; padding: 10px 12px; font-size: .84rem; line-height: 1.45; }
+  .fitnote b { font-weight: 800; }
+  .actions { display: flex; gap: 8px; margin-top: 6px; }
+  .btn { flex: 1; text-align: center; border-radius: 12px; padding: 12px; font-weight: 800; font-size: .92rem; background: var(--accent); color: var(--accent-text); }
+  .btn.ghost { flex: 0 0 auto; background: transparent; border: 1.5px solid var(--border); color: var(--text-dim); padding: 12px 16px; }
+  .link { color: var(--accent); font-weight: 700; font-size: .85rem; text-decoration: underline; text-align: center; }
+  .nav { margin-top: auto; display: flex; justify-content: space-around; border-top: 1px solid var(--border); padding-top: 10px; font-size: .74rem; color: var(--text-dim); font-weight: 700; }
+  .nav .on { color: var(--accent); }
+</style>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</defs></svg>
+
+<div class="wrap">
+  <h1>Starter programs: show what's Premium before the tap</h1>
+  <p class="intro">Today, the only sign that a program needs Premium is a small sparkle, and a tap on Add is the first time anyone learns why. There's a second trap: free holds <b>3 routines</b>, so after someone adds one 3-routine program, <b>every other program</b> opens the routine-limit sheet, sparkle or not. Every phone here is drawn in the Easter theme at 375px. No prices and no pop-ups, per <code>docs/decisions.md</code>.</p>
+
+  <!-- ============ A ============ -->
+  <section class="option">
+    <p class="label">Option A</p>
+    <h2>Free programs first, Premium programs in their own accordion</h2>
+    <p class="why">The free programs keep their equipment groups. The two 5-routine programs move to one closed accordion at the end, whose header states the reason. <b>Fixes:</b> the sparkle surprise. <b>Doesn't fix:</b> the trap after the first add.</p>
+    <div class="row">
+      <div class="opt">
+        <p class="label">A1 · Fresh install, accordion closed</p>
+        <div class="phone">
+          <p class="section-title">Starter programs</p>
+          <p class="section-sub">Optional starting points. Add one, then change anything.</p>
+          <p class="group-name">Machines</p>
+          <p class="group-sub">For a big gym. Easy to learn, and no spotter needed.</p>
+          <div class="prow"><span class="b"><span class="n">Machine push / pull / legs</span><span class="s">3 days a week · 3 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <p class="group-name">Free weights</p>
+          <p class="group-sub">Barbells and dumbbells, plus a few cable and machine lifts.</p>
+          <div class="prow"><span class="b"><span class="n">Beginner full body</span><span class="s">3 days a week · 2 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Upper / lower</span><span class="s">4 days a week · 2 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Push / pull / legs</span><span class="s">3 or 6 days a week · 3 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <p class="group-name">Dumbbells only</p>
+          <div class="prow"><span class="b"><span class="n">Dumbbell full body</span><span class="s">3 days a week · 2 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="acc">
+            <div class="acc-head"><span class="x"><span class="t">Bigger programs<span class="ptag">Premium</span></span><span class="d">5 routines each. Free holds up to 3 routines.</span></span><svg class="chev"><use href="#down"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="opt">
+        <p class="label">A2 · Accordion open</p>
+        <div class="phone">
+          <p class="group-name">Dumbbells only</p>
+          <p class="group-sub">For a home gym with a pair of dumbbells and a bench.</p>
+          <div class="prow"><span class="b"><span class="n">Dumbbell full body</span><span class="s">3 days a week · 2 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="acc">
+            <div class="acc-head"><span class="x"><span class="t">Bigger programs<span class="ptag">Premium</span></span><span class="d">5 routines each. Free holds up to 3 routines.</span></span><svg class="chev"><use href="#up"/></svg></div>
+            <div class="acc-body">
+              <div class="prow"><span class="b"><span class="eq">Machines</span><span class="n">Machine 6-day split</span><span class="s">6 days a week · 5 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+              <div class="prow"><span class="b"><span class="eq">Free weights</span><span class="n">Body-part split</span><span class="s">5 days a week · 5 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+            </div>
+          </div>
+          <p class="cap" style="margin-top:6px">A tap still opens the program's description, so anyone can read the sample week. Its Add button reads <b>See Premium</b> instead of Add.</p>
+          <div class="nav"><span>Home</span><span>Progress</span><span class="on">Routines</span><span>Exercises</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ B ============ -->
+  <section class="option">
+    <p class="label">Option B</p>
+    <h2>Rows that know your free routine slots</h2>
+    <p class="why">The list layout stays as it is today. A small meter shows how many free routine slots are used, and each row says in words whether that program fits. The program's sheet says what Add will do before anyone taps it. On a fresh install everything shows "Fits." <b>Fixes:</b> the trap after the first add. Pairs with A, which moves the 5-routine programs out of the list.</p>
+    <div class="row">
+      <div class="opt">
+        <p class="label">B1 · Fresh install</p>
+        <div class="phone">
+          <p class="section-title">Starter programs</p>
+          <p class="section-sub">Optional starting points. Add one, then change anything.</p>
+          <div class="meter"><span class="dots"><i></i><i></i><i></i></span><span class="t"><b>0 of 3</b> free routines used. Premium has no limit.</span></div>
+          <p class="group-name">Machines</p>
+          <div class="prow"><span class="b"><span class="n">Machine push / pull / legs</span><span class="s">3 days a week · 3 routines · <span class="fits">Fits</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Machine 6-day split</span><span class="s">6 days a week · 5 routines · <span class="warn">Premium</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <p class="group-name">Free weights</p>
+          <div class="prow"><span class="b"><span class="n">Beginner full body</span><span class="s">3 days a week · 2 routines · <span class="fits">Fits</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Upper / lower</span><span class="s">4 days a week · 2 routines · <span class="fits">Fits</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Push / pull / legs</span><span class="s">3 or 6 days a week · 3 routines · <span class="fits">Fits</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Body-part split</span><span class="s">5 days a week · 5 routines · <span class="warn">Premium</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+        </div>
+      </div>
+      <div class="opt">
+        <p class="label">B2 · After adding Machine push / pull / legs</p>
+        <div class="phone">
+          <p class="section-title">Your routines</p>
+          <div class="mine"><div class="r">Machine PPL: Push</div><div class="r">Machine PPL: Pull</div><div class="r">Machine PPL: Legs</div></div>
+          <p class="section-title" style="margin-top:8px">Starter programs</p>
+          <div class="meter"><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="t"><b>3 of 3</b> free routines used. Archive routines to make room, or get Premium for no limit.</span></div>
+          <p class="group-name">Free weights</p>
+          <div class="prow"><span class="b"><span class="n">Beginner full body</span><span class="s">3 days a week · 2 routines · <span class="warn">No room</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Upper / lower</span><span class="s">4 days a week · 2 routines · <span class="warn">No room</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Push / pull / legs</span><span class="s">3 or 6 days a week · 3 routines · <span class="warn">No room</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+        </div>
+      </div>
+      <div class="opt">
+        <p class="label">B3 · Tapping a program that won't fit</p>
+        <div class="phone">
+          <p class="section-title">Starter programs</p>
+          <div class="meter"><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="t"><b>3 of 3</b> free routines used.</span></div>
+          <div class="scrim"></div>
+          <div class="sheet">
+            <span class="eyebrow">Starter program</span>
+            <h3>Upper / lower</h3>
+            <p class="days">4 days a week</p>
+            <div class="tmpl">Upper</div>
+            <div class="tmpl">Lower</div>
+            <div class="fitnote">This adds <b>2 routines</b>. Free holds 3 and you have 3. Archive two of yours to make room, or get Premium for no limit.</div>
+            <div class="actions"><span class="btn">See Premium</span><span class="btn ghost">Close</span></div>
+            <span class="link">Manage my routines</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ A + B ============ -->
+  <section class="option" id="ab">
+    <p class="label">Option A + B (recommended)</p>
+    <h2>Premium accordion, plus rows that know your free slots</h2>
+    <p class="why">This is A's layout: the free programs in their equipment groups, then the closed Premium accordion. The meter and the per-row fit come from B. Because the 5-routine programs live in the accordion, the rows only ever say <b>Fits</b> or <b>No room</b>, never "Premium". Rows that won't fit still open their description, and the sheet says why before anyone taps Add.</p>
+    <div class="row">
+      <div class="opt">
+        <p class="label">AB1 · Fresh install</p>
+        <div class="phone">
+          <p class="section-title">Starter programs</p>
+          <p class="section-sub">Optional starting points. Add one, then change anything.</p>
+          <div class="meter"><span class="dots"><i></i><i></i><i></i></span><span class="t"><b>0 of 3</b> free routines used.</span></div>
+          <p class="group-name">Machines</p>
+          <p class="group-sub">For a big gym. Easy to learn, and no spotter needed.</p>
+          <div class="prow"><span class="b"><span class="n">Machine push / pull / legs</span><span class="s">3 days a week · 3 routines · <span class="fits">Fits</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <p class="group-name">Free weights</p>
+          <p class="group-sub">Barbells and dumbbells, plus a few cable and machine lifts.</p>
+          <div class="prow"><span class="b"><span class="n">Beginner full body</span><span class="s">3 days a week · 2 routines · <span class="fits">Fits</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Upper / lower</span><span class="s">4 days a week · 2 routines · <span class="fits">Fits</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Push / pull / legs</span><span class="s">3 or 6 days a week · 3 routines · <span class="fits">Fits</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <p class="group-name">Dumbbells only</p>
+          <div class="prow"><span class="b"><span class="n">Dumbbell full body</span><span class="s">3 days a week · 2 routines · <span class="fits">Fits</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="acc">
+            <div class="acc-head"><span class="x"><span class="t">Bigger programs<span class="ptag">Premium</span></span><span class="d">5 routines each. Free holds up to 3 routines.</span></span><svg class="chev"><use href="#down"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="opt">
+        <p class="label">AB2 · After adding Machine push / pull / legs</p>
+        <div class="phone">
+          <p class="section-title">Your routines</p>
+          <div class="mine"><div class="r">Machine PPL: Push</div><div class="r">Machine PPL: Pull</div><div class="r">Machine PPL: Legs</div></div>
+          <p class="section-title" style="margin-top:8px">Starter programs</p>
+          <div class="meter"><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="t"><b>3 of 3</b> free routines used. Archive routines to make room, or get Premium for no limit.</span></div>
+          <p class="group-name">Machines</p>
+          <div class="prow"><span class="b"><span class="n">Machine push / pull / legs</span><span class="s">3 days a week · 3 routines · <span class="fits">Added</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <p class="group-name">Free weights</p>
+          <div class="prow"><span class="b"><span class="n">Beginner full body</span><span class="s">3 days a week · 2 routines · <span class="warn">No room</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Upper / lower</span><span class="s">4 days a week · 2 routines · <span class="warn">No room</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Push / pull / legs</span><span class="s">3 or 6 days a week · 3 routines · <span class="warn">No room</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="acc">
+            <div class="acc-head"><span class="x"><span class="t">Bigger programs<span class="ptag">Premium</span></span><span class="d">5 routines each. Free holds up to 3 routines.</span></span><svg class="chev"><use href="#down"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="opt">
+        <p class="label">AB3 · Tapping a program that won't fit</p>
+        <div class="phone">
+          <p class="section-title">Starter programs</p>
+          <div class="meter"><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="t"><b>3 of 3</b> free routines used.</span></div>
+          <div class="scrim"></div>
+          <div class="sheet">
+            <span class="eyebrow">Starter program</span>
+            <h3>Upper / lower</h3>
+            <p class="days">4 days a week</p>
+            <div class="tmpl">Upper</div>
+            <div class="tmpl">Lower</div>
+            <div class="fitnote">This adds <b>2 routines</b>. Free holds 3 and you have 3. Archive two of yours to make room, or get Premium for no limit.</div>
+            <div class="actions"><span class="btn">See Premium</span><span class="btn ghost">Close</span></div>
+            <span class="link">Manage my routines</span>
+          </div>
+        </div>
+      </div>
+      <div class="opt">
+        <p class="label">AB4 · Accordion open (any time)</p>
+        <div class="phone">
+          <p class="group-name">Dumbbells only</p>
+          <div class="prow"><span class="b"><span class="n">Dumbbell full body</span><span class="s">3 days a week · 2 routines · <span class="fits">Fits</span></span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="acc">
+            <div class="acc-head"><span class="x"><span class="t">Bigger programs<span class="ptag">Premium</span></span><span class="d">5 routines each. Free holds up to 3 routines.</span></span><svg class="chev"><use href="#up"/></svg></div>
+            <div class="acc-body">
+              <div class="prow"><span class="b"><span class="eq">Machines</span><span class="n">Machine 6-day split</span><span class="s">6 days a week · 5 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+              <div class="prow"><span class="b"><span class="eq">Free weights</span><span class="n">Body-part split</span><span class="s">5 days a week · 5 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+            </div>
+          </div>
+          <p class="cap" style="margin-top:6px">With Premium, the meter and the fit labels go away, and the two bigger programs move back into their equipment groups like any other program.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ C ============ -->
+  <section class="option">
+    <p class="label">Option C</p>
+    <h2>Pick your equipment first</h2>
+    <p class="why">Three chips at the top filter the list to one equipment group. In each group, the free programs come first, then a divider, then that group's Premium program with a plain label. <b>Fixes:</b> a shorter list and a clearer sparkle. <b>Doesn't fix:</b> the trap after the first add. Explains the limit less well than A.</p>
+    <div class="row">
+      <div class="opt">
+        <p class="label">C1 · Machines</p>
+        <div class="phone">
+          <p class="section-title">Starter programs</p>
+          <p class="section-sub">What do you train with?</p>
+          <div class="chips"><span class="chip on">Machines</span><span class="chip">Free weights</span><span class="chip">Dumbbells only</span></div>
+          <p class="group-sub">For a big gym. Easy to learn, and no spotter needed.</p>
+          <div class="prow"><span class="b"><span class="n">Machine push / pull / legs</span><span class="s">3 days a week · 3 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="divider">With Premium</div>
+          <div class="prow"><span class="b"><span class="n">Machine 6-day split</span><span class="s">6 days a week · 5 routines. Free holds 3.</span></span><svg class="chev"><use href="#chev"/></svg></div>
+        </div>
+      </div>
+      <div class="opt">
+        <p class="label">C2 · Free weights</p>
+        <div class="phone">
+          <p class="section-title">Starter programs</p>
+          <p class="section-sub">What do you train with?</p>
+          <div class="chips"><span class="chip">Machines</span><span class="chip on">Free weights</span><span class="chip">Dumbbells only</span></div>
+          <p class="group-sub">Barbells and dumbbells, plus a few cable and machine lifts.</p>
+          <div class="prow"><span class="b"><span class="n">Beginner full body</span><span class="s">3 days a week · 2 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Upper / lower</span><span class="s">4 days a week · 2 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="prow"><span class="b"><span class="n">Push / pull / legs</span><span class="s">3 or 6 days a week · 3 routines</span></span><svg class="chev"><use href="#chev"/></svg></div>
+          <div class="divider">With Premium</div>
+          <div class="prow"><span class="b"><span class="n">Body-part split</span><span class="s">5 days a week · 5 routines. Free holds 3.</span></span><svg class="chev"><use href="#chev"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

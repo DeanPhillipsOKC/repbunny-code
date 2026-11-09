@@ -1,0 +1,26 @@
+node_modules
+dist
+dist-ssr
+dist-e2e-pwa
+dist-e2e-build
+dist-e2e
+*.tsbuildinfo
+.env
+.env.local
+*.local
+.DS_Store
+test-results
+playwright-report
+blob-report
+playwright/.cache
+
+logs/
+
+# Store release notes, written by scripts/collect-release-notes.mjs in CI (#216)
+whatsnew/
+release_notes.json
+
+# Scratch file left behind by an agent session that couldn't delete it
+# (file-removal shell commands need interactive approval this sandbox
+# doesn't have). Safe to delete by hand.
+scripts/_verify-cleanup.mjs

@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Backup And Restore</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --danger: #e0687a; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1100px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 10px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 32px; padding: 24px 32px 40px; align-items: flex-start; }
+  .col { width: 390px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 92px; }
+  .phone { width: 390px; height: 800px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; position: relative; overflow: hidden; }
+  .behind { padding: 22px 16px; opacity: 0.45; }
+  .behind h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.5rem; margin: 0; }
+  .dim { position: absolute; inset: 0; background: rgba(8, 5, 10, 0.62); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--bg); border-top: 1px solid var(--border); border-radius: 22px 22px 0 0; padding: 10px 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .sheet.surface { background: var(--surface); }
+  .grab { width: 36px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto; }
+  .head { display: flex; justify-content: space-between; align-items: center; }
+  .head h3, .sheet h3 { font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; margin: 0; }
+  .x { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; color: var(--text-dim); }
+  .acct { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .av { width: 40px; height: 40px; border-radius: 50%; background: rgba(183, 156, 240, 0.16); color: var(--secondary); display: grid; place-items: center; }
+  .acct .l { font-size: 0.75rem; color: var(--text-dim); }
+  .acct .e { font-weight: 700; }
+  .label { font-size: 0.66rem; font-weight: 800; letter-spacing: 0.07em; color: var(--text-dim); text-transform: uppercase; margin: 2px 2px -4px; }
+  .group { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--border); }
+  .item:first-child { border-top: none; }
+  .item .ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); flex-shrink: 0; }
+  .item .t { font-weight: 700; font-size: 0.95rem; }
+  .item .s { font-size: 0.74rem; color: var(--text-dim); margin-top: 1px; }
+  .item .chev { margin-left: auto; color: var(--text-dim); }
+  .btn { min-height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; font-size: 0.98rem; border: 1px solid var(--border); background: var(--surface); }
+  .btn.danger { background: transparent; border-color: rgba(224, 104, 122, 0.45); color: var(--danger); }
+  .btn.accent { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  .btn.ghost { background: transparent; color: var(--text-dim); }
+  .btn.restore { background: var(--highlight); border-color: var(--highlight); color: var(--accent-text); }
+  .btn.off { background: transparent; border-color: color-mix(in srgb, var(--highlight) 35%, transparent); color: color-mix(in srgb, var(--highlight) 55%, transparent); }
+  .cap2 { font-size: 0.74rem; color: var(--text-dim); text-align: center; margin: -6px 0 0; }
+  .divider { height: 1px; background: var(--border); }
+  .toast { position: absolute; left: 16px; right: 16px; top: 18px; display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--success) 16%, var(--surface)); border: 1px solid color-mix(in srgb, var(--success) 45%, transparent); font-size: 0.84rem; font-weight: 700; z-index: 2; }
+  .toast small { display: block; font-weight: 600; color: var(--text-dim); font-size: 0.74rem; }
+
+  .file { display: flex; gap: 12px; align-items: center; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .file .fi { width: 40px; height: 46px; border-radius: 8px; background: color-mix(in srgb, var(--secondary) 18%, transparent); color: var(--secondary); display: grid; place-items: center; font-size: 0.62rem; font-weight: 800; }
+  .file .n { font-weight: 700; font-size: 0.88rem; font-family: Consolas, monospace; }
+  .file .d { font-size: 0.74rem; color: var(--text-dim); margin-top: 2px; }
+  .counts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .count { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
+  .count b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 1.3rem; color: var(--text); line-height: 1.1; }
+  .count span { font-size: 0.74rem; color: var(--text-dim); font-weight: 700; }
+  .count.wide { grid-column: 1 / -1; }
+  .warn { padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--highlight) 12%, transparent); border: 1px solid color-mix(in srgb, var(--highlight) 45%, var(--border)); font-size: 0.84rem; line-height: 1.45; }
+  .lbl { font-size: 0.85rem; color: var(--text-dim); }
+  .input { height: 48px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; padding: 0 14px; font-weight: 800; letter-spacing: 0.06em; color: var(--text-dim); }
+  .done-badge { width: 64px; height: 64px; border-radius: 50%; background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); display: grid; place-items: center; margin: 6px auto 0; }
+  .center { text-align: center; }
+  .center p { color: var(--text-dim); font-size: 0.86rem; margin: 4px 0 0; line-height: 1.5; }
+
+  /* plate sheet */
+  .target { display: flex; align-items: center; gap: 10px; }
+  .target .big { flex: 1; height: 54px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--accent); display: flex; align-items: center; padding: 0 14px; font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; }
+  .target .big small { font-family: Manrope, sans-serif; font-size: 0.85rem; color: var(--text-dim); margin-left: auto; font-weight: 700; }
+  .step { width: 46px; height: 54px; border-radius: 12px; border: 1px solid var(--border); display: grid; place-items: center; font-weight: 800; font-size: 1.3rem; color: var(--text-dim); }
+  .line { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-dim); margin: -2px 2px 0; }
+  .line b { color: var(--text); }
+  .line a { color: var(--secondary); font-weight: 800; }
+  .line.hl { background: color-mix(in srgb, var(--highlight) 10%, transparent); outline: 2px solid color-mix(in srgb, var(--highlight) 70%, transparent); border-radius: 8px; padding: 6px 8px; margin: 0 -2px; }
+  .inv { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .inv div { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; border-radius: 12px; border: 1px solid var(--border); font-weight: 800; font-size: 0.85rem; }
+  .inv div i { display: block; border-radius: 4px; }
+  .inv div.off { opacity: 0.38; border-style: dashed; }
+  .inv div span { font-size: 0.64rem; color: var(--text-dim); font-weight: 700; }
+  .platesbox { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 12px; }
+  .platesbox .t { font-weight: 800; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .platesbox .s { font-size: 0.74rem; color: var(--text-dim); margin-bottom: 10px; }
+  .units { display: flex; gap: 4px; }
+  .units span { width: 38px; height: 28px; border-radius: 8px; border: 1px solid var(--border); display: grid; place-items: center; font-size: 0.78rem; font-weight: 800; color: var(--text-dim); }
+  .units span.on { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  .bar-wrap { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 10px 6px 6px; }
+  .bar-wrap svg { display: block; width: 100%; height: 80px; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#20 Backup, restore, and CSV export (plus a new home for plates, #22 follow-up)</h1>
+  <p class="note">Decided with the user 2026-09-29: <b>JSON backup + CSV export</b>, restore <b>replaces everything</b> after a preview and typed confirmation, <b>manual only</b> for now (automatic backups come with Pocket Edition), ships in the current app, always free. The three data actions sit at the <b>top level of the Account sheet</b>. "Plates at my gym" leaves the Account sheet and moves into the plate calculator itself.</p>
+</div>
+<div class="page">
+
+  <!-- 1 -->
+  <div class="col">
+    <p class="cap">1. Account sheet</p>
+    <p class="capnote">"Your data" group right under who you're signed in as: back up, restore, CSV. Plates are gone from here. The toast shows what a backup does: the browser saves (or on iPhone, shares) <code>repbunny-backup-2026-09-29.json</code>.</p>
+    <div class="phone">
+      <div class="behind"><h2>Home</h2></div>
+      <div class="dim"></div>
+      <div class="toast"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg><div>Backup saved<small>repbunny-backup-2026-09-29.json · 12 workouts, 214 sets</small></div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="head"><h3>Account</h3><span class="x">✕</span></div>
+        <div class="acct"><span class="av"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><div><div class="l">Signed in as</div><div class="e">you@example.com</div></div></div>
+        <div class="label">Your data</div>
+        <div class="group">
+          <div class="item" style="--c: var(--secondary)"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></span><div><div class="t">Back up my data</div><div class="s">Saves one file with everything</div></div></div>
+          <div class="item" style="--c: var(--highlight)"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9M7 14l5-5 5 5"/><path d="M5 3h14"/></svg></span><div><div class="t">Restore from a backup</div><div class="s">Replaces what's here with a backup file</div></div><span class="chev">›</span></div>
+          <div class="item" style="--c: var(--success)"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M4 10h16M4 15h16M10 4v16"/></svg></span><div><div class="t">Export sets as CSV</div><div class="s">For spreadsheets. Can't be restored.</div></div></div>
+        </div>
+        <div class="btn">Sign out</div>
+        <div class="divider"></div>
+        <div class="btn danger">Delete account</div>
+        <p class="cap2">Permanently removes your account and all of your training data.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="col">
+    <p class="cap">2. Restore: check the file first</p>
+    <p class="capnote">After you pick a file, the sheet shows what's in it before anything changes. Typing RESTORE unlocks the button, same pattern as Delete account but in amber, since your account stays. A file that isn't a RepBunny backup says so and stops here.</p>
+    <div class="phone">
+      <div class="behind"><h2>Home</h2></div>
+      <div class="dim"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="head"><h3>Restore this backup?</h3><span class="x">✕</span></div>
+        <div class="file"><span class="fi">JSON</span><div><div class="n">repbunny-backup-2026-09-12.json</div><div class="d">Backed up Sep 12, 2026 · 9:41 PM</div></div></div>
+        <div class="counts">
+          <div class="count"><b>11</b><span>workouts</span></div>
+          <div class="count"><b>196</b><span>sets</span></div>
+          <div class="count"><b>24</b><span>exercises</span></div>
+          <div class="count"><b>4</b><span>templates</span></div>
+          <div class="count wide"><b>Jun 3 – Sep 12, 2026</b><span>workouts from · plus 9 weigh-ins and your height</span></div>
+        </div>
+        <div class="warn">This <b>replaces everything</b> in your account right now (12 workouts, 214 sets). Your sign-in and passkey stay the same.</div>
+        <span class="lbl">Type <b style="color:var(--text)">RESTORE</b> to confirm</span>
+        <div class="input">RESTO</div>
+        <div class="btn off">Replace with this backup</div>
+        <div class="btn ghost">Cancel</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="col">
+    <p class="cap">3. Restore: done</p>
+    <p class="capnote">A short confirmation with what came back, then Done lands on Home with the restored data. If anything fails partway, it says what failed and that nothing was changed (the replace happens in one step on the server).</p>
+    <div class="phone">
+      <div class="behind"><h2>Home</h2></div>
+      <div class="dim"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="done-badge"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+        <div class="center"><h3>Backup restored</h3><p>11 workouts, 196 sets, 24 exercises, 4 templates, and 9 weigh-ins are back, as of Sep 12, 2026.</p></div>
+        <div class="btn accent">Done</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="col">
+    <p class="cap">4. Plates move into the calculator (#22 follow-up)</p>
+    <p class="capnote">Instead of a Gym menu with one thing in it, "Your plates" is a line in Load the bar, right under the bar (highlighted). Edit opens the same on/off grid in place. Changes apply to every barbell exercise, as before.</p>
+    <div class="phone">
+      <div class="behind"><h2>Push day</h2></div>
+      <div class="dim"></div>
+      <div class="sheet surface">
+        <div class="grab"></div>
+        <div><h3>Load the bar</h3><div style="font-size:.8rem;color:var(--text-dim);margin-top:2px">Barbell Bench Press</div></div>
+        <div class="target"><span class="step">−</span><span class="big">185<small>lb total</small></span><span class="step">+</span></div>
+        <div class="line"><span>Bar: <b>45 lb</b> (standard)</span><a>Change</a></div>
+        <div class="line hl"><span>Your plates: <b>45, 35, 25, 10, 5, 2.5</b></span><a>Done</a></div>
+        <div class="platesbox">
+          <div class="t">Plates at my gym<span class="units"><span class="on">lb</span><span>kg</span></span></div>
+          <div class="s">Tap to turn off any your gym doesn't have.</div>
+          <div class="inv" id="inv"></div>
+        </div>
+        <div class="bar-wrap"><svg id="bar" viewBox="0 0 360 80"></svg></div>
+        <div class="btn accent">Use 185 lb</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const S = { 55: ['#e0687a', 100, 15], 45: ['#f2879c', 96, 14], 35: ['#f2c069', 86, 12], 25: ['#b79cf0', 74, 11], 10: ['#a9cb8d', 56, 9], 5: ['#b9a8c2', 42, 7], 2.5: ['#e8dcef', 32, 6], 1.25: ['#8b7896', 24, 5] }
+  document.getElementById('inv').innerHTML = [55, 45, 35, 25, 10, 5, 2.5, 1.25].map((p) => {
+    const on = p !== 55 && p !== 1.25
+    const [c, h, w] = S[p]
+    return `<div class="${on ? '' : 'off'}"><i style="width:${Math.max(w, 6)}px;height:${Math.round(h / 3.2)}px;background:${c}"></i>${p}<span>${on ? 'lb' : 'off'}</span></div>`
+  }).join('')
+  const svg = document.getElementById('bar'), cy = 40, sc = 0.7
+  let out = `<rect x="6" y="${cy - 2}" width="348" height="4" rx="2" fill="#6d5a78"/><rect x="113" y="${cy - 8}" width="5" height="16" rx="2" fill="#8b7896"/><rect x="242" y="${cy - 8}" width="5" height="16" rx="2" fill="#8b7896"/>`
+  let xl = 112, xr = 248
+  for (const p of [45, 25]) { const [c, h, w] = S[p]; out += `<rect x="${xl - w}" y="${cy - h * sc / 2}" width="${w}" height="${h * sc}" rx="3" fill="${c}"/><rect x="${xr}" y="${cy - h * sc / 2}" width="${w}" height="${h * sc}" rx="3" fill="${c}"/>`; xl -= w + 2; xr += w + 2 }
+  svg.innerHTML = out
+</script>
+</body>
+</html>

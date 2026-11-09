@@ -1,0 +1,8 @@
+# Security headers for repbunny.app (Cloudflare Pages). Issue #268.
+# The two sha256 hashes cover the inline scripts in index.html; e2e/security-headers-unit.spec.ts
+# recomputes them, so editing those scripts fails the gate until the hashes here are updated.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-k8ZoqoS/qHVRhkcvg0oiWri9mxhXHtdBYt1phVUaxW8=' 'sha256-kJvY3/TxJjvTk6c/f2/01BfRXzp7Nnl7XZAOvmz7kDE='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()

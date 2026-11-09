@@ -1,0 +1,243 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Session List</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --cardio: #f4a07a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1220px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; display: flex; flex-direction: column; gap: 18px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 0 4px; line-height: 1.45; min-height: 76px; }
+  .capnote b { color: var(--text); }
+  .phone { width: 377px; height: 760px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 20px 16px 0; position: relative; }
+  .phone.short { height: 500px; }
+  .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 40px; background: linear-gradient(transparent, var(--bg)); }
+  .hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.45rem; margin: 0; line-height: 1.2; }
+  .x { width: 36px; height: 36px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); flex-shrink: 0; }
+  .stub { height: 92px; border-radius: 12px; border: 1px dashed var(--border); color: var(--text-dim); font-size: 0.74rem; display: grid; place-items: center; margin-bottom: 20px; }
+  .section { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); margin: 0 0 8px; }
+
+  /* shared session card */
+  .s { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+  .s-head { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+  .s-date { font-weight: 800; font-size: 0.88rem; white-space: nowrap; }
+  .s-tpl { color: var(--text-dim); font-size: 0.76rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .paw { width: 13px; height: 13px; flex-shrink: 0; }
+  .older { display: block; width: 100%; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: 700 0.86rem Manrope, sans-serif; margin: 4px 0 16px; }
+
+  /* ---------- A: table with column headings ---------- */
+  .a table { width: 100%; border-collapse: collapse; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .a th { font-size: 0.64rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); text-align: right; padding: 0 0 4px; }
+  .a th:first-child, .a td:first-child { text-align: left; width: 34px; }
+  .a td { font-size: 0.86rem; text-align: right; padding: 6px 0; border-top: 1px solid var(--border); white-space: nowrap; }
+  .a td:first-child { color: var(--text-dim); font-weight: 700; }
+  .a td.dim { color: var(--text-dim); }
+  .a td .u { color: var(--text-dim); font-size: 0.74rem; margin-left: 2px; }
+  .a tr.rec td { color: var(--highlight); font-weight: 800; }
+  .a tr.rec td .u { color: color-mix(in srgb, var(--highlight) 70%, transparent); }
+  .a td.mk { width: 20px; text-align: right; }
+
+  /* ---------- B: set chips, no headings ---------- */
+  .b .rows { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; font-variant-numeric: tabular-nums; }
+  .b .r { display: grid; grid-template-columns: 22px 1fr auto 18px; align-items: center; gap: 10px; height: 30px; }
+  .b .n { width: 22px; height: 22px; border-radius: 50%; background: var(--surface-2); color: var(--text-dim); font-size: 0.7rem; font-weight: 700; display: grid; place-items: center; }
+  .b .r.rec .n { background: color-mix(in srgb, var(--highlight) 22%, transparent); color: var(--highlight); }
+  .b .main { font-size: 0.9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .b .main .u, .b .main .x2 { color: var(--text-dim); font-weight: 600; }
+  .b .rpe { font-size: 0.7rem; font-weight: 800; color: var(--secondary); background: color-mix(in srgb, var(--secondary) 12%, transparent); padding: 2px 7px; border-radius: 999px; }
+  .b .rpe.none { background: none; }
+
+  /* ---------- C: A's table plus a top-set summary line ---------- */
+  .c .s-sum { display: flex; align-items: baseline; gap: 14px; margin-top: 6px; font-size: 0.74rem; color: var(--text-dim); }
+  .c .s-sum b { color: var(--accent); font-family: 'Baloo 2', sans-serif; font-size: 1rem; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#181 Session list on a lift's progress screen</h1>
+  <p class="note">Today every session under the chart is a date heading over plain text lines ("8 × 225 lb · RPE 8"), and all of them render at once. Each option below makes it <b>one card per session</b> (date, template name when there is one) with the sets in <b>aligned columns</b>, a gold paw on a set that was a record when it was logged (same paw as the Workout log's "PR set this workout"), and the <b>newest 10 sessions</b>, then <b>Show older</b> adds 10 more.</p>
+  <p class="note">Columns follow the lift's load type: Weight / Reps / RPE for weights; Added / Reps for bodyweight; Assist / Reps for assisted; Level / Reps for level; Time plus whichever of Distance, Incline, Level, Cal the session logged for timed. RPE only shows when a session has one. Each set keeps the unit it was logged in, so a kg session stays kg.</p>
+</div>
+
+<div class="page">
+
+  <!-- ===================== OPTION A ===================== -->
+  <div class="col a">
+    <div>
+      <p class="cap">Option A · Table with headings</p>
+      <p class="capnote">Closest to "put it in tables." Small column headings in each card, numbers right-aligned so weights line up down the page. The record row turns gold with a paw.</p>
+    </div>
+    <div class="phone">
+      <div class="hdr"><h2>Barbell Bench Press</h2><div class="x">✕</div></div>
+      <div class="stub">chart, Next time, best reps (unchanged)</div>
+      <p class="section">Sessions</p>
+
+      <div class="s">
+        <div class="s-head"><span class="s-date">Tue, Oct 6 · 6:12 PM</span><span class="s-tpl">Push Day: Heavy Bench &amp; Overhead Work</span></div>
+        <table>
+          <tr><th>Set</th><th>Weight</th><th>Reps</th><th>RPE</th><th class="mk"></th></tr>
+          <tr><td>1</td><td>185<span class="u">lb</span></td><td>8</td><td>7</td><td class="mk"></td></tr>
+          <tr><td>2</td><td>205<span class="u">lb</span></td><td>6</td><td>8</td><td class="mk"></td></tr>
+          <tr class="rec"><td>3</td><td>225<span class="u">lb</span></td><td>5</td><td>9</td><td class="mk"><svg class="paw" viewBox="0 0 24 24"><ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="var(--highlight)"/><ellipse cx="6" cy="9" rx="2.1" ry="2.6" fill="var(--highlight)"/><ellipse cx="11" cy="6.5" rx="2.1" ry="2.6" fill="var(--highlight)"/><ellipse cx="16.2" cy="7.5" rx="2" ry="2.5" fill="var(--highlight)"/><ellipse cx="19" cy="11.5" rx="1.8" ry="2.3" fill="var(--highlight)"/></svg></td></tr>
+          <tr><td>4</td><td>205<span class="u">lb</span></td><td>7</td><td>8.5</td><td class="mk"></td></tr>
+        </table>
+      </div>
+
+      <div class="s">
+        <div class="s-head"><span class="s-date">Fri, Oct 2 · 7:40 AM</span></div>
+        <table>
+          <tr><th>Set</th><th>Weight</th><th>Reps</th><th class="mk"></th></tr>
+          <tr><td>1</td><td>92.5<span class="u">kg</span></td><td>5</td><td class="mk"></td></tr>
+          <tr><td>2</td><td>92.5<span class="u">kg</span></td><td>5</td><td class="mk"></td></tr>
+          <tr><td>3</td><td>92.5<span class="u">kg</span></td><td>4</td><td class="mk"></td></tr>
+        </table>
+      </div>
+
+      <div class="s">
+        <div class="s-head"><span class="s-date">Mon, Sep 28 · 6:05 PM</span><span class="s-tpl">Push Day</span></div>
+        <table>
+          <tr><th>Set</th><th>Weight</th><th>Reps</th><th>RPE</th><th class="mk"></th></tr>
+          <tr><td>1</td><td>185<span class="u">lb</span></td><td>8</td><td class="dim">–</td><td class="mk"></td></tr>
+          <tr><td>2</td><td>205<span class="u">lb</span></td><td>6</td><td>8</td><td class="mk"></td></tr>
+        </table>
+      </div>
+      <div class="fade"></div>
+    </div>
+
+    <div class="phone short">
+      <div class="hdr"><h2>Treadmill</h2><div class="x">✕</div></div>
+      <p class="section">Sessions</p>
+      <div class="s">
+        <div class="s-head"><span class="s-date">Sun, Oct 4 · 9:30 AM</span><span class="s-tpl">Cardio</span></div>
+        <table>
+          <tr><th>Set</th><th>Time</th><th>Distance</th><th>Incline</th><th>Cal</th></tr>
+          <tr><td>1</td><td>20:00</td><td>2.1<span class="u">mi</span></td><td>3</td><td>210</td></tr>
+          <tr><td>2</td><td>5:00</td><td>0.4<span class="u">mi</span></td><td>0</td><td>45</td></tr>
+        </table>
+      </div>
+      <div class="s">
+        <div class="s-head"><span class="s-date">Thu, Oct 1 · 6:50 PM</span></div>
+        <table>
+          <tr><th>Set</th><th>Time</th><th>Distance</th></tr>
+          <tr><td>1</td><td>30:00</td><td>4.8<span class="u">km</span></td></tr>
+        </table>
+      </div>
+      <p class="section" style="margin-top:14px">…10th session, then</p>
+      <button class="older">Show older</button>
+    </div>
+  </div>
+
+  <!-- ===================== OPTION B ===================== -->
+  <div class="col b">
+    <div>
+      <p class="cap">Option B · Set rows, no headings</p>
+      <p class="capnote">Lighter. Keeps today's numbered circles, one bold "225 lb × 5" per row, RPE as a small lavender pill on the right. A record set's circle turns gold, with the paw at the end. Lines up, but reads less like a spreadsheet.</p>
+    </div>
+    <div class="phone">
+      <div class="hdr"><h2>Barbell Bench Press</h2><div class="x">✕</div></div>
+      <div class="stub">chart, Next time, best reps (unchanged)</div>
+      <p class="section">Sessions</p>
+
+      <div class="s">
+        <div class="s-head"><span class="s-date">Tue, Oct 6 · 6:12 PM</span><span class="s-tpl">Push Day: Heavy Bench &amp; Overhead Work</span></div>
+        <div class="rows">
+          <div class="r"><span class="n">1</span><span class="main">185 <span class="u">lb</span> <span class="x2">×</span> 8</span><span class="rpe">RPE 7</span><span></span></div>
+          <div class="r"><span class="n">2</span><span class="main">205 <span class="u">lb</span> <span class="x2">×</span> 6</span><span class="rpe">RPE 8</span><span></span></div>
+          <div class="r rec"><span class="n">3</span><span class="main">225 <span class="u">lb</span> <span class="x2">×</span> 5</span><span class="rpe">RPE 9</span><svg class="paw" viewBox="0 0 24 24"><ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="var(--highlight)"/><ellipse cx="6" cy="9" rx="2.1" ry="2.6" fill="var(--highlight)"/><ellipse cx="11" cy="6.5" rx="2.1" ry="2.6" fill="var(--highlight)"/><ellipse cx="16.2" cy="7.5" rx="2" ry="2.5" fill="var(--highlight)"/><ellipse cx="19" cy="11.5" rx="1.8" ry="2.3" fill="var(--highlight)"/></svg></div>
+          <div class="r"><span class="n">4</span><span class="main">205 <span class="u">lb</span> <span class="x2">×</span> 7</span><span class="rpe">RPE 8.5</span><span></span></div>
+        </div>
+      </div>
+
+      <div class="s">
+        <div class="s-head"><span class="s-date">Fri, Oct 2 · 7:40 AM</span></div>
+        <div class="rows">
+          <div class="r"><span class="n">1</span><span class="main">92.5 <span class="u">kg</span> <span class="x2">×</span> 5</span><span class="rpe none"></span><span></span></div>
+          <div class="r"><span class="n">2</span><span class="main">92.5 <span class="u">kg</span> <span class="x2">×</span> 5</span><span class="rpe none"></span><span></span></div>
+          <div class="r"><span class="n">3</span><span class="main">92.5 <span class="u">kg</span> <span class="x2">×</span> 4</span><span class="rpe none"></span><span></span></div>
+        </div>
+      </div>
+
+      <div class="s">
+        <div class="s-head"><span class="s-date">Mon, Sep 28 · 6:05 PM</span><span class="s-tpl">Push Day</span></div>
+        <div class="rows">
+          <div class="r"><span class="n">1</span><span class="main">185 <span class="u">lb</span> <span class="x2">×</span> 8</span><span class="rpe none"></span><span></span></div>
+          <div class="r"><span class="n">2</span><span class="main">205 <span class="u">lb</span> <span class="x2">×</span> 6</span><span class="rpe">RPE 8</span><span></span></div>
+        </div>
+      </div>
+      <div class="fade"></div>
+    </div>
+
+    <div class="phone short">
+      <div class="hdr"><h2>Treadmill</h2><div class="x">✕</div></div>
+      <p class="section">Sessions</p>
+      <div class="s">
+        <div class="s-head"><span class="s-date">Sun, Oct 4 · 9:30 AM</span><span class="s-tpl">Cardio</span></div>
+        <div class="rows">
+          <div class="r"><span class="n">1</span><span class="main">20:00 <span class="u">·</span> 2.1 <span class="u">mi · Incline</span> 3 <span class="u">·</span> 210 <span class="u">cal</span></span><span class="rpe none"></span><span></span></div>
+          <div class="r"><span class="n">2</span><span class="main">5:00 <span class="u">·</span> 0.4 <span class="u">mi · Incline</span> 0 <span class="u">·</span> 45 <span class="u">cal</span></span><span class="rpe none"></span><span></span></div>
+        </div>
+      </div>
+      <div class="s">
+        <div class="s-head"><span class="s-date">Thu, Oct 1 · 6:50 PM</span></div>
+        <div class="rows">
+          <div class="r"><span class="n">1</span><span class="main">30:00 <span class="u">·</span> 4.8 <span class="u">km</span></span><span class="rpe none"></span><span></span></div>
+        </div>
+      </div>
+      <p class="section" style="margin-top:14px">…10th session, then</p>
+      <button class="older">Show older</button>
+    </div>
+  </div>
+
+  <!-- ===================== OPTION C ===================== -->
+  <div class="col a c">
+    <div>
+      <p class="cap">Option C · Table plus a top set</p>
+      <p class="capnote">Option A's table, with one line under the date giving the session's top set and total reps, so scrolling back through months you can read the trend without reading every row.</p>
+    </div>
+    <div class="phone">
+      <div class="hdr"><h2>Barbell Bench Press</h2><div class="x">✕</div></div>
+      <div class="stub">chart, Next time, best reps (unchanged)</div>
+      <p class="section">Sessions</p>
+
+      <div class="s">
+        <div class="s-head"><span class="s-date">Tue, Oct 6 · 6:12 PM</span><span class="s-tpl">Push Day: Heavy Bench &amp; Overhead Work</span></div>
+        <div class="s-sum"><span>Top set <b>225 lb × 5</b></span><span>4 sets · 26 reps</span></div>
+        <table>
+          <tr><th>Set</th><th>Weight</th><th>Reps</th><th>RPE</th><th class="mk"></th></tr>
+          <tr><td>1</td><td>185<span class="u">lb</span></td><td>8</td><td>7</td><td class="mk"></td></tr>
+          <tr><td>2</td><td>205<span class="u">lb</span></td><td>6</td><td>8</td><td class="mk"></td></tr>
+          <tr class="rec"><td>3</td><td>225<span class="u">lb</span></td><td>5</td><td>9</td><td class="mk"><svg class="paw" viewBox="0 0 24 24"><ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="var(--highlight)"/><ellipse cx="6" cy="9" rx="2.1" ry="2.6" fill="var(--highlight)"/><ellipse cx="11" cy="6.5" rx="2.1" ry="2.6" fill="var(--highlight)"/><ellipse cx="16.2" cy="7.5" rx="2" ry="2.5" fill="var(--highlight)"/><ellipse cx="19" cy="11.5" rx="1.8" ry="2.3" fill="var(--highlight)"/></svg></td></tr>
+          <tr><td>4</td><td>205<span class="u">lb</span></td><td>7</td><td>8.5</td><td class="mk"></td></tr>
+        </table>
+      </div>
+
+      <div class="s">
+        <div class="s-head"><span class="s-date">Fri, Oct 2 · 7:40 AM</span></div>
+        <div class="s-sum"><span>Top set <b>92.5 kg × 5</b></span><span>3 sets · 14 reps</span></div>
+        <table>
+          <tr><th>Set</th><th>Weight</th><th>Reps</th><th class="mk"></th></tr>
+          <tr><td>1</td><td>92.5<span class="u">kg</span></td><td>5</td><td class="mk"></td></tr>
+          <tr><td>2</td><td>92.5<span class="u">kg</span></td><td>5</td><td class="mk"></td></tr>
+          <tr><td>3</td><td>92.5<span class="u">kg</span></td><td>4</td><td class="mk"></td></tr>
+        </table>
+      </div>
+      <div class="fade"></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

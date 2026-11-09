@@ -1,0 +1,47 @@
+# Emails the owner a weekly digest of the open `human` issues (#225): the top picks, the ones that
+# would unblock the runner, stale ones, and ones on hold. scripts/human-digest.mjs builds the card;
+# it writes nothing when there are no human issues, and then nothing is sent. Run it by hand from
+# the Actions tab (or the GitHub app). See docs/backlog-runner.md > Weekly digest of human issues.
+name: Human issue digest
+
+on:
+  schedule:
+    # Mondays 12:07 UTC: 7:07 am Central in daylight time, 6:07 am in standard time.
+    - cron: '7 12 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: human-digest
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      # Send-Notification.ps1 skips quietly when the Gmail secrets aren't set. The digest goes to
+      # DIGEST_EMAIL_RECIPIENTS, or the sending address when that secret isn't set.
+      - name: Email the digest
+        shell: pwsh
+        run: |
+          $html = Join-Path $env:RUNNER_TEMP 'human-digest.html'
+          $subject = node scripts/human-digest.mjs --out $html
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (-not $subject) { Write-Host 'No open human issues; nothing to send.'; exit 0 }
+          Write-Host $subject
+          ./scripts/Send-Notification.ps1 -Subject $subject -BodyFile $html -IsHtml
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GMAIL_SENDER_ADDRESS: ${{ secrets.GMAIL_SENDER_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_RECIPIENTS: ${{ secrets.DIGEST_EMAIL_RECIPIENTS || secrets.GMAIL_SENDER_ADDRESS }}

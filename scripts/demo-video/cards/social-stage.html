@@ -1,0 +1,97 @@
+<!doctype html>
+<!--
+  The vertical stage for the launch intro videos (social-intro.mjs), 1080x1920,
+  the 9:16 size Facebook Reels and TikTok want. The app clip sits in a rounded
+  card, with the spoken line as a caption above it. Everything that matters is
+  inside TikTok and Reels' safe zone: clear of the top ~140px (tabs), the right
+  ~120px (button rail), and the bottom ~350px (the post's caption), where only
+  the app's bottom bar sits. social-intro.mjs screenshots three layers:
+    ?layer=bg    the backdrop, the card's shadow, and the RepBunny mark (&name=0 leaves the mark out)
+    ?layer=name  the RepBunny mark alone, on transparent, to bring in after the title
+    ?layer=mask  the card's rounded shape, white on black, at card size
+    ?layer=cap   one caption on transparent (&text=...)
+    ?layer=title the opening title in the caption's place, on transparent (&a=Meet&b=RepBunny)
+  window.STAGE reports the card box ({ x, y, w, h }) for the compositor.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: 'Baloo 2'; font-weight: 600 800; src: url(/site/fonts/baloo2-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 400 800; src: url(/site/fonts/manrope-latin.woff2) format('woff2'); }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: transparent; color: #f5edf2; font-family: 'Manrope', sans-serif; }
+  body.layer-bg {
+    background:
+      radial-gradient(760px 620px at 100% 0%, rgba(242,135,156,.30), transparent 70%),
+      radial-gradient(800px 700px at 0% 100%, rgba(183,156,240,.24), transparent 70%),
+      #17111c;
+  }
+  body.layer-mask { background: #000; }
+  .card { position: absolute; border-radius: 44px; }
+  .layer-bg .card { background: #0d0910; box-shadow: 0 40px 90px -30px rgba(0,0,0,.85), 0 0 0 3px #4a3a56; }
+  .layer-mask .card { background: #fff; }
+  .name { position: absolute; left: 120px; right: 120px; top: 150px; display: flex; align-items: center; justify-content: center; gap: 14px; font: 800 44px 'Baloo 2', sans-serif; }
+  .name img { width: 56px; height: 56px; border-radius: 15px; }
+  .cap {
+    position: absolute; left: 120px; right: 120px; top: 228px; height: 222px;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    font-weight: 800; line-height: 1.22; text-shadow: 0 3px 18px rgba(0,0,0,.5);
+  }
+  .title { position: absolute; left: 120px; right: 120px; top: 228px; height: 222px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; line-height: 1; text-shadow: 0 4px 24px rgba(0,0,0,.45); }
+  .title .a { font-size: 64px; font-weight: 700; }
+  .title .b { font-size: 120px; font-weight: 800; color: #f2879c; }
+</style>
+</head>
+<body>
+  <script>
+    // The clip is 660x1320 (a 390x780 view); the card keeps that shape. The card,
+    // the mark, the title, and the captions all center on x=540, the frame's
+    // middle, in a column kept 120px clear of TikTok's button rail on both sides.
+    const CARD = { x: 210, y: 480, w: 660, h: 1320 }
+    const q = new URLSearchParams(location.search)
+    const layer = q.get('layer') ?? 'bg'
+    document.body.className = `layer-${layer}`
+    const card = (box) => {
+      const el = document.createElement('div')
+      el.className = 'card'
+      Object.assign(el.style, { left: `${box.x}px`, top: `${box.y}px`, width: `${box.w}px`, height: `${box.h}px` })
+      document.body.append(el)
+    }
+    const name = () => document.body.insertAdjacentHTML('beforeend', '<div class="name"><img src="/site/img/icon.png" alt="" />RepBunny</div>')
+    if (layer === 'bg') {
+      card(CARD)
+      if (q.get('name') !== '0') name()
+    } else if (layer === 'name') {
+      name()
+    } else if (layer === 'mask') {
+      document.documentElement.style.width = document.body.style.width = `${CARD.w}px`
+      document.documentElement.style.height = document.body.style.height = `${CARD.h}px`
+      card({ x: 0, y: 0, w: CARD.w, h: CARD.h })
+    } else if (layer === 'title') {
+      const box = document.createElement('div')
+      box.className = 'title'
+      for (const k of ['a', 'b']) {
+        const line = document.createElement('div')
+        line.className = k
+        line.textContent = q.get(k) ?? ''
+        box.append(line)
+      }
+      document.body.append(box)
+    } else {
+      const box = document.createElement('div')
+      box.className = 'cap'
+      const text = document.createElement('div')
+      text.textContent = q.get('text') ?? ''
+      box.append(text)
+      document.body.append(box)
+      // Largest size that fits the caption box, from 54px down.
+      for (let size = 54; size >= 32; size -= 2) {
+        box.style.fontSize = `${size}px`
+        if (text.offsetHeight <= box.clientHeight) break
+      }
+    }
+    window.STAGE = { card: CARD }
+  </script>
+</body>
+</html>

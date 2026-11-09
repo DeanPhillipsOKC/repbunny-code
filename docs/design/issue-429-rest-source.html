@@ -1,0 +1,214 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Rest Source Links</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: #f5edf2; font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1300px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: #b9a8c2; font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; max-width: 1100px; }
+  .note b { color: #f5edf2; }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; display: flex; flex-direction: column; gap: 10px; }
+  .cap { color: #f2c069; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 0 4px; }
+  .capnote { color: #b9a8c2; font-size: 0.78rem; margin: 0 0 0 4px; line-height: 1.45; min-height: 60px; }
+  .capnote b { color: #f5edf2; }
+
+  .phone { width: 377px; height: 780px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 40px 24px 28px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+
+  /* Rest screen, as in src/components/RestTimer.vue */
+  .badge { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; }
+  .badge i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .badge span { font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); }
+  .hero { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .glow { position: relative; width: 170px; height: 170px; display: grid; place-items: center; }
+  .glow::before { content: ''; position: absolute; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 35%, transparent) 0%, transparent 70%); }
+  .glow img { width: 136px; height: 136px; object-fit: contain; position: relative; }
+  .copy { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .headline { margin: 0; font-size: 1.15rem; font-weight: 700; }
+  .count { margin: 0; font-size: 3.6rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; line-height: 1; }
+  .ctx { margin: 0; font-size: .85rem; color: var(--text-dim); }
+  .footer { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .track { width: 100%; max-width: 280px; height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  .fill { height: 100%; border-radius: 999px; background: var(--accent); }
+  .adjust { display: flex; gap: 12px; width: 100%; max-width: 280px; }
+  .adjust div { flex: 1; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px; font-weight: 600; font-size: .9rem; }
+  .skip { width: 100%; max-width: 300px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px; font-weight: 700; }
+  .back { color: var(--text-dim); font-weight: 700; font-size: .9rem; }
+
+  /* New: source line */
+  .source { max-width: 300px; text-align: center; font-size: .82rem; color: var(--text-dim); line-height: 1.6; margin: -2px 0 0; }
+  .source b { color: var(--text); font-weight: 700; }
+  .source a { color: var(--accent); font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .source .sep { opacity: .5; margin: 0 4px; }
+
+  /* New: keep chip after -15s/+15s */
+  .keep { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--success) 55%, var(--border)); background: color-mix(in srgb, var(--success) 12%, var(--surface)); color: var(--success); font-weight: 800; font-size: .84rem; }
+  .keep svg { width: 16px; height: 16px; }
+  .saved { color: var(--success); font-weight: 700; font-size: .84rem; }
+
+  /* New: first-rest tip */
+  .tip { width: 100%; max-width: 310px; border: 1px solid var(--border); background: var(--surface); border-radius: 14px; padding: 10px 12px; display: flex; gap: 10px; align-items: flex-start; font-size: .8rem; line-height: 1.45; color: var(--text-dim); position: relative; }
+  .tip b { color: var(--text); }
+  .tip .ico { color: var(--highlight); font-size: 1rem; line-height: 1.2; }
+  .tip .x { position: absolute; top: 6px; right: 10px; color: var(--text-dim); font-size: 1rem; }
+  .tip a { color: var(--accent); font-weight: 700; text-decoration: none; }
+  .tip p { margin: 0 14px 0 0; }
+
+  /* Option B: icon button + sheet */
+  .gear { display: flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); font-size: .8rem; font-weight: 700; }
+  .gear svg { width: 15px; height: 15px; }
+  .dim { position: absolute; inset: 0; background: rgba(8,5,10,.62); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--border); border-radius: 22px 22px 0 0; padding: 12px 20px 26px; }
+  .grab { width: 40px; height: 4px; border-radius: 99px; background: var(--border); margin: 0 auto 14px; }
+  .sheet h3 { font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; margin: 0 0 2px; }
+  .sheet .sub { color: var(--text-dim); font-size: .82rem; margin: 0 0 14px; }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 13px 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); margin-bottom: 8px; font-weight: 700; font-size: .9rem; }
+  .row small { display: block; color: var(--text-dim); font-weight: 600; font-size: .76rem; margin-top: 2px; }
+  .row .chev { color: var(--text-dim); }
+  .row.on { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); }
+  .row .tag { font-size: .68rem; font-weight: 800; color: var(--accent); letter-spacing: .05em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>Issue #429: rest timer on by default, with links to its setting</h1>
+  <p class="note">The rest screen from <b>RestTimer.vue</b>, with the new pieces added. <b>Option A</b> (screens 1 to 4) puts a small text line under the -15s/+15s buttons that names where the time came from, with links. <b>Option B</b> (screen 5) swaps the line for one small button that opens a sheet with the same choices. Both keep Skip Rest and Back to workout where they are, and both are in-app only (not the lock screen). Links open the setting on top of the rest, and the rest keeps counting.</p>
+</div>
+<div class="page">
+
+  <div class="col">
+    <p class="cap">A1 · Using the default</p>
+    <p class="capnote">Bench press has no rest of its own, so the 2:00 default is used. <b>Edit</b> opens Account at Default rest. <b>Set for Bench press</b> opens that exercise's form with Rest focused.</p>
+    <div class="phone">
+      <div class="badge"><i></i><span>Resting</span></div>
+      <div class="hero">
+        <div class="glow"><img src="../../public/rest-bunny.png" alt=""></div>
+        <div class="copy">
+          <p class="headline">Nice set. Catch your breath.</p>
+          <p class="count">1:42</p>
+          <p class="ctx">Next: Bench press</p>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="track"><div class="fill" style="width:85%"></div></div>
+        <div class="adjust"><div>-15s</div><div>+15s</div></div>
+        <p class="source">Default rest <b>2:00</b> <a>Edit</a><span class="sep">·</span><a>Set for Bench press</a></p>
+        <div class="skip">Skip Rest</div>
+        <div class="back">Back to workout</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">A2 · Exercise has its own rest</p>
+    <p class="capnote">Squat has its own 3:00, so the line names the exercise. <b>Edit</b> opens Squat's form with Rest focused.</p>
+    <div class="phone">
+      <div class="badge"><i></i><span>Resting</span></div>
+      <div class="hero">
+        <div class="glow"><img src="../../public/rest-bunny.png" alt=""></div>
+        <div class="copy">
+          <p class="headline">That one looked heavy.</p>
+          <p class="count">2:31</p>
+          <p class="ctx">Next: Squat</p>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="track"><div class="fill" style="width:84%"></div></div>
+        <div class="adjust"><div>-15s</div><div>+15s</div></div>
+        <p class="source">Squat rest <b>3:00</b> <a>Edit</a></p>
+        <div class="skip">Skip Rest</div>
+        <div class="back">Back to workout</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">A3 · After +15s</p>
+    <p class="capnote">The source line turns into a one-tap offer. <b>Keep 2:15 for Bench press</b> saves the exercise's own rest, then reads "Saved for Bench press" for a moment. Ignore it and nothing is saved.</p>
+    <div class="phone">
+      <div class="badge"><i></i><span>Resting</span></div>
+      <div class="hero">
+        <div class="glow"><img src="../../public/rest-bunny.png" alt=""></div>
+        <div class="copy">
+          <p class="headline">Nice set. Catch your breath.</p>
+          <p class="count">1:57</p>
+          <p class="ctx">Next: Bench press</p>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="track"><div class="fill" style="width:87%"></div></div>
+        <div class="adjust"><div>-15s</div><div>+15s</div></div>
+        <div class="keep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Keep 2:15 for Bench press</div>
+        <div class="skip">Skip Rest</div>
+        <div class="back">Back to workout</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">A4 · First rest ever</p>
+    <p class="capnote">Shown once, on the first rest a user ever sees, in place of the source line. Dismissed with ×, then never again on this phone. After that, screens A1 to A3 apply.</p>
+    <div class="phone">
+      <div class="badge"><i></i><span>Resting</span></div>
+      <div class="hero">
+        <div class="glow"><img src="../../public/rest-bunny.png" alt=""></div>
+        <div class="copy">
+          <p class="headline">First set done!</p>
+          <p class="count">1:54</p>
+          <p class="ctx">Next: Bench press</p>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="track"><div class="fill" style="width:95%"></div></div>
+        <div class="adjust"><div>-15s</div><div>+15s</div></div>
+        <div class="tip"><span class="ico">⏱</span><p><b>Your rest timer starts after each set.</b> It's 2:00 for now. Change it for <a>all exercises</a> or <a>just Bench press</a>.</p><span class="x">×</span></div>
+        <div class="skip">Skip Rest</div>
+        <div class="back">Back to workout</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">B · Icon button instead (alternative)</p>
+    <p class="capnote">One small "2:00 rest" button with a timer icon replaces the text line. Tapping it opens this sheet. It's quieter on the rest screen, but it takes one more tap. "Keep" after ±15s shows as a third row.</p>
+    <div class="phone">
+      <div class="badge"><i></i><span>Resting</span></div>
+      <div class="hero">
+        <div class="glow"><img src="../../public/rest-bunny.png" alt=""></div>
+        <div class="copy">
+          <p class="headline">Nice set. Catch your breath.</p>
+          <p class="count">1:42</p>
+          <p class="ctx">Next: Bench press</p>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="track"><div class="fill" style="width:85%"></div></div>
+        <div class="adjust"><div>-15s</div><div>+15s</div></div>
+        <div class="gear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M10 2h4"/></svg>2:00 rest</div>
+        <div class="skip">Skip Rest</div>
+        <div class="back">Back to workout</div>
+      </div>
+      <div class="dim"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3>Rest timer</h3>
+        <p class="sub">Bench press is using your default, 2:00.</p>
+        <div class="row on"><div>Default for all exercises<small>2:00</small></div><span class="tag">In use</span></div>
+        <div class="row"><div>Just for Bench press<small>Not set</small></div><span class="chev">›</span></div>
+        <div class="row"><div>Change the default<small>Opens Account</small></div><span class="chev">›</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

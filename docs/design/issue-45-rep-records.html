@@ -1,0 +1,212 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Rep Records</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1240px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 10px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 32px; padding: 24px 32px 40px; align-items: flex-start; }
+  .col { width: 390px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 74px; }
+  .phone { width: 390px; height: 860px; background: #0c0910; border: 1px solid var(--border); border-radius: 28px; position: relative; overflow: hidden; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 40px; background: var(--bg); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 20px 16px; overflow: hidden; }
+  .hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .hdr h3 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; flex: 1; line-height: 1.1; }
+  .iconbtn { width: 36px; height: 36px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); font-size: 0.9rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 14px 12px; margin-bottom: 16px; }
+  .chart-peek { opacity: 0.55; }
+  .k { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); }
+  .big { font-family: 'Baloo 2', sans-serif; font-size: 2rem; color: var(--accent); line-height: 1.1; }
+  .big small { font-size: 1rem; }
+  svg.chart { width: 100%; height: 34px; display: block; margin-top: 4px; }
+  .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: linear-gradient(transparent, var(--bg)); }
+
+  /* 2. Next-time target */
+  .next { display: flex; gap: 12px; align-items: center; }
+  .next .ico { width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
+  .next.up .ico { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+  .next .body { flex: 1; min-width: 0; }
+  .next .goal { font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; line-height: 1.15; }
+  .next .goal em { font-style: normal; color: var(--accent); }
+  .next.up .goal em { color: var(--success); }
+  .next .why { font-size: 0.74rem; color: var(--text-dim); margin-top: 2px; line-height: 1.4; }
+  .range { display: flex; gap: 3px; margin-top: 10px; }
+  .range span { flex: 1; height: 22px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--border); font-size: 0.66rem; font-weight: 800; color: var(--text-dim); display: grid; place-items: center; }
+  .range span.done { background: color-mix(in srgb, var(--accent) 30%, var(--surface-2)); border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); color: var(--text); }
+  .range span.goal { border: 1.5px dashed var(--accent); color: var(--accent); }
+  .next.up .range span.done { background: color-mix(in srgb, var(--success) 30%, var(--surface-2)); border-color: color-mix(in srgb, var(--success) 50%, var(--border)); }
+  .range-cap { display: flex; justify-content: space-between; font-size: 0.64rem; color: var(--text-dim); margin-top: 4px; font-weight: 700; }
+
+  /* 1. Best reps at each weight */
+  .rr-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+  .rr-head h4 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; }
+  .rr-head span { font-size: 0.72rem; color: var(--text-dim); font-weight: 700; }
+  .rr-sub { font-size: 0.74rem; color: var(--text-dim); margin: 0 0 10px; line-height: 1.4; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+  th { font-size: 0.64rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); text-align: left; padding: 0 0 6px; }
+  th.r, td.r { text-align: right; }
+  td { height: 34px; padding: 0; border-top: 1px solid var(--border); vertical-align: middle; white-space: nowrap; }
+  td.w { font-weight: 800; width: 96px; }
+  td.reps { width: 44px; font-family: 'Baloo 2', sans-serif; font-size: 1.05rem; color: var(--accent); }
+  td.bar { padding: 0 10px 0 2px; }
+  td.bar i { display: block; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--accent) 55%, transparent); }
+  td.date { color: var(--text-dim); font-size: 0.74rem; width: 52px; }
+  tr.last td.w::after { content: 'last'; margin-left: 6px; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--secondary); border: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent); border-radius: 999px; padding: 1px 5px; vertical-align: 1px; }
+  .more { display: block; width: 100%; margin-top: 8px; padding: 8px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); font: 700 0.76rem Manrope, sans-serif; text-align: center; }
+
+  /* States strip */
+  .states .card { margin-bottom: 12px; }
+  .states .lbl { font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--highlight); margin: 0 0 8px; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#45 redo: Next-time target + Best reps at each weight (proposal 2026-09-30)</h1>
+  <p class="note">Replaces the rep-max table, which compared a set's weight to an estimated 1RM (unfair when the set was 11 reps). Both cards <b>only compare a weight to itself</b>. Weight exercises only, in the history sheet under the chart, above the session list.</p>
+  <p class="note"><b>1. Best reps at each weight:</b> one row per weight you've used, heaviest first, with the most reps you've ever done at it and when. That's the number to beat. The weight you used last session gets a "last" tag. Six rows, then "Show all". Mixed lb/kg converted to the chart's unit like the chart.
+  <b>2. Next time:</b> double progression. Using the heaviest weight from your last session: below the top of the range, aim for one more rep than your best at that weight; once you've hit the top, go up. The rep range defaults to <b>8 to 12</b> and the jump to <b>+5 lb / +2.5 kg</b> (no per-exercise setting yet; that could come later).</p>
+</div>
+<div class="page">
+  <div class="col">
+    <p class="cap">A. Your Leg Extension today</p>
+    <p class="capnote">Last session was 210 × 9, but your best at 210 is 11 (Sep 26). So the target is 12 at 210, which is also the top of the range: hit it and next time says go up. The 190 row shows 10 reps you can still beat if you drop back down.</p>
+    <div class="phone">
+      <div class="sheet">
+        <div class="hdr"><h3>Leg Extension</h3><div class="iconbtn">✕</div></div>
+        <div class="card chart-peek"><div class="k">Est. 1RM</div><div class="big">287 <small>lb</small></div><svg class="chart" id="c1" viewBox="0 0 326 70" preserveAspectRatio="none"></svg></div>
+
+        <div class="card">
+          <div class="k" style="margin-bottom:8px">Next time</div>
+          <div class="next">
+            <div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></div>
+            <div class="body">
+              <div class="goal">210 lb × <em>12</em></div>
+              <div class="why">Beat your 11 from Sep 26. Hit 12 and it's time to go up to 215.</div>
+            </div>
+          </div>
+          <div class="range" id="r1"></div>
+          <div class="range-cap"><span>Rep range 8 to 12</span></div>
+        </div>
+
+        <div class="card">
+          <div class="rr-head"><h4>Best reps at each weight</h4><span>lb</span></div>
+          <p class="rr-sub">The most reps you've done at each weight. Beat it for a rep PR.</p>
+          <table>
+            <thead><tr><th>Weight</th><th>Reps</th><th></th><th class="r">When</th></tr></thead>
+            <tbody id="t1"></tbody>
+          </table>
+        </div>
+        <div class="fade"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">B. Longer history: time to go up</p>
+    <p class="capnote">Last session you got 12 at 185, the top of the range, so the card turns green and says go up to 190. You've done 190 × 9 before, so the target is 10, not a fresh 8.</p>
+    <div class="phone">
+      <div class="sheet">
+        <div class="hdr"><h3>Barbell Bench Press</h3><div class="iconbtn">✕</div></div>
+        <div class="card chart-peek"><div class="k">Est. 1RM</div><div class="big">259 <small>lb</small></div><svg class="chart" id="c2" viewBox="0 0 326 70" preserveAspectRatio="none"></svg></div>
+
+        <div class="card">
+          <div class="k" style="margin-bottom:8px">Next time</div>
+          <div class="next up">
+            <div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 14 12 8 18 14"/></svg></div>
+            <div class="body">
+              <div class="goal">Go up: 190 lb × <em>10</em></div>
+              <div class="why">You hit 12 at 185 on Sep 27. Your best at 190 is 9, so aim for 10.</div>
+            </div>
+          </div>
+          <div class="range" id="r2"></div>
+          <div class="range-cap"><span>Rep range 8 to 12</span></div>
+        </div>
+
+        <div class="card">
+          <div class="rr-head"><h4>Best reps at each weight</h4><span>lb</span></div>
+          <p class="rr-sub">The most reps you've done at each weight. Beat it for a rep PR.</p>
+          <table>
+            <thead><tr><th>Weight</th><th>Reps</th><th></th><th class="r">When</th></tr></thead>
+            <tbody id="t2"></tbody>
+          </table>
+          <div class="more">Show all 9 weights</div>
+        </div>
+        <div class="fade"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col states">
+    <p class="cap">C. Other "Next time" states</p>
+    <p class="capnote">Below the range: build reps at the same weight before anything else. Going up to a weight with no history: aim for the bottom of the range. Works from your first session, since it only needs your last one.</p>
+
+    <p class="lbl">Below the range (last: 225 × 6)</p>
+    <div class="card">
+      <div class="next">
+        <div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></div>
+        <div class="body">
+          <div class="goal">225 lb × <em>7</em></div>
+          <div class="why">Your best at 225 is 6. Build up to 8 before adding weight.</div>
+        </div>
+      </div>
+      <div class="range" id="r3"></div>
+      <div class="range-cap"><span>Rep range 8 to 12</span></div>
+    </div>
+
+    <p class="lbl">First time at the new weight</p>
+    <div class="card">
+      <div class="next up">
+        <div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 14 12 8 18 14"/></svg></div>
+        <div class="body">
+          <div class="goal">Go up: 60 kg × <em>8</em></div>
+          <div class="why">You hit 12 at 57.5 kg on Sep 24. First time at 60, so aim for 8.</div>
+        </div>
+      </div>
+      <div class="range" id="r4"></div>
+      <div class="range-cap"><span>Rep range 8 to 12</span></div>
+    </div>
+  </div>
+</div>
+<script>
+  // Range strip: reps 8..12; filled up to your best at that weight, dashed on the goal.
+  function range(id, best, goal) {
+    document.getElementById(id).innerHTML = [8, 9, 10, 11, 12]
+      .map((n) => `<span class="${n <= best ? 'done' : n === goal ? 'goal' : ''}">${n}</span>`)
+      .join('')
+  }
+  range('r1', 11, 12)
+  range('r2', 9, 10)
+  range('r3', 6, 8)
+  range('r4', 0, 8)
+
+  function table(id, rows, lastWeight) {
+    const max = Math.max(...rows.map((r) => r[1]))
+    document.getElementById(id).innerHTML = rows
+      .map(([w, reps, date]) => `<tr class="${w === lastWeight ? 'last' : ''}"><td class="w">${w}</td><td class="reps">${reps}</td><td class="bar"><i style="width:${(reps / max) * 100}%"></i></td><td class="r date">${date}</td></tr>`)
+      .join('')
+  }
+  table('t1', [[210, 11, 'Sep 26'], [190, 10, 'Sep 26']], 210)
+  table('t2', [[205, 5, 'Aug 2'], [195, 7, 'Sep 12'], [190, 9, 'Sep 19'], [185, 12, 'Sep 27'], [175, 12, 'Aug 30'], [165, 14, 'Aug 9']], 185)
+
+  function spark(id, vals) {
+    const svg = document.getElementById(id), W = 326, H = 70, p = 4, mn = Math.min(...vals), r = Math.max(...vals) - mn || 1
+    const pts = vals.map((v, i) => `${p + (i / (vals.length - 1)) * (W - 2 * p)},${H - p - ((v - mn) / r) * (H - 2 * p)}`).join(' ')
+    svg.innerHTML = `<polyline points="${pts}" fill="none" stroke="#f2879c" stroke-width="2" vector-effect="non-scaling-stroke"/>`
+  }
+  spark('c1', [276, 287])
+  spark('c2', [225, 232, 238, 241, 249, 252, 259])
+</script>
+</body>
+</html>

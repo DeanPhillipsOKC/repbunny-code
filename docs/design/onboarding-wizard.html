@@ -1,0 +1,293 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Setup Wizard</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d;
+  }
+  /* Chalk tokens from src/lib/theme.ts */
+  .chalk {
+    --bg: #121417; --surface: #1b1e23; --surface-2: #22262c; --border: #343a42;
+    --text: #eef1f4; --text-dim: #a3acb6; --accent: #8fb4d9; --accent-text: #121417;
+    --secondary: #b8c4d0; --highlight: #e6c27a; --success: #8cc79a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: #f5edf2; font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1300px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: #b9a8c2; font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; max-width: 1100px; }
+  .note b { color: #f5edf2; }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; display: flex; flex-direction: column; gap: 10px; }
+  .cap { color: #f2c069; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 0 4px; }
+  .capnote { color: #b9a8c2; font-size: 0.78rem; margin: 0 0 0 4px; line-height: 1.45; min-height: 76px; }
+  .capnote b { color: #f5edf2; }
+
+  .phone { width: 377px; height: 780px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 18px 20px 20px; position: relative; display: flex; flex-direction: column; }
+
+  /* wizard chrome */
+  .top { display: flex; align-items: center; justify-content: space-between; height: 36px; margin-bottom: 18px; }
+  .back { width: 36px; height: 36px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); }
+  .back.hidden { visibility: hidden; }
+  .dots { display: flex; gap: 6px; }
+  .dots i { width: 8px; height: 8px; border-radius: 99px; background: var(--border); }
+  .dots i.on { width: 22px; background: var(--accent); }
+  .dots i.done { background: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+  .skip { font-size: 0.85rem; font-weight: 700; color: var(--text-dim); width: 64px; text-align: right; }
+  .step { font-size: 0.72rem; font-weight: 800; color: var(--accent); letter-spacing: .06em; text-transform: uppercase; margin: 0 0 4px; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0; line-height: 1.15; }
+  .lede { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; margin: 6px 0 18px; }
+  .spacer { flex: 1; }
+  .cta { width: 100%; padding: 16px; border-radius: 999px; background: var(--accent); color: var(--accent-text); font-weight: 800; font-size: 1rem; text-align: center; box-shadow: 0 14px 28px -14px var(--accent); }
+  .ghost { text-align: center; color: var(--text-dim); font-weight: 700; font-size: 0.88rem; padding: 14px 0 0; }
+  .fine { color: var(--text-dim); font-size: 0.76rem; line-height: 1.45; text-align: center; margin: 10px 0 0; }
+
+  /* welcome */
+  .hello { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .hello img { width: 210px; filter: drop-shadow(0 16px 26px rgba(0,0,0,.5)); }
+  .wordmark { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 2.2rem; margin: 14px 0 0; }
+  .tag { color: var(--text-dim); font-style: italic; margin: 4px 0 18px; font-size: .95rem; }
+  .promise { display: flex; flex-direction: column; gap: 8px; text-align: left; width: 100%; }
+  .promise div { display: flex; gap: 10px; align-items: center; font-size: .86rem; font-weight: 600; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; }
+  .promise b { color: var(--highlight); font-size: 1rem; width: 18px; text-align: center; }
+
+  /* units */
+  .label { font-size: .8rem; font-weight: 800; color: var(--text-dim); margin: 0 0 8px; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+  .seg div { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 16px 12px; text-align: center; }
+  .seg div.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+  .seg b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; line-height: 1; }
+  .seg span { font-size: .8rem; color: var(--text-dim); font-weight: 600; }
+  .field { display: flex; align-items: center; background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; font-size: 1.1rem; font-weight: 700; color: var(--text-dim); }
+  .field .u { margin-left: auto; font-size: .9rem; }
+  .optional { font-weight: 600; color: var(--text-dim); font-size: .76rem; margin-left: 6px; }
+  .why { font-size: .78rem; color: var(--text-dim); line-height: 1.5; margin: 8px 2px 0; }
+  .lock { display: flex; gap: 10px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-top: 18px; font-size: .8rem; line-height: 1.45; color: var(--text-dim); }
+  .lock b { color: var(--text); }
+
+  /* look */
+  .looks { display: flex; flex-direction: column; gap: 10px; }
+  .look { display: flex; gap: 12px; align-items: center; border: 1.5px solid var(--border); background: var(--surface); border-radius: 16px; padding: 10px; }
+  .look.on { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+  .look .t { flex: 1; }
+  .look .n { font-weight: 800; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+  .look .c { font-size: .78rem; color: var(--text-dim); line-height: 1.4; margin-top: 2px; }
+  .check { width: 22px; height: 22px; border-radius: 99px; border: 2px solid var(--border); flex-shrink: 0; display: grid; place-items: center; }
+  .look.on .check { border-color: var(--accent); background: var(--accent); color: var(--accent-text); font-size: 13px; font-weight: 900; }
+
+  /* mini home previews inside each look card */
+  .mini { width: 84px; height: 112px; border-radius: 10px; padding: 7px; flex-shrink: 0; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,.08); }
+  .mini .h { height: 6px; width: 46px; border-radius: 3px; margin-bottom: 6px; }
+  .mini .card { height: 30px; border-radius: 6px; margin-bottom: 5px; }
+  .mini .btn { height: 12px; border-radius: 99px; width: 100%; position: absolute; bottom: 8px; left: 0; margin: 0 7px; width: 70px; }
+  .mini img { position: absolute; right: 2px; top: 30px; width: 46px; }
+  .m-classic { background: #17111c; } .m-classic .h { background: #f5edf2; } .m-classic .card { background: #211829; border: 1px solid #3a2b40; } .m-classic .btn { background: #f2879c; }
+  .m-chalk { background: #121417; } .m-chalk .h { background: #eef1f4; } .m-chalk .card { background: #1b1e23; border: 1px solid #343a42; } .m-chalk .btn { background: #8fb4d9; }
+  .m-mark { position: absolute; right: 7px; top: 6px; width: 12px; height: 12px; border-radius: 3px; background: url(../../public/icon-512.png) center/cover; opacity: .9; }
+  .more { font-size: .8rem; color: var(--text-dim); text-align: center; margin-top: 12px; line-height: 1.5; }
+  .more b { color: var(--text); }
+
+  /* start */
+  .explain { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; margin-bottom: 14px; }
+  .explain .q { font-weight: 800; font-size: .88rem; margin: 0 0 4px; color: var(--highlight); }
+  .explain p { margin: 0; font-size: .82rem; line-height: 1.5; color: var(--text-dim); }
+  .explain p b { color: var(--text); }
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice { background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; padding: 13px 14px; }
+  .choice.primary { border-color: var(--accent); }
+  .row { display: flex; gap: 12px; align-items: center; }
+  .ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 16%, var(--surface-2)); color: var(--accent); flex-shrink: 0; font-size: 1.1rem; font-weight: 900; }
+  .choice .n { font-weight: 800; font-size: .98rem; }
+  .choice .s { font-size: .78rem; color: var(--text-dim); margin-top: 2px; line-height: 1.4; }
+  .choice .chev { margin-left: auto; color: var(--text-dim); }
+  .how { display: inline-flex; align-items: center; gap: 6px; margin: 8px 0 0 52px; font-size: .76rem; font-weight: 800; color: var(--accent); }
+  .how i { width: 16px; height: 16px; border-radius: 99px; border: 1.5px solid var(--accent); display: grid; place-items: center; font-style: normal; font-size: 7px; }
+  .badge { font-size: .64rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; background: color-mix(in srgb, var(--highlight) 22%, transparent); color: var(--highlight); padding: 2px 7px; border-radius: 99px; }
+
+  /* preferences */
+  .prefs-h { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .prefs-h h2 { font-size: 1.4rem; }
+  .group { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 14px; }
+  .group .r { display: flex; justify-content: space-between; align-items: center; padding: 14px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: .9rem; }
+  .group .r:last-child { border-bottom: none; }
+  .group .r span { color: var(--text-dim); font-weight: 600; font-size: .82rem; }
+  .group .r.new { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+  .glabel { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 800; color: var(--text-dim); margin: 0 0 8px 4px; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>First-run setup wizard</h1>
+  <p class="note">Replaces the one-screen splash (<b>OnboardingScreen.vue</b>, which today only shows in the PWA before sign-in and <b>never shows in the native app</b>, since local mode is always "signed in"), the one-off <b>WeightUnitSheet</b>, and the Home <b>welcome card</b> from #207. Four steps, each skippable, about 30 seconds. Fresh installs only; existing users never see it, and anyone can run it again from Preferences.</p>
+  <p class="note">The look step is the point of the redesign: the second thing a new user sees is that RepBunny can be <b>steel blue with no bunny art</b>. Classic, Chalk, and the Minimal mascot are all free. Tapping a look repaints the wizard right away, so steps 3 and 4 below are shown in Chalk.</p>
+</div>
+
+<div class="page">
+
+  <!-- 1. Welcome -->
+  <div class="col">
+    <p class="cap">1 · Welcome</p>
+    <p class="capnote">Short and warm, then straight to setup. The three promises answer "why this app" before asking for anything. <b>Skip setup</b> uses the defaults (lb, Classic) and lands on Home with the welcome card.</p>
+    <div class="phone">
+      <div class="hello">
+        <img src="../../public/onboarding-bunny.png" alt="" onerror="this.src='../../public/celebration-dumbbell-bunny.png'">
+        <p class="wordmark">RepBunny</p>
+        <p class="tag">Small wins. Stronger every set.</p>
+        <div class="promise">
+          <div><b>✓</b>Log a set in a couple of taps</div>
+          <div><b>✓</b>See every lift get stronger</div>
+          <div><b>✓</b>No account. Your data stays on your phone</div>
+        </div>
+      </div>
+      <div class="cta">Set up in 30 seconds</div>
+      <div class="ghost">Skip setup</div>
+    </div>
+  </div>
+
+  <!-- 2. Units -->
+  <div class="col">
+    <p class="cap">2 · Units and you</p>
+    <p class="capnote">Absorbs <b>WeightUnitSheet</b>. The unit is preselected from the phone's region (kg outside the US). Body weight is optional, and <b>Skip</b> is as easy as filling it in. It's saved as the first weigh-in.</p>
+    <div class="phone">
+      <div class="top"><div class="back hidden">‹</div><div class="dots"><i class="on"></i><i></i><i></i></div><div class="skip">Skip</div></div>
+      <p class="step">Step 1 of 3</p>
+      <h2>How do you measure?</h2>
+      <p class="lede">New exercises start in this unit. You can switch any exercise later.</p>
+      <p class="label">I lift in</p>
+      <div class="seg">
+        <div class="on"><b>lb</b><span>Pounds</span></div>
+        <div><b>kg</b><span>Kilograms</span></div>
+      </div>
+      <p class="label">Body weight <span class="optional">optional</span></p>
+      <div class="field">e.g. 180<span class="u">lb</span></div>
+      <p class="why">Used for bodyweight exercises like pull-ups and dips, and for your Body tab. Leave it blank if you'd rather not.</p>
+      <div class="lock"><span>🔒</span><span><b>Stays on this phone.</b> RepBunny has no account and never uploads your data.</span></div>
+      <div class="spacer"></div>
+      <div class="cta">Next</div>
+    </div>
+  </div>
+
+  <!-- 3. Look (Classic selected) -->
+  <div class="col">
+    <p class="cap">3a · Pick your look (Classic picked)</p>
+    <p class="capnote">Three looks, each with a little preview of Home. No "for him / for her" labels: the previews and captions do the talking. <b>All three are free.</b> Nothing here says Premium.</p>
+    <div class="phone">
+      <div class="top"><div class="back">‹</div><div class="dots"><i class="done"></i><i class="on"></i><i></i></div><div class="skip">Skip</div></div>
+      <p class="step">Step 2 of 3</p>
+      <h2>Pick your look</h2>
+      <p class="lede">Cute or all business. It's your call.</p>
+      <div class="looks">
+        <div class="look on">
+          <div class="mini m-classic"><div class="h"></div><div class="card"></div><img src="../../public/celebration-bunny.png" alt=""><div class="btn"></div></div>
+          <div class="t"><div class="n">Classic</div><div class="c">Pink and playful. The bunny cheers you on and throws confetti for records.</div></div>
+          <div class="check">✓</div>
+        </div>
+        <div class="look">
+          <div class="mini m-classic"><div class="h"></div><div class="card"></div><div class="card"></div><div class="m-mark"></div><div class="btn"></div></div>
+          <div class="t"><div class="n">Classic, no bunny</div><div class="c">Same colors, without the bunny art or confetti.</div></div>
+          <div class="check"></div>
+        </div>
+        <div class="look">
+          <div class="mini m-chalk"><div class="h"></div><div class="card"></div><div class="card"></div><div class="m-mark"></div><div class="btn"></div></div>
+          <div class="t"><div class="n">Chalk</div><div class="c">Steel blue on graphite. No pink, no bunny art. Just your numbers.</div></div>
+          <div class="check"></div>
+        </div>
+      </div>
+      <p class="more">Change it anytime in <b>Preferences › Theme</b>,<br>where there are more themes to try.</p>
+      <div class="spacer"></div>
+      <div class="cta">Next</div>
+    </div>
+  </div>
+
+  <!-- 3b. Look (Chalk selected) -->
+  <div class="col">
+    <p class="cap">3b · Same step, Chalk picked</p>
+    <p class="capnote">The whole wizard repaints the moment a look is tapped, so they see it before committing. Chalk is <b>Chalk + Minimal mascot</b>: no bunny art anywhere, only the tiny app mark. Records still get a plain-text callout.</p>
+    <div class="phone chalk">
+      <div class="top"><div class="back">‹</div><div class="dots"><i class="done"></i><i class="on"></i><i></i></div><div class="skip">Skip</div></div>
+      <p class="step">Step 2 of 3</p>
+      <h2>Pick your look</h2>
+      <p class="lede">Cute or all business. It's your call.</p>
+      <div class="looks">
+        <div class="look">
+          <div class="mini m-classic"><div class="h"></div><div class="card"></div><img src="../../public/celebration-bunny.png" alt=""><div class="btn"></div></div>
+          <div class="t"><div class="n">Classic</div><div class="c">Pink and playful. The bunny cheers you on and throws confetti for records.</div></div>
+          <div class="check"></div>
+        </div>
+        <div class="look">
+          <div class="mini m-classic"><div class="h"></div><div class="card"></div><div class="card"></div><div class="m-mark"></div><div class="btn"></div></div>
+          <div class="t"><div class="n">Classic, no bunny</div><div class="c">Same colors, without the bunny art or confetti.</div></div>
+          <div class="check"></div>
+        </div>
+        <div class="look on">
+          <div class="mini m-chalk"><div class="h"></div><div class="card"></div><div class="card"></div><div class="m-mark"></div><div class="btn"></div></div>
+          <div class="t"><div class="n">Chalk</div><div class="c">Steel blue on graphite. No pink, no bunny art. Just your numbers.</div></div>
+          <div class="check">✓</div>
+        </div>
+      </div>
+      <p class="more">Change it anytime in <b>Preferences › Theme</b>,<br>where there are more themes to try.</p>
+      <div class="spacer"></div>
+      <div class="cta">Next</div>
+    </div>
+  </div>
+
+  <!-- 4. Start -->
+  <div class="col">
+    <p class="cap">4 · How do you want to train?</p>
+    <p class="capnote">Explains routine and program before asking. <b>Create my own program</b> opens the routine editor; after the first save it offers "Add another routine". Each choice finishes setup and goes straight there (same targets as the #207 card). <b>See how</b> opens the matching repbunny.app guide with a 20-second clip, in the browser, no tracking.</p>
+    <div class="phone chalk">
+      <div class="top"><div class="back">‹</div><div class="dots"><i class="done"></i><i class="done"></i><i class="on"></i></div><div class="skip"></div></div>
+      <p class="step">Step 3 of 3</p>
+      <h2>How do you want to train?</h2>
+      <div class="explain" style="margin-top:14px">
+        <p class="q">Routines and programs</p>
+        <p>A <b>routine</b> is a saved workout you repeat, like "Push day". Your <b>program</b> is the routines you do each week: one or several, depending on how you train.</p>
+      </div>
+      <div class="choices">
+        <div class="choice">
+          <div class="row"><span class="ic">★</span><div><div class="n">Use a starter program</div><div class="s">Not sure what to do? Get proven routines with how-tos for every lift.</div></div><span class="chev">›</span></div>
+          <span class="how"><i>▶</i>See how · 20s</span>
+        </div>
+        <div class="choice">
+          <div class="row"><span class="ic">✎</span><div><div class="n">Create my own program</div><div class="s">Have a plan? Set up the routines you do each week, then start any of them in one tap.</div></div><span class="chev">›</span></div>
+          <span class="how"><i>▶</i>See how · 20s</span>
+        </div>
+        <div class="choice">
+          <div class="row"><span class="ic">+</span><div><div class="n">Just log as I go</div><div class="s">Start a workout now and pick exercises as you do them.</div></div><span class="chev">›</span></div>
+          <span class="how"><i>▶</i>See how · 20s</span>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <p class="fine">You can do all three. This just picks where to start.</p>
+    </div>
+  </div>
+
+  <!-- 5. Preferences -->
+  <div class="col">
+    <p class="cap">5 · Run setup again</p>
+    <p class="capnote">A row in Preferences reopens the wizard with current choices preselected. Nothing is lost: it only changes unit, look, and (if filled in) adds a weigh-in. A <b>Getting started</b> row links to the guides.</p>
+    <div class="phone chalk">
+      <div class="prefs-h"><div class="back">‹</div><h2>Preferences</h2></div>
+      <p class="glabel">Look and units</p>
+      <div class="group">
+        <div class="r">Theme <span>Chalk ›</span></div>
+        <div class="r">Weight unit <span>lb ›</span></div>
+        <div class="r">Barbell and plates <span>›</span></div>
+      </div>
+      <p class="glabel">Help</p>
+      <div class="group">
+        <div class="r new">Run setup again <span>›</span></div>
+        <div class="r">Getting started guides <span>repbunny.app ›</span></div>
+        <div class="r">Report a bug <span>›</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

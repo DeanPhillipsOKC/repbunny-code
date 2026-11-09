@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Small Win Chips</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: #f5edf2; font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1300px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: #b9a8c2; font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; max-width: 1100px; }
+  .note b { color: #f5edf2; }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; display: flex; flex-direction: column; gap: 10px; }
+  .cap { color: #f2c069; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 0 4px; }
+  .capnote { color: #b9a8c2; font-size: 0.78rem; margin: 0 0 0 4px; line-height: 1.45; min-height: 60px; }
+  .capnote b { color: #f5edf2; }
+  .phone { width: 377px; height: 700px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 28px 12px; position: relative; }
+
+  /* Logger, as in src/components/WorkoutLogger.vue */
+  .ex-name { font-family: 'Baloo 2', sans-serif; font-size: 1.5rem; font-weight: 800; margin: 0 4px 2px; }
+  .ex-sub { margin: 0 4px 12px; color: var(--text-dim); font-size: .82rem; }
+  .head { display: flex; gap: 6px; padding: 0 8px 4px 42px; font-size: .62rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim); }
+  .head span:first-child { flex: 1; text-align: center; }
+  .head .r { width: 64px; text-align: center; } .head .p { width: 52px; text-align: center; } .head .sp { width: 88px; }
+  .rows { display: flex; flex-direction: column; gap: 8px; }
+  .row { display: flex; align-items: center; gap: 6px; min-height: 56px; padding: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); flex-wrap: wrap; }
+  .num { flex-shrink: 0; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: var(--surface-2); font-weight: 800; }
+  .cell { flex-shrink: 0; text-align: center; font-size: 1.3rem; font-weight: 700; }
+  .w { flex: 1; min-width: 0; white-space: nowrap; }
+  .w small { margin-left: 2px; font-size: .85rem; font-weight: 600; color: var(--text-dim); }
+  .reps { width: 64px; } .rpe { width: 52px; font-size: 1.1rem; color: var(--text-dim); }
+  .acts { width: 88px; display: flex; justify-content: flex-end; align-items: center; gap: 4px; color: var(--text-dim); }
+  .acts .ok { width: 40px; display: flex; justify-content: center; color: var(--success); }
+  .draft { background: var(--surface-2); min-height: 68px; }
+  .inp { flex: 1; height: 48px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); display: grid; place-items: center; font-weight: 700; font-size: 1.15rem; }
+  .inp.r { flex: 0 0 64px; } .inp.p { flex: 0 0 52px; color: var(--text-dim); font-size: .9rem; }
+  .x { width: 40px; text-align: center; color: var(--text-dim); } .go { width: 44px; height: 44px; border-radius: 10px; background: var(--accent); color: var(--accent-text); display: grid; place-items: center; font-weight: 800; }
+
+  /* Option A: chip on its own line under the values, starting under Weight */
+  .win-a { flex-basis: 100%; margin: 2px 0 0 34px; display: flex; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px 3px 7px; border-radius: 999px; font-size: .72rem; font-weight: 800; letter-spacing: .02em; border: 1px solid color-mix(in srgb, var(--highlight) 50%, var(--border)); background: color-mix(in srgb, var(--highlight) 14%, transparent); color: var(--highlight); }
+  .chip svg { width: 13px; height: 13px; }
+  .chip.target { border-color: color-mix(in srgb, var(--success) 50%, var(--border)); background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
+
+  /* Option B: star replaces the set number, label in the RPE slot */
+  .num.star { background: color-mix(in srgb, var(--highlight) 22%, transparent); color: var(--highlight); }
+  .tag-b { position: absolute; }
+
+  /* Rest screen, as in src/components/RestTimer.vue */
+  .rest { display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 40px 24px 28px; }
+  .badge { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; }
+  .badge i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .badge span { font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); }
+  .hero { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .bunny { width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 35%, transparent) 0%, transparent 70%); display: grid; place-items: center; font-size: 3.4rem; }
+  .copy { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+  .headline { margin: 0; font-size: 1.15rem; font-weight: 700; }
+  .count { margin: 0; font-size: 3.6rem; font-weight: 700; line-height: 1; }
+  .ctx { margin: 0; font-size: .85rem; color: var(--text-dim); }
+  .wins { list-style: none; margin: 4px 0 2px; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .wins li { display: flex; align-items: center; gap: 6px; font-size: .86rem; font-weight: 700; color: var(--text); }
+  .wins .chip { font-size: .66rem; }
+  .footer { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .track { width: 100%; max-width: 280px; height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  .fill { width: 62%; height: 100%; background: var(--accent); }
+  .adjust { display: flex; gap: 12px; width: 100%; max-width: 280px; }
+  .adjust div { flex: 1; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px; font-weight: 600; font-size: .9rem; }
+  .skip { width: 100%; max-width: 300px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#475 Small-win chips</h1>
+  <p class="note">A set that's the <b>heaviest yet</b>, a <b>rep best</b> at its weight, an <b>est. 1RM best</b> (Premium) or a <b>target hit</b> gets one chip on its logged row (strongest win only) and a line per win on the rest screen. No takeover; a big record still gets the full-screen celebration and the chip too.</p>
+</div>
+<div class="page">
+  <div class="col">
+    <p class="cap">Option A · chip under the set (chosen)</p>
+    <p class="capnote">The chip sits on a short line of its own under the values, starting under the Weight column like the target chip on open rows. Long labels and kg both fit. Rows without a win stay their normal height.</p>
+    <div class="phone">
+      <p class="ex-name">Barbell bench press</p>
+      <p class="ex-sub">Set 4 of 4 · Last time 185 lb × 8</p>
+      <div class="head"><span>Weight</span><span class="r">Reps</span><span class="p">RPE</span><span class="sp"></span></div>
+      <div class="rows">
+        <div class="row"><span class="num">1</span><span class="cell w">185<small>lb</small></span><span class="cell reps">8</span><span class="cell rpe">8</span><span class="acts">✎<span class="ok">✓</span></span></div>
+        <div class="row"><span class="num">2</span><span class="cell w">190<small>lb</small></span><span class="cell reps">6</span><span class="cell rpe">9</span><span class="acts">✎<span class="ok">✓</span></span>
+          <div class="win-a"><span class="chip"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>Heaviest yet</span></div></div>
+        <div class="row"><span class="num">3</span><span class="cell w">185<small>lb</small></span><span class="cell reps">10</span><span class="cell rpe">–</span><span class="acts">✎<span class="ok">✓</span></span>
+          <div class="win-a"><span class="chip"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>Rep best</span></div></div>
+        <div class="row"><span class="num">4</span><span class="cell w">84<small>kg</small></span><span class="cell reps">8</span><span class="cell rpe">9</span><span class="acts">✎<span class="ok">✓</span></span>
+          <div class="win-a"><span class="chip target"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>Target hit</span></div></div>
+        <div class="row draft"><span class="num">5</span><span class="inp">185</span><span class="inp r">8</span><span class="inp p">RPE</span><span class="x">✕</span><span class="go">✓</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">Option B · star in the set number</p>
+    <p class="capnote">No extra height: the set number turns into a gold star and the label only shows on the rest screen. Quieter, but "what did I win?" needs a long-press or memory, and the number disappears.</p>
+    <div class="phone">
+      <p class="ex-name">Barbell bench press</p>
+      <p class="ex-sub">Set 4 of 4 · Last time 185 lb × 8</p>
+      <div class="head"><span>Weight</span><span class="r">Reps</span><span class="p">RPE</span><span class="sp"></span></div>
+      <div class="rows">
+        <div class="row"><span class="num">1</span><span class="cell w">185<small>lb</small></span><span class="cell reps">8</span><span class="cell rpe">8</span><span class="acts">✎<span class="ok">✓</span></span></div>
+        <div class="row"><span class="num star">★</span><span class="cell w">190<small>lb</small></span><span class="cell reps">6</span><span class="cell rpe">9</span><span class="acts">✎<span class="ok">✓</span></span></div>
+        <div class="row"><span class="num star">★</span><span class="cell w">185<small>lb</small></span><span class="cell reps">10</span><span class="cell rpe">–</span><span class="acts">✎<span class="ok">✓</span></span></div>
+        <div class="row"><span class="num star">★</span><span class="cell w">84<small>kg</small></span><span class="cell reps">8</span><span class="cell rpe">9</span><span class="acts">✎<span class="ok">✓</span></span></div>
+        <div class="row draft"><span class="num">5</span><span class="inp">185</span><span class="inp r">8</span><span class="inp p">RPE</span><span class="x">✕</span><span class="go">✓</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p class="cap">Rest screen (both options)</p>
+    <p class="capnote">Every win from the set, one line each, between the bunny's line and the countdown. Here: 190 lb × 6 was the heaviest yet and an est. 1RM best (Premium), and it hit the target.</p>
+    <div class="phone rest">
+      <div class="badge"><i></i><span>Resting</span></div>
+      <div class="hero">
+        <div class="bunny">🐰</div>
+        <div class="copy">
+          <p class="headline">Heavier than last time. Nice.</p>
+          <ul class="wins" aria-label="Small wins">
+            <li><span class="chip"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>Heaviest yet</span>190 lb, up from 185 lb</li>
+            <li><span class="chip"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>1RM best</span>Est. 1RM 228 lb</li>
+            <li><span class="chip target"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>Target hit</span>190 lb × 6</li>
+          </ul>
+          <p class="count">1:52</p>
+          <p class="ctx">Next: Barbell bench press</p>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="track"><div class="fill"></div></div>
+        <div class="adjust"><div>-15s</div><div>+15s</div></div>
+        <div class="skip">Skip rest</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

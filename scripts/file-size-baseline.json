@@ -1,0 +1,13 @@
+{
+  "src/components/AccountSheet.vue": 1595,
+  "src/components/ExerciseHistoryDetail.vue": 1070,
+  "src/components/FinishRecap.vue": 878,
+  "src/components/ImportHistory.vue": 1210,
+  "src/components/SetupWizard.vue": 844,
+  "src/components/TemplateEditor.vue": 1107,
+  "src/components/ThemeSheet.vue": 1044,
+  "src/components/WorkoutHistory.vue": 1912,
+  "src/components/WorkoutLogger.vue": 5779,
+  "src/data/sqlite/repos.ts": 1101,
+  "src/stores/workouts.ts": 1478
+}

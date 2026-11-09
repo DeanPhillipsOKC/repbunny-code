@@ -1,0 +1,50 @@
+# Starts the Owner calendar routine (/owner-calendar headless) only when a dated owner step needs
+# adding, moving, or deleting on the owner's Google Calendar (#746), so a cycle with nothing pending
+# costs no routine run. scripts/owner-calendar.mjs finds `<!-- owner-date: ... -->` markers and
+# `On hold until` comments without a matching `<!-- calendar-synced: ... -->` reply, and closed
+# issues whose events are still ahead; scripts/dispatch-calendar.mjs fires the routine's API trigger
+# when there are any. No AI runs here. 12 runs a day, about a minute each.
+# See docs/backlog-runner.md > Owner calendar.
+name: Dispatch owner calendar
+
+on:
+  schedule:
+    - cron: '37 */2 * * *'
+  workflow_dispatch:
+
+# issues: write lets the script keep the `owner-date` label on the issues it has to watch.
+# actions: read lets it see whether an earlier run fired in the last hour (the repo is private).
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+concurrency:
+  group: dispatch-calendar
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Check and fire
+        id: dispatch
+        run: node scripts/dispatch-calendar.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTOMATION_PAUSED: ${{ vars.AUTOMATION_PAUSED }}
+          CALENDAR_ROUTINE_ID: ${{ secrets.CALENDAR_ROUTINE_ID }}
+          CALENDAR_ROUTINE_TOKEN: ${{ secrets.CALENDAR_ROUTINE_TOKEN }}
+
+      # Only runs after a real fire. The script looks for this step's name in earlier runs to
+      # avoid firing twice within an hour.
+      - name: Routine fired
+        if: steps.dispatch.outputs.fired == 'true'
+        run: echo "Owner calendar routine fired"

@@ -1,0 +1,47 @@
+# Native build check (#346): compiles the Android app on pull requests that touch it.
+# Cloud sessions can't reach Google's Maven (dl.google.com), so this is where Gradle runs for them.
+# Debug build only: no signing, no secrets. See docs/architecture/commit-policy.md > Native build check.
+name: Android build
+
+on:
+  pull_request:
+    paths:
+      - 'android/**'
+      - 'capacitor.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/android-build.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Android build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - run: npm ci --ignore-scripts
+
+      - name: Build web app and sync to Android
+        run: npm run android:sync
+
+      - name: Compile the Android app
+        working-directory: android
+        run: ./gradlew assemblePersonalDebug

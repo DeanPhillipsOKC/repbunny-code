@@ -1,0 +1,48 @@
+<!doctype html>
+<!--
+  Sprint review title card (dry run, 2026-10-15): one per shipped change, before
+  its clip. ?a and ?b are the two title lines, ?n is "#535", ?k is "1 of 3".
+  Rendered by cards.mjs like intro.html; window.CARD gives its length and sounds.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: 'Baloo 2'; font-weight: 600 800; src: url(/site/fonts/baloo2-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 400 800; src: url(/site/fonts/manrope-latin.woff2) format('woff2'); }
+  :root { --bg: #17111c; --accent: #f2879c; --secondary: #b79cf0; --highlight: #f2c069; --text: #f5edf2; --text-soft: #cdbfca; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 480px; height: 1040px; overflow: hidden; background: var(--bg); }
+  .card { position: absolute; inset: 0; overflow: hidden; background: var(--bg); font-family: 'Baloo 2', sans-serif; color: var(--text);
+    animation: out .35s ease-in 1.85s both; }
+  @keyframes out { to { opacity: 0; transform: scale(1.08); } }
+  .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .45; }
+  .b1 { width: 320px; height: 320px; background: var(--secondary); left: -110px; top: 260px; animation: drift 2.2s ease-in-out both; }
+  .b2 { width: 280px; height: 280px; background: var(--accent); right: -100px; top: 520px; animation: drift 2.2s ease-in-out reverse both; }
+  @keyframes drift { from { transform: translate(0, 0); } to { transform: translate(40px, -30px); } }
+  .meta { position: absolute; top: 330px; left: 0; right: 0; text-align: center; font-family: 'Manrope', sans-serif; font-weight: 700;
+    font-size: 22px; letter-spacing: .5px; color: var(--text-soft); animation: fade .4s ease-out .1s both; }
+  .meta b { color: var(--highlight); }
+  .title { position: absolute; top: 380px; left: 0; right: 0; text-align: center; line-height: 1; }
+  .l1 { display: block; font-size: 54px; font-weight: 700; animation: up .45s cubic-bezier(.2, .9, .3, 1.15) .2s both; }
+  .l2 { display: block; font-size: 76px; font-weight: 800; padding: 0 16px;
+    background: linear-gradient(90deg, var(--accent), var(--secondary), var(--highlight));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: up .45s cubic-bezier(.2, .9, .3, 1.15) .38s both; }
+  @keyframes up { from { transform: translateY(60px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="meta"><b id="n"></b> &nbsp;·&nbsp; <span id="k"></span></div>
+  <div class="title"><span class="l1" id="a"></span><span class="l2" id="b"></span></div>
+</div>
+<script>
+  const q = new URLSearchParams(location.search)
+  for (const id of ['a', 'b', 'n', 'k']) document.getElementById(id).textContent = q.get(id) ?? ''
+  window.CARD = { duration: 2.2, sounds: [['whoosh', 0.15]] }
+</script>
+</body>
+</html>

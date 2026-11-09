@@ -1,0 +1,53 @@
+<!doctype html>
+<!-- The Google Play feature graphic (1024x500, #198), styled like card.html. Render it with
+     `node scripts/og-image/render.mjs --play`. Play can crop or overlay the edges, so keep the
+     words in the left half and away from the borders. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: 'Baloo 2'; src: url('../../site/fonts/baloo2-latin.woff2') format('woff2'); font-weight: 400 800; }
+  @font-face { font-family: 'Manrope'; src: url('../../site/fonts/manrope-latin.woff2') format('woff2'); font-weight: 200 800; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1024px; height: 500px; }
+  body {
+    position: relative; overflow: hidden; font-family: 'Manrope', sans-serif; color: #f5edf2;
+    background:
+      radial-gradient(460px 380px at 80% 40%, rgba(242,135,156,.34), transparent 70%),
+      radial-gradient(420px 340px at 64% 96%, rgba(183,156,240,.28), transparent 70%),
+      radial-gradient(340px 260px at 6% 0%, rgba(242,192,105,.12), transparent 70%),
+      #17111c;
+  }
+  .copy { position: absolute; left: 64px; top: 0; bottom: 0; width: 480px; display: flex; flex-direction: column; justify-content: center; }
+  .brand { display: flex; align-items: center; gap: 12px; font: 800 30px/1 'Baloo 2', sans-serif; margin-bottom: 20px; }
+  .brand img { width: 46px; height: 46px; border-radius: 12px; }
+  h1 { font: 800 52px/1.04 'Baloo 2', sans-serif; letter-spacing: -1px; }
+  h1 span { background: linear-gradient(90deg, #f2879c, #b79cf0); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { margin-top: 16px; font-size: 21px; font-weight: 600; color: #cdbfca; }
+
+  .phone { position: absolute; width: 214px; height: 420px; padding: 8px; border-radius: 34px; background: #0d0910; border: 2px solid #4a3a56; box-shadow: 0 34px 70px -20px rgba(0,0,0,.7); }
+  .phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 26px; display: block; }
+  .back { left: 786px; top: 56px; transform: rotate(9deg); opacity: .92; }
+  .front { left: 604px; top: 70px; transform: rotate(-6deg); }
+  .toast { position: absolute; left: 540px; top: 92px; display: flex; align-items: center; gap: 10px; padding: 10px 16px 10px 10px; border-radius: 16px; background: #241a2c; border: 1.5px solid #4a3a56; box-shadow: 0 18px 40px -12px rgba(0,0,0,.7); transform: rotate(-4deg); }
+  .toast b { display: block; font-size: 17px; color: #f2c069; }
+  .toast small { font-size: 14px; color: #cdbfca; }
+  .toast .cup { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; font-size: 22px; background: #3a2c45; }
+  .bunny { position: absolute; left: 516px; top: 300px; width: 186px; filter: drop-shadow(0 18px 24px rgba(0,0,0,.55)); }
+  .spark { position: absolute; color: #f2c069; font-size: 26px; }
+</style>
+</head>
+<body>
+  <div class="copy">
+    <div class="brand"><img src="../../site/img/icon.png" alt="">RepBunny</div>
+    <h1>Small wins.<br><span>Stronger every set.</span></h1>
+    <p class="sub">A quick workout log that keeps everything on your phone.</p>
+  </div>
+  <div class="phone back"><img src="../../site/img/shot-progress-chart.webp" alt=""></div>
+  <div class="phone front"><img src="../../site/img/shot-logging.webp" alt=""></div>
+  <div class="toast"><span class="cup">🏆</span><span><b>New record!</b><small>Leg press 10 × 180 lb</small></span></div>
+  <img class="bunny" src="../../site/img/bunny-dumbbell.webp" alt="">
+  <span class="spark" style="left:980px;top:24px;font-size:20px">✦</span>
+  <span class="spark" style="left:740px;top:22px;font-size:20px;color:#f2879c">✦</span>
+</body>
+</html>

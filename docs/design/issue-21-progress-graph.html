@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Progress Graph</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1700px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.85rem; margin: 0 0 14px; line-height: 1.5; }
+  .page { display: flex; flex-wrap: wrap; gap: 32px; padding: 24px 32px 40px; align-items: flex-start; }
+  .col { width: 390px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 56px; }
+  .phone { width: 390px; height: 800px; background: #0c0910; border: 1px solid var(--border); border-radius: 28px; position: relative; overflow: hidden; }
+  .dim { position: absolute; inset: 0; background: color-mix(in srgb, var(--bg) 70%, transparent); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 70px; background: var(--bg); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 20px 16px; overflow: hidden; }
+  .sheet.short { top: auto; }
+
+  .hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .hdr h3 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; flex: 1; line-height: 1.1; }
+  .iconbtn { width: 36px; height: 36px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); font-size: 0.9rem; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 14px 12px; margin-bottom: 16px; }
+  .seg { display: flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: 11px; padding: 3px; margin-bottom: 12px; }
+  .seg span { flex: 1; text-align: center; padding: 7px 4px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; color: var(--text-dim); }
+  .seg span.sel { background: var(--accent); color: var(--accent-text); }
+  .seg.tabs span.sel { background: var(--surface); color: var(--text); box-shadow: 0 0 0 1px var(--border); }
+  .seg.tabs { margin-bottom: 16px; }
+  .k { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); display: flex; justify-content: space-between; align-items: baseline; }
+  .k a { text-transform: none; letter-spacing: 0; color: var(--secondary); font-weight: 700; font-size: 0.76rem; text-decoration: none; display: inline-flex; gap: 4px; align-items: center; }
+  .k a .q { width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid var(--secondary); display: inline-grid; place-items: center; font-size: 0.6rem; font-weight: 800; }
+  .big { display: flex; align-items: baseline; gap: 10px; margin: 2px 0 2px; }
+  .big .v { font-family: 'Baloo 2', sans-serif; font-size: 2rem; color: var(--accent); line-height: 1.1; }
+  .big .v small { font-size: 1rem; }
+  .delta { font-size: 0.78rem; font-weight: 800; color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); padding: 2px 8px; border-radius: 999px; }
+  .sub { font-size: 0.74rem; color: var(--text-dim); margin-bottom: 6px; }
+  svg.chart { width: 100%; height: 150px; display: block; }
+  .axis { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; }
+  .ranges { display: flex; gap: 6px; margin-top: 10px; }
+  .ranges span { flex: 1; text-align: center; padding: 6px 0; border-radius: 999px; font-size: 0.74rem; font-weight: 800; color: var(--text-dim); border: 1px solid var(--border); }
+  .ranges span.sel { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .tip { position: absolute; background: var(--surface-2); border: 1px solid var(--accent); border-radius: 10px; padding: 5px 9px; font-size: 0.72rem; line-height: 1.35; white-space: nowrap; }
+  .tip b { color: var(--accent); }
+  .chartwrap { position: relative; }
+
+  .sessions h4 { margin: 0 0 6px; font-size: 0.92rem; }
+  .sessions .set { display: flex; gap: 10px; align-items: center; margin-bottom: 4px; font-size: 0.86rem; }
+  .sessions .n { width: 22px; height: 22px; border-radius: 50%; background: var(--surface-2); color: var(--text-dim); font-size: 0.7rem; font-weight: 700; display: grid; place-items: center; }
+  .sessions .entry { margin-bottom: 14px; }
+  .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 80px; background: linear-gradient(transparent, var(--bg)); }
+
+  /* explainer */
+  .explain { text-align: left; }
+  .explain .art { display: flex; justify-content: center; margin: -6px 0 2px; }
+  .explain img { width: 150px; height: 150px; object-fit: contain; }
+  .explain h3 { font-family: 'Baloo 2', sans-serif; font-size: 1.4rem; margin: 0 0 6px; text-align: center; }
+  .explain p { color: var(--text-dim); font-size: 0.88rem; line-height: 1.5; margin: 0 0 12px; }
+  .explain p b { color: var(--text); }
+  .eq { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 12px; }
+  .eq .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .eq .lift { font-weight: 800; font-size: 1.05rem; }
+  .eq .arrow { color: var(--text-dim); font-size: 1.2rem; }
+  .eq .res { font-family: 'Baloo 2', sans-serif; font-size: 1.5rem; color: var(--accent); }
+  .eq .cap2 { font-size: 0.68rem; color: var(--text-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+  .why { list-style: none; padding: 0; margin: 0 0 14px; }
+  .why li { display: flex; gap: 10px; font-size: 0.85rem; line-height: 1.45; margin-bottom: 8px; color: var(--text-dim); }
+  .why li .ic { flex-shrink: 0; width: 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; font-size: 0.8rem; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); font-weight: 800; }
+  .why li b { color: var(--text); }
+  .btn { display: block; width: 100%; text-align: center; padding: 13px; border-radius: var(--radius); font-weight: 800; font-size: 0.95rem; background: var(--accent); color: var(--accent-text); }
+  .fine { font-size: 0.7rem; color: var(--text-dim); text-align: center; margin-top: 8px; }
+
+  /* load type grid */
+  .mini { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; margin-bottom: 10px; }
+  .mini .t { display: flex; justify-content: space-between; align-items: baseline; font-weight: 800; font-size: 0.86rem; }
+  .mini .t span { font-size: 0.68rem; color: var(--text-dim); font-weight: 700; }
+  .mini .m { font-size: 0.72rem; color: var(--text-dim); margin: 2px 0 4px; }
+  .mini svg { width: 100%; height: 54px; display: block; }
+  .pill { display: inline-block; font-size: 0.66rem; font-weight: 800; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-dim); margin-left: 4px; }
+  .empty { text-align: center; padding: 26px 10px 18px; color: var(--text-dim); font-size: 0.84rem; }
+  .empty svg { opacity: 0.5; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#21 Per-exercise progress graph</h1>
+  <p class="note">Draft for the design session, 2026-09-29. Lives in the existing exercise history sheet (<code>ExerciseHistoryDetail.vue</code>), which already opens from the Exercises tab and the live logger. Est. 1RM uses Epley (185 lb x 8 = 234 lb), one point per session (that session's best set). Mascot: <code>public/clipboard-bunny.png</code>. Screens A and B are the two placement options; C is the explainer; D shows how the other load types chart.</p>
+</div>
+<div class="page">
+
+  <!-- A -->
+  <div class="col">
+    <p class="cap">A. Chart card on top (recommended)</p>
+    <p class="capnote">Replaces today's "Heaviest completed set" card. Metric toggle, headline number with change over the range, range pills. Session list continues below, unchanged.</p>
+    <div class="phone"><div class="dim"></div>
+      <div class="sheet">
+        <div class="hdr"><h3>Barbell Bench Press</h3><div class="iconbtn">✕</div></div>
+        <div class="card">
+          <div class="seg"><span class="sel">Est. 1RM</span><span>Heaviest</span><span>Volume</span></div>
+          <div class="k">Est. 1RM <a href="#"><span class="q">?</span>What's est. 1RM?</a></div>
+          <div class="big"><span class="v">234 <small>lb</small></span><span class="delta">▲ 29 lb</span></div>
+          <div class="sub">Best: 185 lb × 8 on Sep 26 · up from 205 lb in 3 months</div>
+          <div class="chartwrap"><svg class="chart" id="chartA" viewBox="0 0 326 150" preserveAspectRatio="none"></svg></div>
+          <div class="axis"><span>Jul 1</span><span>Aug 1</span><span>Sep 26</span></div>
+          <div class="ranges"><span>1M</span><span class="sel">3M</span><span>1Y</span><span>All</span></div>
+        </div>
+        <div class="sessions">
+          <div class="entry"><h4>Fri, Sep 26, 6:10 PM</h4>
+            <div class="set"><span class="n">1</span>10 × 155 lb</div>
+            <div class="set"><span class="n">2</span>8 × 185 lb</div>
+            <div class="set"><span class="n">3</span>6 × 185 lb · RPE 9</div></div>
+          <div class="entry"><h4>Tue, Sep 23, 6:02 PM</h4>
+            <div class="set"><span class="n">1</span>10 × 155 lb</div></div>
+        </div>
+        <div class="fade"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B -->
+  <div class="col">
+    <p class="cap">B. Progress / Sessions tabs</p>
+    <p class="capnote">Same card, but behind a tab so the session list is one tap away instead of a scroll. Tapping a dot shows that session. Tabs cost a tap for people who opened history to check last time's weights mid-workout.</p>
+    <div class="phone"><div class="dim"></div>
+      <div class="sheet">
+        <div class="hdr"><h3>Barbell Bench Press</h3><div class="iconbtn">✕</div></div>
+        <div class="seg tabs"><span class="sel">Progress</span><span>Sessions</span></div>
+        <div class="card">
+          <div class="seg"><span class="sel">Est. 1RM</span><span>Heaviest</span><span>Volume</span></div>
+          <div class="k">Est. 1RM <a href="#"><span class="q">?</span>What's est. 1RM?</a></div>
+          <div class="big"><span class="v">234 <small>lb</small></span><span class="delta">▲ 29 lb</span></div>
+          <div class="sub">Up from 205 lb in 3 months</div>
+          <div class="chartwrap"><svg class="chart" id="chartB" viewBox="0 0 326 150" preserveAspectRatio="none"></svg>
+            <div class="tip" style="left:150px; top:30px">Sep 5 · <b>219 lb</b><br />175 lb × 8</div></div>
+          <div class="axis"><span>Jul 1</span><span>Aug 1</span><span>Sep 26</span></div>
+          <div class="ranges"><span>1M</span><span class="sel">3M</span><span>1Y</span><span>All</span></div>
+        </div>
+        <div class="mini" style="margin-top:4px">
+          <div class="t">Best sets <span>top 3 by est. 1RM</span></div>
+          <div class="m" style="font-size:0.82rem; color: var(--text); line-height:1.7">185 × 8 · Sep 26 → 234<br />185 × 7 · Sep 19 → 228<br />180 × 8 · Sep 16 → 228</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C -->
+  <div class="col">
+    <p class="cap">C. "What's est. 1RM?" explainer</p>
+    <p class="capnote">Bottom sheet over the history sheet (not a new page), so closing it lands right back on the chart. Plain words, one worked example, three reasons. Uses the existing clipboard bunny.</p>
+    <div class="phone"><div class="dim"></div>
+      <div class="sheet short" style="top:96px">
+        <div class="hdr" style="margin-bottom:0"><span style="flex:1"></span><div class="iconbtn">✕</div></div>
+        <div class="explain">
+          <div class="art"><img src="../../public/clipboard-bunny.png" alt="" /></div>
+          <h3>What's est. 1RM?</h3>
+          <p><b>1RM</b> means your <b>one-rep max</b>: the most you could lift for a single rep. You never have to actually try it. RepBunny <b>estimates</b> it from the sets you already log.</p>
+          <div class="eq">
+            <div class="row"><div><div class="cap2">You lifted</div><div class="lift">185 lb × 8 reps</div></div><div class="arrow">→</div><div style="text-align:right"><div class="cap2">Est. 1RM</div><div class="res">≈ 234 lb</div></div></div>
+          </div>
+          <ul class="why">
+            <li><span class="ic" style="--c: var(--accent)">⇅</span><span><b>Compare any set.</b> 8 reps one week and 5 the next still land on the same scale.</span></li>
+            <li><span class="ic" style="--c: var(--success)">↗</span><span><b>See real progress.</b> If the line climbs, you're getting stronger, even when the weight on the bar didn't change.</span></li>
+            <li><span class="ic" style="--c: var(--secondary)">✓</span><span><b>No risky max-out.</b> It's a guide, not a goal. Most accurate for sets of 1 to 12 reps.</span></li>
+          </ul>
+          <div class="btn">Got it</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- D -->
+  <div class="col">
+    <p class="cap">D. Other load types + empty state</p>
+    <p class="capnote">Each load type charts the number its history card already uses, so nothing new to learn. Metric toggle only appears for weight exercises. Needs 2+ sessions in range to draw.</p>
+    <div class="phone"><div class="dim"></div>
+      <div class="sheet" style="padding-top:18px">
+        <div class="mini"><div class="t">Pull-Up <span class="pill">Bodyweight</span><span style="margin-left:auto">Most reps</span></div><div class="m">Best set each session (added weight shown on tap)</div><svg id="m1" viewBox="0 0 326 54" preserveAspectRatio="none"></svg></div>
+        <div class="mini"><div class="t">Assisted Dip <span class="pill">Assisted</span><span style="margin-left:auto">Least assist</span></div><div class="m">Line goes <b style="color:var(--text)">up</b> as assist goes down (axis flipped)</div><svg id="m2" viewBox="0 0 326 54" preserveAspectRatio="none"></svg></div>
+        <div class="mini"><div class="t">Stair Climber <span class="pill">Level</span><span style="margin-left:auto">Best level</span></div><div class="m">Highest level each session</div><svg id="m3" viewBox="0 0 326 54" preserveAspectRatio="none"></svg></div>
+        <div class="mini"><div class="t">Plank <span class="pill">Timed</span><span style="margin-left:auto">Longest</span></div><div class="m">Longest hold each session (distance for cardio)</div><svg id="m4" viewBox="0 0 326 54" preserveAspectRatio="none"></svg></div>
+        <div class="card" style="margin-top:4px"><div class="empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 17 9 11 13 15 21 7"/></svg>
+          <div style="margin-top:6px"><b style="color:var(--text)">Log this one more time to see your trend.</b><br />Your chart starts after 2 sessions.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function draw(id, vals, opts = {}) {
+    const svg = document.getElementById(id)
+    const [W, H] = svg.getAttribute('viewBox').split(' ').slice(2).map(Number)
+    const pad = opts.pad ?? 10
+    const min = Math.min(...vals), max = Math.max(...vals), r = Math.max(max - min, 1)
+    const x = (i) => pad + (i / (vals.length - 1)) * (W - pad * 2)
+    const y = (v) => H - pad - ((v - min) / r) * (H - pad * 2)
+    let s = ''
+    if (opts.grid) for (let g = 0; g < 3; g++) { const gy = pad + g * (H - pad * 2) / 2; s += `<line x1="0" x2="${W}" y1="${gy}" y2="${gy}" stroke="#3a2b40" stroke-dasharray="3 4" stroke-width="1"/>`; s += `<text x="${W - 2}" y="${gy - 3}" fill="#b9a8c2" font-size="9" text-anchor="end" font-family="Manrope">${Math.round(max - g * r / 2)}</text>` }
+    const pts = vals.map((v, i) => `${x(i)},${y(v)}`).join(' ')
+    if (opts.area) s += `<polygon points="${x(0)},${H} ${pts} ${x(vals.length - 1)},${H}" fill="#f2879c" opacity="0.10"/>`
+    s += `<polyline points="${pts}" fill="none" stroke="#f2879c" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`
+    vals.forEach((v, i) => {
+      const best = opts.best && i === vals.length - 1
+      const sel = opts.sel === i
+      s += `<circle cx="${x(i)}" cy="${y(v)}" r="${best || sel ? 5 : 3}" fill="${best ? '#f2c069' : sel ? '#17111c' : '#f2879c'}" ${sel ? 'stroke="#f2879c" stroke-width="2.5"' : ''}/>`
+    })
+    svg.innerHTML = s
+  }
+  const e1rm = [205, 208, 212, 210, 216, 219, 217, 224, 226, 228, 228, 234]
+  draw('chartA', e1rm, { grid: true, area: true, best: true })
+  draw('chartB', e1rm, { grid: true, area: true, best: true, sel: 5 })
+  draw('m1', [6, 7, 7, 8, 8, 9, 10, 10], { pad: 6 })
+  draw('m2', [-60, -55, -55, -50, -45, -45, -40, -35], { pad: 6 })
+  draw('m3', [8, 8, 9, 9, 10, 10, 11, 12], { pad: 6 })
+  draw('m4', [45, 50, 55, 60, 60, 70, 75, 90], { pad: 6 })
+</script>
+</body>
+</html>

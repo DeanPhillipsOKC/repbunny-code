@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Issue 263: Update the routine from the finish recap</title>
+<style>
+  @font-face { font-family: 'Baloo 2'; font-weight: 500 800; src: url(../../public/fonts/baloo2-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 400 800; src: url(../../public/fonts/manrope-latin.woff2) format('woff2'); }
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .page { display: flex; flex-wrap: wrap; gap: 26px; padding: 26px; align-items: flex-start; width: 1260px; }
+  .col { width: 375px; }
+  .tag { display: inline-block; margin-bottom: 8px; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .tag-now { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+  .tag-new { background: rgba(242,192,105,0.16); color: var(--highlight); }
+  .col-title { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; margin: 0 0 2px; }
+  .col-note { color: var(--text-dim); font-size: 0.8rem; margin: 0 0 12px; line-height: 1.45; min-height: 76px; }
+  .phone { background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 18px 16px 20px; }
+
+  .eyebrow { margin: 0; font-size: 0.72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--secondary); }
+  .title { margin: 2px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
+  .meta { margin: 2px 0 14px; color: var(--text-dim); font-size: 0.85rem; }
+
+  .card { background: var(--surface); border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border)); border-radius: 16px; padding: 14px; }
+  .top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .mascot { width: 40px; height: 40px; border-radius: 12px; background: var(--surface-2); display: grid; place-items: center; font-size: 1.3rem; flex-shrink: 0; }
+  .h { margin: 0; font-size: 1rem; font-weight: 800; overflow-wrap: anywhere; }
+  .copy { margin: 2px 0 0; font-size: 0.82rem; line-height: 1.4; color: var(--text-dim); }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); font-size: 0.9rem; line-height: 1.35; }
+  li:first-child { border-top: 0; }
+  .box { flex-shrink: 0; width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border); display: grid; place-items: center; font-size: 0.8rem; font-weight: 800; color: var(--accent-text); }
+  .box.on { background: var(--accent); border-color: var(--accent); }
+  .line { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .line b { font-weight: 800; }
+  .line .dim { color: var(--text-dim); }
+  .actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+  .btn { flex: 1; min-height: 44px; border-radius: 12px; background: var(--accent); color: var(--accent-text); border: 0; font: 800 0.95rem Manrope, sans-serif; }
+  .ghost { min-height: 44px; padding: 0 14px; border-radius: 12px; background: transparent; color: var(--text-dim); border: 1px solid var(--border); font: 700 0.85rem Manrope, sans-serif; }
+  .chip { display: inline-block; margin-left: 4px; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); color: var(--text-dim); font-size: 0.72rem; font-weight: 700; }
+  .rest { margin-top: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px; color: var(--text-dim); font-size: 0.85rem; }
+  .saved { margin: 0; color: var(--success); font-size: 0.85rem; }
+  .teaser { display: flex; align-items: center; gap: 10px; }
+  .teaser .grow { flex: 1; min-width: 0; }
+  .review { min-height: 40px; padding: 0 14px; border-radius: 12px; background: var(--accent); color: var(--accent-text); border: 0; font: 800 0.85rem Manrope, sans-serif; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="col">
+    <span class="tag tag-new">Option A (chosen)</span>
+    <p class="col-title">Itemized card under the header</p>
+    <p class="col-note">Same spot and shape as the "Do this again?" offer. Each difference is its own checkable line; removals start unchecked. Nothing is written until Update routine.</p>
+    <div class="phone">
+      <p class="eyebrow">Workout saved</p>
+      <p class="title">Upper Body Strength Day</p>
+      <p class="meta">48 min · 14 sets · 5,120 kg</p>
+      <section class="card">
+        <div class="top">
+          <div class="mascot">🐰</div>
+          <div>
+            <p class="h">Update Upper Body Strength Day?</p>
+            <p class="copy">Keep today's changes for next time. Only the ticked ones are saved.</p>
+          </div>
+        </div>
+        <ul>
+          <li><span class="box on">✓</span><span class="line">Add <b>Cable fly</b> <span class="dim">(3 sets)</span></span></li>
+          <li><span class="box on">✓</span><span class="line"><b>Barbell bench press</b>: 3 → 4 sets</span></li>
+          <li><span class="box on">✓</span><span class="line">Swap <b>Leg press</b> for <b>Hack squat machine (plate loaded)</b></span></li>
+          <li><span class="box"></span><span class="line">Remove <b>Standing calf raise</b> <span class="dim">(skipped today)</span></span></li>
+        </ul>
+        <div class="actions">
+          <button class="btn">Update routine</button>
+          <button class="ghost">Not now</button>
+        </div>
+      </section>
+      <div class="rest">Records, vs last time, week strip, notes… (unchanged)</div>
+    </div>
+  </div>
+
+  <div class="col">
+    <span class="tag tag-new">Option B</span>
+    <p class="col-title">Collapsed teaser, Review expands</p>
+    <p class="col-note">One line with the change count; Review opens the same checklist. Smaller on screen, but one more tap before the lifter sees what would change.</p>
+    <div class="phone">
+      <p class="eyebrow">Workout saved</p>
+      <p class="title">Push Day</p>
+      <p class="meta">32 min · 9 sets · 2,860 lb</p>
+      <section class="card">
+        <div class="teaser">
+          <div class="mascot">🐰</div>
+          <div class="grow">
+            <p class="h">Update Push Day?</p>
+            <p class="copy">2 changes from today</p>
+          </div>
+          <button class="review">Review</button>
+        </div>
+      </section>
+      <div class="rest">Records, vs last time, week strip, notes… (unchanged)</div>
+    </div>
+  </div>
+
+  <div class="col">
+    <span class="tag tag-new">Option A, after Update</span>
+    <p class="col-title">Saved state</p>
+    <p class="col-note">The card collapses to one success line, like "Saved as …" after the first-workout offer. "Not now" removes the card, and it stays gone for this workout even after a resume and refinish.</p>
+    <div class="phone">
+      <p class="eyebrow">Workout saved</p>
+      <p class="title">Upper Body Strength Day</p>
+      <p class="meta">48 min · 14 sets · 5,120 kg</p>
+      <p class="saved">Updated Upper Body Strength Day. Next time starts with today's changes.</p>
+      <div class="rest">Records, vs last time, week strip, notes… (unchanged)</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Issue 336: Set entry checks (block 0 reps, confirm unlikely weights)</title>
+<style>
+  @font-face { font-family: 'Baloo 2'; font-weight: 500 800; src: url(../../public/fonts/baloo2-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 400 800; src: url(../../public/fonts/manrope-latin.woff2) format('woff2'); }
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --danger: #e0687a; --success: #a9cb8d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .page { display: flex; flex-wrap: wrap; gap: 26px; padding: 26px; align-items: flex-start; width: 1260px; }
+  .col { width: 375px; }
+  .tag { display: inline-block; margin-bottom: 8px; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .tag-now { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+  .tag-new { background: rgba(242,192,105,0.16); color: var(--highlight); }
+  .col-title { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; margin: 0 0 2px; }
+  .col-note { color: var(--text-dim); font-size: 0.8rem; margin: 0 0 12px; line-height: 1.45; min-height: 58px; }
+  .phone { background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 16px 16px 20px; }
+  .ex-name { font-family: 'Baloo 2', sans-serif; font-size: 1.3rem; font-weight: 800; margin: 0 0 10px; }
+  .set-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .head { display: flex; gap: 8px; color: var(--text-dim); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding-left: 34px; }
+  .head span:nth-child(1) { width: 78px; } .head span:nth-child(2) { width: 62px; } .head span:nth-child(3) { width: 52px; }
+  .set { display: flex; gap: 8px; align-items: flex-start; }
+  .num { width: 26px; height: 44px; display: grid; place-items: center; color: var(--text-dim); font-weight: 800; flex-shrink: 0; }
+  .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .line { display: flex; gap: 8px; align-items: center; }
+  .in { height: 44px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; font-weight: 700; font-size: 1rem; }
+  .in.w { width: 78px; } .in.r { width: 62px; } .in.p { width: 52px; color: var(--text-dim); }
+  .in.bad { border-color: var(--danger); }
+  .acts { margin-left: auto; display: flex; gap: 6px; }
+  .x, .ok { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; }
+  .x { border: 1px solid var(--border); color: var(--text-dim); }
+  .ok { background: var(--accent); color: var(--accent-text); }
+  .done { color: var(--success); }
+  .logged { flex: 1; height: 44px; display: flex; align-items: center; font-weight: 700; }
+  .row-error { color: var(--danger); font-size: 0.8rem; margin: 0; }
+  .warn { padding: 12px; border-radius: 12px; background: rgba(242,192,105,0.12); border: 1px solid rgba(242,192,105,0.35); display: flex; flex-direction: column; gap: 10px; }
+  .warn-msg { display: flex; gap: 8px; font-size: 0.85rem; font-weight: 600; line-height: 1.35; }
+  .warn-msg b { color: var(--highlight); }
+  .warn-acts { display: flex; gap: 8px; }
+  .warn-acts span { flex: 1; min-height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 0.85rem; font-weight: 700; }
+  .fix { background: var(--accent); color: var(--accent-text); }
+  .any { border: 1px solid rgba(242,192,105,0.45); color: var(--highlight); }
+  .strip { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 600; color: var(--highlight); }
+  .strip .txt { flex: 1; min-width: 0; }
+  .strip .mini { padding: 6px 10px; border-radius: 10px; font-weight: 700; white-space: nowrap; }
+  .dock { margin-top: 14px; height: 50px; border-radius: 14px; background: var(--accent); color: var(--accent-text); display: grid; place-items: center; font-weight: 800; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="col">
+    <span class="tag tag-now">Block (all options)</span>
+    <h3 class="col-title">0 reps: blocked, no Retry</h3>
+    <p class="col-note">Nothing is sent. The message sits in the row's error slot, the row keeps its ✕ and Add set, and Finish workout stays enabled. Typing in the row clears it.</p>
+    <div class="phone">
+      <p class="ex-name">Barbell Bench Press</p>
+      <div class="set-card">
+        <div class="head"><span>lb</span><span>Reps</span><span>RPE</span></div>
+        <div class="set"><span class="num">1</span><div class="body"><div class="line"><span class="logged">135 lb × 8</span><span class="ok done" style="background:none">✓</span></div></div></div>
+        <div class="set"><span class="num">2</span><div class="body">
+          <div class="line"><span class="in w">135</span><span class="in r bad">0</span><span class="in p">–</span><span class="acts"><span class="x">✕</span><span class="ok">✓</span></span></div>
+          <p class="row-error">Reps must be 1 or more.</p>
+        </div></div>
+      </div>
+      <div class="dock">Finish workout</div>
+    </div>
+  </div>
+
+  <div class="col">
+    <span class="tag tag-new">Option A (chosen)</span>
+    <h3 class="col-title">Confirm card under the row</h3>
+    <p class="col-note">The body-weight typo card (WeightTypoWarning) with a message prop. Two 44px buttons, wraps cleanly at 375px with long exercise names.</p>
+    <div class="phone">
+      <p class="ex-name">Barbell Bench Press</p>
+      <div class="set-card">
+        <div class="head"><span>lb</span><span>Reps</span><span>RPE</span></div>
+        <div class="set"><span class="num">1</span><div class="body"><div class="line"><span class="logged">135 lb × 8</span><span class="ok done" style="background:none">✓</span></div></div></div>
+        <div class="set"><span class="num">2</span><div class="body">
+          <div class="line"><span class="in w">1350</span><span class="in r">8</span><span class="in p">–</span><span class="acts"><span class="x">✕</span><span class="ok">✓</span></span></div>
+          <div class="warn">
+            <div class="warn-msg"><b>⚠</b><span>1350 lb is a big jump from 135 lb last time. Log it anyway?</span></div>
+            <div class="warn-acts"><span class="fix">Fix it</span><span class="any">Log anyway</span></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <span class="tag tag-now">Option B</span>
+    <h3 class="col-title">One-line strip</h3>
+    <p class="col-note">Shorter, but the buttons drop under 44px and the message wraps to 3 lines next to them on long names. Not chosen.</p>
+    <div class="phone">
+      <p class="ex-name">Barbell Bench Press</p>
+      <div class="set-card">
+        <div class="head"><span>lb</span><span>Reps</span><span>RPE</span></div>
+        <div class="set"><span class="num">1</span><div class="body"><div class="line"><span class="in w">0</span><span class="in r">7</span><span class="in p">–</span><span class="acts"><span class="x">✕</span><span class="ok">✓</span></span></div>
+          <div class="strip"><span class="txt">0 lb on Barbell Bench Press? Log it anyway?</span><span class="mini fix">Fix it</span><span class="mini any">Log anyway</span></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

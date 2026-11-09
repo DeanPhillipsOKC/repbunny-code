@@ -1,0 +1,359 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Milestone Rewards</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-pressed: #ed6b85; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d;
+  }
+  /* Cotton Candy, the light theme check */
+  .cotton {
+    --bg: #fff7f4; --surface: #ffffff; --surface-2: #fdeef0; --border: #f0d4da;
+    --text: #2b1d2a; --text-dim: #6e5868; --accent: #bf3a65; --accent-pressed: #a8305a; --accent-text: #ffffff;
+    --secondary: #7650c4; --highlight: #8f5c08; --success: #2e7a3d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: #f5edf2; font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1240px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: #b9a8c2; font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; }
+  .note b { color: #f5edf2; }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; }
+  .opt-title { font-family: 'Baloo 2', sans-serif; color: #f2879c; font-size: 1.2rem; margin: 0 0 2px 4px; }
+  .cap { color: #f2c069; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: #b9a8c2; font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 58px; }
+  .capnote b { color: #f5edf2; }
+  .phone { position: relative; width: 377px; height: 780px; background: rgba(0,0,0,0.5); border: 1px solid #3a2b40; border-radius: 28px; overflow: hidden; }
+
+  .sheet { position: absolute; left: 0; right: 0; top: 40px; bottom: 0; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 10px 16px 0; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+  .sheet > * { flex-shrink: 0; }
+  .handle { align-self: center; width: 36px; height: 4px; border-radius: 2px; background: var(--border); }
+  .head { display: flex; align-items: center; gap: 10px; }
+  .head h3 { flex: 1; margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; line-height: 1.15; }
+  .hbtn { width: 44px; height: 44px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text); }
+  .hbtn.x { color: var(--text-dim); }
+  .group-label { margin: 2px 2px -4px; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-dim); }
+  .sub-label { margin: 0 2px -6px; font-size: 0.8rem; font-weight: 700; color: var(--text); display: flex; align-items: baseline; gap: 6px; }
+  .sub-label span { font-size: 0.7rem; font-weight: 600; color: var(--text-dim); }
+  .snote { margin: 0 2px; font-size: 0.74rem; color: var(--text-dim); line-height: 1.4; }
+  .faded { height: 46px; margin: -6px -16px 0; position: relative; overflow: hidden; }
+  .faded .row { position: absolute; left: 16px; right: 16px; bottom: 0; height: 56px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+
+  /* Shapes, drawn in code like DayMark.vue */
+  .mk { width: 18px; height: 18px; display: block; }
+  .mk.star { fill: var(--highlight); }
+  .mk.heart { fill: var(--accent); }
+  .mk.paw { fill: var(--accent); }
+  .mk.bell { fill: var(--secondary); }
+  .mk.db { fill: var(--secondary); }
+  .mk.plate { fill: var(--text-dim); }
+  .mk.note { fill: var(--secondary); }
+  .mk.quote { fill: var(--secondary); }
+  .lock { width: 11px; height: 11px; fill: var(--text-dim); flex-shrink: 0; }
+
+  /* Option A: tiles, 4 across */
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .tile { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px 7px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; min-width: 0; position: relative; }
+  .tile.sel { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .tile.trying { border-color: var(--secondary); box-shadow: inset 0 0 0 1px var(--secondary); }
+  .sw { width: 40px; height: 30px; border-radius: 8px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 1px; }
+  .sw .mk { width: 14px; height: 14px; }
+  .tlabel { font-size: 0.7rem; font-weight: 700; line-height: 1.15; text-align: center; overflow-wrap: anywhere; }
+  .tile.sel .tlabel { color: var(--accent); }
+  .tsub { font-size: 0.6rem; font-weight: 700; color: var(--text-dim); display: flex; align-items: center; gap: 3px; line-height: 1.1; text-align: center; }
+  .tile.locked .sw, .tile.locked .tlabel { opacity: 0.45; }  .tcheck { position: absolute; top: 4px; right: 4px; width: 15px; height: 15px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; }
+  .tcheck svg { width: 9px; height: 9px; }
+
+  .peekcard { display: flex; flex-direction: column; gap: 10px; padding: 12px; background: var(--surface); border: 1px solid var(--secondary); border-radius: 14px; }
+  .peekhead { display: flex; align-items: center; gap: 8px; }
+  .peekhead b { font-size: 0.9rem; }
+  .ptag { padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--secondary) 16%, transparent); color: var(--secondary); font-size: 0.64rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; margin-left: auto; white-space: nowrap; }
+  .week { display: flex; justify-content: space-between; padding: 8px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; }
+  .wd { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.6rem; font-weight: 700; color: var(--text-dim); }
+  .dot { width: 18px; height: 18px; border-radius: 50%; background: color-mix(in srgb, var(--text) 9%, transparent); display: grid; place-items: center; }
+  .dot.done { background: none; }
+  .bar { height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--secondary); border-radius: 999px; }
+  .ptext { margin: 0; font-size: 0.78rem; color: var(--text-dim); line-height: 1.4; }
+  .ptext strong { color: var(--text); }
+  .gobtn { min-height: 38px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: var(--text); }
+
+  /* sound + lines rows (both options) */
+  .rows { display: flex; flex-direction: column; gap: 8px; }
+  .srow { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px 8px 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .srow.sel { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .srow.locked .stext { opacity: 0.55; }
+  .stext { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .stext b { font-size: 0.86rem; }
+  .stext span { font-size: 0.7rem; color: var(--text-dim); margin-top: 1px; line-height: 1.3; }
+  .srow.sel .stext b { color: var(--accent); }
+  .play { width: 36px; height: 36px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text); flex-shrink: 0; }
+  .unl { font-size: 0.64rem; font-weight: 800; color: var(--text-dim); display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+
+  /* Option B: list rows into a picker */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .lrow { display: flex; align-items: center; gap: 12px; padding: 12px 12px; min-height: 58px; border-top: 1px solid var(--border); }
+  .lrow:first-child { border-top: none; }
+  .licon { width: 34px; height: 34px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); display: grid; place-items: center; flex-shrink: 0; }
+  .ltext { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .ltext b { font-size: 0.9rem; }
+  .ltext span { font-size: 0.74rem; color: var(--text-dim); margin-top: 1px; }
+  .chev { color: var(--text-dim); flex-shrink: 0; }
+  .newdot { padding: 2px 7px; border-radius: 999px; background: var(--accent); color: var(--accent-text); font-size: 0.6rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+  .count { font-size: 0.7rem; color: var(--text-dim); font-weight: 700; white-space: nowrap; }
+  .opts { display: flex; flex-direction: column; gap: 8px; }
+  .orow { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .orow.sel { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .orow.trying { border-color: var(--secondary); box-shadow: inset 0 0 0 1px var(--secondary); }
+  .orow.locked .ow { opacity: 0.45; }
+  .ow { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .marks { display: flex; gap: 2px; padding: 6px 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
+  .marks .mk { width: 13px; height: 13px; }
+  .check { margin-left: auto; color: var(--accent); display: flex; flex-shrink: 0; }
+
+  /* Result artboard */
+  .home { position: absolute; inset: 40px 0 0; background: var(--bg); color: var(--text); padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .home h2 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.5rem; }
+  .htile { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .eyebrow { font-size: 0.66rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-dim); }
+  .celebrate { position: relative; flex: 1; border-radius: 16px; overflow: hidden; background: radial-gradient(circle at 50% 38%, var(--surface-2) 0%, var(--bg) 70%); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; }
+  .celebrate .badge { color: var(--highlight); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
+  .celebrate img { width: 110px; height: 110px; object-fit: contain; }
+  .celebrate p { margin: 0; font-weight: 700; font-size: 1.1rem; }
+  .confetto { position: absolute; }
+  .nice { width: 100%; min-height: 42px; border-radius: 12px; background: var(--accent); color: var(--accent-text); display: grid; place-items: center; font-weight: 800; font-size: 0.9rem; }
+  .rest-line { text-align: center; font-weight: 700; font-size: 1rem; margin: 0; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="star" viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></symbol>
+    <symbol id="heart" viewBox="0 0 24 24"><path d="M12 21s-8.5-5.3-8.5-11.2C3.5 6.6 5.9 4.5 8.4 4.5c1.6 0 2.9.8 3.6 2 .7-1.2 2-2 3.6-2 2.5 0 4.9 2.1 4.9 5.3C20.5 15.7 12 21 12 21z"/></symbol>
+    <symbol id="paw" viewBox="0 0 24 24"><ellipse cx="12" cy="16" rx="5.5" ry="4.2"/><ellipse cx="6" cy="9" rx="2.1" ry="2.6"/><ellipse cx="11" cy="6.5" rx="2.1" ry="2.6"/><ellipse cx="16.2" cy="7.5" rx="2" ry="2.5"/><ellipse cx="19" cy="11.5" rx="1.8" ry="2.3"/></symbol>
+    <symbol id="db" viewBox="0 0 24 24"><rect x="1.5" y="8" width="3" height="8" rx="1"/><rect x="4.5" y="5.5" width="3.5" height="13" rx="1.2"/><rect x="8" y="10.6" width="8" height="2.8" rx="1"/><rect x="16" y="5.5" width="3.5" height="13" rx="1.2"/><rect x="19.5" y="8" width="3" height="8" rx="1"/></symbol>
+    <symbol id="plate" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 7.2a2.8 2.8 0 100 5.6 2.8 2.8 0 000-5.6z"/></symbol>
+    <symbol id="bell" viewBox="0 0 24 24"><path d="M12 2.5c.8 0 1.4.6 1.4 1.3v.6c3 .7 5 3.3 5 6.4v4.4l1.8 2.3c.4.5 0 1.2-.6 1.2H4.4c-.6 0-1-.7-.6-1.2l1.8-2.3v-4.4c0-3.1 2-5.7 5-6.4v-.6c0-.7.6-1.3 1.4-1.3zM9.6 20h4.8a2.4 2.4 0 01-4.8 0z"/></symbol>
+    <symbol id="note" viewBox="0 0 24 24"><path d="M9 4.5l11-2v13.2a3.2 3.2 0 11-2-3V6.6l-7 1.3v10a3.2 3.2 0 11-2-3z"/></symbol>
+    <symbol id="quote" viewBox="0 0 24 24"><path d="M4 5.5h16a2 2 0 012 2v8a2 2 0 01-2 2h-9l-5 4v-4H4a2 2 0 01-2-2v-8a2 2 0 012-2z"/></symbol>
+    <symbol id="lock" viewBox="0 0 24 24"><path d="M7 10V7.5a5 5 0 0110 0V10h1a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2zm2.5 0h5V7.5a2.5 2.5 0 00-5 0z"/></symbol>
+    <symbol id="playic" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></symbol>
+    <symbol id="eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.8" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="tick" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<div class="intro">
+  <h1>Issue #154: Milestone rewards in Extras</h1>
+  <p class="note">A new <b>Extras</b> group at the bottom of Account &gt; Preferences &gt; Theme, open to free and Premium users. 13 rewards across 13 milestone tiers (the trial-pass tiers keep their passes). Locked rewards show greyed with their unlock rule; tapping one previews it without picking it. <b>Option A</b> keeps every choice on the Theme screen as tiles. <b>Option B</b> adds five rows that each open a picker, so the Theme screen stays short. The result artboard is the same for both.</p>
+</div>
+
+<div class="page">
+
+  <!-- ===== Option A1 ===== -->
+  <div class="col">
+    <p class="opt-title">Option A: tiles on the Theme screen</p>
+    <p class="cap">A1 · Week mark and confetti, a locked one tapped</p>
+    <p class="capnote">Four tiles across. Picked tile has the accent ring and check. Tapping a locked tile rings it in lavender and opens a preview under the row: what it looks like, the rule, and how close you are. No pick button.</p>
+    <div class="phone">
+      <div class="sheet">
+        <div class="handle"></div>
+        <div class="head">
+          <div class="hbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+          <h3>Theme</h3>
+          <div class="hbtn x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="faded"><div class="row"></div></div>
+        <div class="group-label">Extras</div>
+        <p class="snote">Unlocked by your milestones. Picks apply on this device.</p>
+
+        <div class="sub-label">Week mark <span>This week tracker</span></div>
+        <div class="tiles">
+          <div class="tile sel"><span class="tcheck"><svg style="color:var(--accent-text)"><use href="#tick"/></svg></span><span class="sw"><svg class="mk paw"><use href="#paw"/></svg></span><span class="tlabel">Match theme</span></div>
+          <div class="tile"><span class="sw"><svg class="mk star"><use href="#star"/></svg></span><span class="tlabel">Stars</span></div>
+          <div class="tile locked trying"><span class="sw"><svg class="mk heart"><use href="#heart"/></svg></span><span class="tlabel">Hearts</span><span class="tsub"><svg class="lock"><use href="#lock"/></svg>25 workouts</span></div>
+          <div class="tile locked"><span class="sw"><svg class="mk db"><use href="#db"/></svg></span><span class="tlabel">Dumbbells</span><span class="tsub"><svg class="lock"><use href="#lock"/></svg>26 strong wks</span></div>
+        </div>
+        <div class="peekcard">
+          <div class="peekhead"><svg class="mk heart"><use href="#heart"/></svg><b>Hearts</b><span class="ptag">Unlocks at 25 workouts</span></div>
+          <div class="week">
+            <div class="wd"><span class="dot done"><svg class="mk heart"><use href="#heart"/></svg></span>S</div>
+            <div class="wd"><span class="dot"></span>M</div>
+            <div class="wd"><span class="dot done"><svg class="mk heart"><use href="#heart"/></svg></span>T</div>
+            <div class="wd"><span class="dot done"><svg class="mk heart"><use href="#heart"/></svg></span>W</div>
+            <div class="wd"><span class="dot"></span>T</div>
+            <div class="wd"><span class="dot done"><svg class="mk heart"><use href="#heart"/></svg></span>F</div>
+            <div class="wd"><span class="dot"></span>S</div>
+          </div>
+          <div class="bar"><i style="width:72%"></i></div>
+          <p class="ptext"><strong>18 of 25 workouts.</strong> 7 more and it's yours.</p>
+        </div>
+
+        <div class="sub-label">Confetti <span>Record celebration</span></div>
+        <div class="tiles">
+          <div class="tile sel"><span class="tcheck"><svg style="color:var(--accent-text)"><use href="#tick"/></svg></span><span class="sw"><i style="width:5px;height:8px;background:var(--accent);border-radius:1px"></i><i style="width:5px;height:5px;background:var(--highlight);border-radius:50%;margin:0 2px"></i><i style="width:5px;height:8px;background:var(--success);border-radius:1px"></i></span><span class="tlabel">Match theme</span></div>
+          <div class="tile"><span class="sw"><svg class="mk heart"><use href="#heart"/></svg><svg class="mk heart" style="fill:var(--secondary)"><use href="#heart"/></svg></span><span class="tlabel">Hearts</span></div>
+          <div class="tile locked"><span class="sw"><svg class="mk star"><use href="#star"/></svg><svg class="mk star" style="fill:var(--accent)"><use href="#star"/></svg></span><span class="tlabel">Stars</span><span class="tsub"><svg class="lock"><use href="#lock"/></svg>10 records</span></div>
+          <div class="tile locked"><span class="sw"><svg class="mk plate"><use href="#plate"/></svg><svg class="mk plate" style="fill:var(--secondary)"><use href="#plate"/></svg></span><span class="tlabel">Plates</span><span class="tsub"><svg class="lock"><use href="#lock"/></svg>50 records</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Option A2 ===== -->
+  <div class="col">
+    <p class="opt-title">&nbsp;</p>
+    <p class="cap">A2 · Sounds and bunny lines (Cotton Candy, light)</p>
+    <p class="capnote">Tapping any sound plays it, locked ones too (a locked one plays but isn't picked). Line packs are rows showing a sample line; a locked pack shows its rule. Fanfare defaults to <b>Off</b>, since records are silent today. The chime defaults to <b>Classic</b>, today's chime.</p>
+    <div class="phone cotton">
+      <div class="sheet">
+        <div class="handle"></div>
+        <div class="head">
+          <div class="hbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+          <h3>Theme</h3>
+          <div class="hbtn x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="sub-label">Rest chime <span>When rest ends</span></div>
+        <div class="tiles">
+          <div class="tile sel"><span class="tcheck"><svg style="color:var(--accent-text)"><use href="#tick"/></svg></span><span class="sw"><svg class="mk bell"><use href="#bell"/></svg></span><span class="tlabel">Classic</span></div>
+          <div class="tile"><span class="sw"><svg class="mk bell" style="fill:var(--highlight)"><use href="#bell"/></svg></span><span class="tlabel">Bells</span></div>
+          <div class="tile locked"><span class="sw"><svg class="mk note"><use href="#note"/></svg></span><span class="tlabel">Marimba</span><span class="tsub"><svg class="lock"><use href="#lock"/></svg>52 strong wks</span></div>
+          <div class="tile" style="visibility:hidden"></div>
+        </div>
+        <p class="snote" style="margin-top:-4px">Tap a sound to hear it.</p>
+
+        <div class="sub-label">Record fanfare</div>
+        <div class="tiles">
+          <div class="tile sel"><span class="tcheck"><svg style="color:var(--accent-text)"><use href="#tick"/></svg></span><span class="sw" style="font-size:0.66rem;font-weight:800;color:var(--text-dim)">Off</span><span class="tlabel">Off</span></div>
+          <div class="tile"><span class="sw"><svg class="mk note" style="fill:var(--accent)"><use href="#note"/></svg></span><span class="tlabel">Ta-da</span></div>
+          <div class="tile locked"><span class="sw"><svg class="mk note" style="fill:var(--highlight)"><use href="#note"/></svg></span><span class="tlabel">Trumpets</span><span class="tsub"><svg class="lock"><use href="#lock"/></svg>200 workouts</span></div>
+          <div class="tile" style="visibility:hidden"></div>
+        </div>
+
+        <div class="sub-label">Bunny lines <span>Rest timer and recap</span></div>
+        <div class="rows">
+          <div class="srow sel"><div class="stext"><b>Classic</b><span>"Keep it up."</span></div><span class="check"><svg width="18" height="18"><use href="#tick"/></svg></span></div>
+          <div class="srow"><div class="stext"><b>Gym puns</b><span>"You're doing grape. Now ketchup on rest."</span></div></div>
+          <div class="srow locked"><div class="stext"><b>Coach mode</b><span>"Breathe. Next set, same bar speed."</span></div><span class="unl"><svg class="lock"><use href="#lock"/></svg>25 records</span></div>
+          <div class="srow locked"><div class="stext"><b>Extra soft</b><span>"Proud of you for showing up today."</span></div><span class="unl"><svg class="lock"><use href="#lock"/></svg>300 workouts</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Option B1 ===== -->
+  <div class="col">
+    <p class="opt-title">Option B: rows that open a picker</p>
+    <p class="cap">B1 · Extras group on the Theme screen</p>
+    <p class="capnote">Five rows, each showing the current pick and how many are unlocked. A <b>New</b> pill appears on a row when a milestone just unlocked something in it, until the picker is opened.</p>
+    <div class="phone">
+      <div class="sheet">
+        <div class="handle"></div>
+        <div class="head">
+          <div class="hbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+          <h3>Theme</h3>
+          <div class="hbtn x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="faded"><div class="row"></div></div>
+        <p class="snote">Applies right away, on this device.</p>
+        <div class="group-label">Extras</div>
+        <p class="snote">Unlocked by your milestones.</p>
+        <div class="card">
+          <div class="lrow"><span class="licon"><svg class="mk star"><use href="#star"/></svg></span><span class="ltext"><b>Week mark</b><span>Stars</span></span><span class="count">2 of 4</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>
+          <div class="lrow"><span class="licon"><svg class="mk heart"><use href="#heart"/></svg></span><span class="ltext"><b>Confetti</b><span>Hearts</span></span><span class="newdot">New</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>
+          <div class="lrow"><span class="licon"><svg class="mk bell"><use href="#bell"/></svg></span><span class="ltext"><b>Rest chime</b><span>Classic</span></span><span class="count">1 of 3</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>
+          <div class="lrow"><span class="licon"><svg class="mk note"><use href="#note"/></svg></span><span class="ltext"><b>Record fanfare</b><span>Ta-da</span></span><span class="count">2 of 3</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>
+          <div class="lrow"><span class="licon"><svg class="mk quote"><use href="#quote"/></svg></span><span class="ltext"><b>Bunny lines</b><span>Gym puns</span></span><span class="count">2 of 4</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+        <p class="snote">See every milestone in Progress &gt; Milestones.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Option B2 ===== -->
+  <div class="col">
+    <p class="opt-title">&nbsp;</p>
+    <p class="cap">B2 · Week mark picker (Cotton Candy, light)</p>
+    <p class="capnote">A sub-screen with Back and Close, like the Account sections. Each option shows a row of its marks. A locked one tapped shows the same preview card as A1, under its row.</p>
+    <div class="phone cotton">
+      <div class="sheet">
+        <div class="handle"></div>
+        <div class="head">
+          <div class="hbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+          <h3>Week mark</h3>
+          <div class="hbtn x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        </div>
+        <p class="snote">The mark for each day you trained on Home's This week tracker.</p>
+        <div class="opts">
+          <div class="orow"><span class="ow"><span class="marks"><svg class="mk paw"><use href="#paw"/></svg><svg class="mk paw"><use href="#paw"/></svg><svg class="mk paw"><use href="#paw"/></svg></span><b style="font-size:0.9rem">Match theme</b></span></div>
+          <div class="orow sel"><span class="ow"><span class="marks"><svg class="mk star"><use href="#star"/></svg><svg class="mk star"><use href="#star"/></svg><svg class="mk star"><use href="#star"/></svg></span><b style="font-size:0.9rem;color:var(--accent)">Stars</b></span><span class="check"><svg width="18" height="18"><use href="#tick"/></svg></span></div>
+          <div class="orow locked trying"><span class="ow"><span class="marks"><svg class="mk heart"><use href="#heart"/></svg><svg class="mk heart"><use href="#heart"/></svg><svg class="mk heart"><use href="#heart"/></svg></span><b style="font-size:0.9rem">Hearts</b></span><span class="unl"><svg class="lock"><use href="#lock"/></svg>25 workouts</span></div>
+          <div class="peekcard">
+            <div class="week">
+              <div class="wd"><span class="dot done"><svg class="mk heart"><use href="#heart"/></svg></span>S</div>
+              <div class="wd"><span class="dot"></span>M</div>
+              <div class="wd"><span class="dot done"><svg class="mk heart"><use href="#heart"/></svg></span>T</div>
+              <div class="wd"><span class="dot done"><svg class="mk heart"><use href="#heart"/></svg></span>W</div>
+              <div class="wd"><span class="dot"></span>T</div>
+              <div class="wd"><span class="dot done"><svg class="mk heart"><use href="#heart"/></svg></span>F</div>
+              <div class="wd"><span class="dot"></span>S</div>
+            </div>
+            <div class="bar"><i style="width:72%"></i></div>
+            <p class="ptext"><strong>18 of 25 workouts.</strong> 7 more and it's yours.</p>
+          </div>
+          <div class="orow locked"><span class="ow"><span class="marks"><svg class="mk db"><use href="#db"/></svg><svg class="mk db"><use href="#db"/></svg><svg class="mk db"><use href="#db"/></svg></span><b style="font-size:0.9rem">Dumbbells</b></span><span class="unl"><svg class="lock"><use href="#lock"/></svg>26 strong weeks</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Result ===== -->
+  <div class="col">
+    <p class="opt-title">Both: the result</p>
+    <p class="cap">Stars on Home, heart confetti on a record</p>
+    <p class="capnote">Picks override the theme's decor in every theme (here Classic); Match theme puts candy corns, leaves, or carrots back. The recap's milestone card names the reward: "25 workouts! Unlocked: Hearts week mark".</p>
+    <div class="phone">
+      <div class="home">
+        <h2>Log a workout</h2>
+        <div class="htile">
+          <span class="eyebrow">This week</span>
+          <div class="week" style="background:transparent;border:none;padding:0">
+            <div class="wd"><span class="dot done"><svg class="mk star"><use href="#star"/></svg></span>S</div>
+            <div class="wd"><span class="dot"></span>M</div>
+            <div class="wd"><span class="dot done"><svg class="mk star"><use href="#star"/></svg></span>T</div>
+            <div class="wd"><span class="dot done"><svg class="mk star"><use href="#star"/></svg></span>W</div>
+            <div class="wd"><span class="dot"></span>T</div>
+            <div class="wd"><span class="dot"></span>F</div>
+            <div class="wd"><span class="dot"></span>S</div>
+          </div>
+        </div>
+        <div class="celebrate">
+          <svg class="confetto mk heart" style="left:10%;top:8%;transform:rotate(-14deg)"><use href="#heart"/></svg>
+          <svg class="confetto mk heart" style="left:28%;top:20%;fill:var(--secondary);transform:rotate(18deg)"><use href="#heart"/></svg>
+          <svg class="confetto mk heart" style="left:70%;top:6%;fill:var(--highlight)"><use href="#heart"/></svg>
+          <svg class="confetto mk heart" style="left:84%;top:26%;transform:rotate(-24deg)"><use href="#heart"/></svg>
+          <svg class="confetto mk heart" style="left:52%;top:14%;fill:var(--success);transform:rotate(10deg)"><use href="#heart"/></svg>
+          <svg class="confetto mk heart" style="left:16%;top:40%;fill:var(--highlight);transform:rotate(30deg)"><use href="#heart"/></svg>
+          <svg class="confetto mk heart" style="left:88%;top:52%;fill:var(--secondary)"><use href="#heart"/></svg>
+          <span class="badge">★ New record ★</span>
+          <img src="../../public/celebration-bunny.png" alt="" onerror="this.style.display='none'" />
+          <p>Look at you go!</p>
+          <span style="font-size:0.85rem;color:var(--text-dim)">Bench Press · 185 lb × 6</span>
+          <span class="nice">Nice!</span>
+        </div>
+        <div class="htile" style="flex-direction:row;align-items:center;gap:10px">
+          <svg class="mk quote" style="width:22px;height:22px"><use href="#quote"/></svg>
+          <span style="font-size:0.82rem;color:var(--text-dim)">Rest timer with Gym puns: <b style="color:var(--text)">"You're doing grape."</b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

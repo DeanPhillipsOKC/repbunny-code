@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Issue #144: Halloween's candy corn (style.css, decor-candy-corn). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <group>
+        <clip-path android:pathData="M12,2.2c1.3,0 8.6,14.2 8.4,17.2 -0.3,2.9 -16.5,2.9 -16.8,0C3.4,16.4 10.7,2.2 12,2.2z" />
+        <path android:fillColor="#ffd166" android:pathData="M0,0h24v24h-24z" />
+        <path android:fillColor="#ff9a3c" android:pathData="M0,0h24v15.5h-24z" />
+        <path android:fillColor="#f6efe6" android:pathData="M0,0h24v8.5h-24z" />
+    </group>
+</vector>

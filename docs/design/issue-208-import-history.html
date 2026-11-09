@@ -1,0 +1,310 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Import History</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --danger: #e0687a; --cardio: #f4a07a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1300px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; display: flex; flex-direction: column; gap: 10px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 0 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 0 4px; line-height: 1.45; min-height: 112px; }
+  .capnote b { color: var(--text); }
+  .phone { width: 377px; height: 760px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 16px 16px 0; position: relative; }
+
+  .sub-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .icon-btn { width: 40px; height: 40px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); flex-shrink: 0; font-weight: 800; }
+  .sub-hdr h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.3rem; margin: 0; flex: 1; line-height: 1.15; }
+  .lede { font-size: 0.84rem; color: var(--text-dim); line-height: 1.45; margin: -4px 0 12px; }
+  .lede b { color: var(--text); }
+
+  /* Your data rows */
+  .data-group { display: flex; flex-direction: column; gap: 8px; }
+  .data-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .data-icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
+  .data-title { font-weight: 800; font-size: 0.93rem; display: block; }
+  .data-caption { font-size: 0.76rem; color: var(--text-dim); display: block; margin-top: 1px; }
+  .chev { color: var(--text-dim); margin-left: auto; font-size: 1.2rem; }
+  .new-pill { font-size: 0.62rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); margin-left: 6px; vertical-align: 2px; }
+  .glow { box-shadow: 0 0 0 2px color-mix(in srgb, var(--highlight) 55%, transparent); }
+
+  /* app picker */
+  .apps { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .app { padding: 14px 12px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; }
+  .app.sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+  .app-name { font-weight: 800; font-size: 1rem; display: flex; align-items: center; justify-content: space-between; }
+  .app-sub { font-size: 0.74rem; color: var(--text-dim); }
+  .radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: grid; place-items: center; }
+  .radio.on { border-color: var(--accent); }
+  .radio.on::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+  .soon { font-size: 0.76rem; color: var(--text-dim); margin: -4px 0 14px 2px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .sec { font-size: 0.72rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--text-dim); margin: 0 0 8px; }
+  ol.how { margin: 0; padding-left: 20px; font-size: 0.86rem; line-height: 1.55; }
+  ol.how li { margin-bottom: 4px; }
+  ol.how b { color: var(--text); }
+  .privacy { display: flex; gap: 10px; align-items: center; margin: 12px 0; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--secondary) 12%, transparent); border: 1px solid color-mix(in srgb, var(--secondary) 45%, var(--border)); font-size: 0.82rem; line-height: 1.4; }
+  .privacy svg { color: var(--secondary); flex-shrink: 0; }
+  .btn { width: 100%; min-height: 50px; border-radius: 14px; font: 800 0.95rem Manrope, sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid transparent; }
+  .btn-accent { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  .btn-ghost { background: transparent; color: var(--text-dim); border-color: var(--border); }
+  .btn-off { background: transparent; color: color-mix(in srgb, var(--accent) 55%, transparent); border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
+
+  /* review */
+  .progress { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.78rem; font-weight: 800; color: var(--text-dim); }
+  .bar { flex: 1; height: 6px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+  .bar span { display: block; height: 100%; background: var(--accent); border-radius: 6px; }
+  .scroll { position: absolute; left: 16px; right: 16px; top: 104px; bottom: 92px; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
+  .dock { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 18px; background: var(--bg); border-top: 1px solid var(--border); }
+  .dock .hintline { font-size: 0.74rem; color: var(--text-dim); text-align: center; margin: 0 0 8px; }
+  .row { padding: 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; }
+  .row.done { padding: 10px 12px; background: var(--surface); }
+  .src { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .src-name { font-weight: 800; font-size: 0.93rem; overflow-wrap: anywhere; }
+  .src-meta { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; font-weight: 700; }
+  .q { font-size: 0.8rem; color: var(--text-dim); margin: 6px 0 6px; font-weight: 700; }
+  .opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 6px; background: var(--surface); }
+  .opt.sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, var(--surface)); }
+  .opt-name { font-weight: 700; font-size: 0.88rem; display: block; }
+  .opt-sub { font-size: 0.72rem; color: var(--text-dim); display: block; }
+  .tag { font-size: 0.6rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; padding: 2px 6px; border-radius: 999px; margin-left: auto; flex-shrink: 0; }
+  .tag.yours { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+  .tag.lib { background: color-mix(in srgb, var(--secondary) 18%, transparent); color: var(--secondary); }
+  .tag.new { background: color-mix(in srgb, var(--highlight) 18%, transparent); color: var(--highlight); }
+  .opt.addnew { border-style: dashed; }
+  .more { font-size: 0.8rem; font-weight: 800; color: var(--secondary); margin: 2px 0 8px 2px; }
+  .ans { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; margin-top: 3px; }
+  .ans .arrow { color: var(--text-dim); }
+  .ans b { font-weight: 800; }
+  .ans .ok { color: var(--success); flex-shrink: 0; }
+  .change { margin-left: auto; font-size: 0.76rem; font-weight: 800; color: var(--secondary); flex-shrink: 0; }
+  .guess { display: flex; align-items: center; gap: 10px; margin: 8px 0 10px; padding: 10px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); }
+  .acts { display: flex; gap: 8px; }
+  .acts .btn { min-height: 44px; font-size: 0.86rem; border-radius: 12px; }
+  .acts .yes { flex: 1; }
+  .acts .other { width: auto; padding: 0 14px; background: transparent; color: var(--text); border-color: var(--border); }
+
+  /* sheet over B */
+  .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--bg); border-top: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 10px 16px 18px; }
+  .handle { width: 36px; height: 4px; border-radius: 4px; background: var(--border); margin: 0 auto 10px; }
+  .sheet h3 { margin: 0 0 2px; font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; }
+  .search { height: 44px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); font-size: 0.9rem; display: flex; align-items: center; padding: 0 14px; margin: 10px 0; }
+
+  /* confirm */
+  .counts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .count { padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .count b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 1.3rem; line-height: 1.1; }
+  .count span { font-size: 0.74rem; font-weight: 700; color: var(--text-dim); }
+  .count.wide { grid-column: 1 / -1; }
+  .file-card { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; }
+  .file-icon { width: 40px; height: 46px; border-radius: 8px; display: grid; place-items: center; background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); font-size: 0.62rem; font-weight: 800; flex-shrink: 0; }
+  .file-name { font-family: Consolas, monospace; font-size: 0.86rem; font-weight: 700; display: block; }
+  .file-date { font-size: 0.74rem; color: var(--text-dim); }
+  .toggle-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; }
+  .switch { width: 44px; height: 26px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); position: relative; flex-shrink: 0; margin-left: auto; }
+  .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--text-dim); }
+  .switch.on { background: var(--accent); border-color: var(--accent); }
+  .switch.on::after { left: 21px; background: var(--accent-text); }
+  .info { padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--secondary) 12%, transparent); border: 1px solid color-mix(in srgb, var(--secondary) 45%, var(--border)); font-size: 0.82rem; line-height: 1.45; margin-bottom: 12px; }
+
+  /* done */
+  .done-badge { width: 64px; height: 64px; margin: 40px auto 10px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+  .done-title { text-align: center; font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; margin: 0; }
+  .done-copy { text-align: center; color: var(--text-dim); font-size: 0.86rem; line-height: 1.5; margin: 4px 8px 16px; }
+  .mascot { width: 72px; height: 72px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; margin: 0 auto; }
+  .mascot img { width: 48px; height: 48px; border-radius: 10px; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#208 Import from Strong and Hevy</h1>
+  <p class="note">A new <b>Import from another app</b> row in Account &gt; Your data, under Restore. You pick the app, then its CSV. The file is read on the phone and never sent anywhere. Every exercise name in the file gets one review row before anything is written; candidates come from <b>your exercises first</b>, then the library. Answers are remembered per app and name, so a newer export from the same app skips straight to the confirm screen.</p>
+  <p class="note">Pick <b>A or B</b> for the review screen (screens 3a/3b); the rest is the same either way. Open questions settled here: <b>history only</b> (the files have routine names, not routine definitions; the workout's name goes in its note, "From Strong: Push Day"), <b>RPE kept</b>, <b>warm-up sets skipped</b> by default with a switch to keep them, so they don't count as records.</p>
+</div>
+<div class="page">
+
+  <!-- 1 Your data -->
+  <div class="col">
+    <p class="cap">1 · Your data</p>
+    <p class="capnote">A fourth row right under Restore, in the pink accent (restore is gold, backup lavender, CSVs green). Disabled with "Finish your workout first" mid-workout, like Restore. Free for everyone: logging is free, so is bringing your history.</p>
+    <div class="phone">
+      <div class="sub-hdr"><span class="icon-btn">‹</span><h2>Your data</h2><span class="icon-btn">✕</span></div>
+      <div class="data-group">
+        <div class="data-item" style="--c: var(--secondary)"><span class="data-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></span><span><span class="data-title">Back up my data</span><span class="data-caption">Saves a file with everything, or just what you pick</span></span><span class="chev">›</span></div>
+        <div class="data-item" style="--c: var(--highlight)"><span class="data-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21V9M7 14l5-5 5 5"/><path d="M5 3h14"/></svg></span><span><span class="data-title">Restore from a backup</span><span class="data-caption">Replaces what's here, or adds a partial file</span></span><span class="chev">›</span></div>
+        <div class="data-item glow" style="--c: var(--accent)"><span class="data-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h12M12 7l5 5-5 5"/><path d="M20 4v16"/></svg></span><span><span class="data-title">Import from another app</span><span class="data-caption">Bring your Strong or Hevy history</span></span><span class="chev">›</span></div>
+        <div class="data-item" style="--c: var(--success)"><span class="data-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M4 10h16M4 15h16M10 4v16"/></svg></span><span><span class="data-title">Export sets as CSV</span><span class="data-caption">For spreadsheets. Can't be restored.</span></span></div>
+        <div class="data-item" style="--c: var(--success)"><span class="data-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M4 10h16M4 15h16M10 4v16"/></svg></span><span><span class="data-title">Export measurements as CSV</span><span class="data-caption">Waist, chest, and the rest, by date.</span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 pick app -->
+  <div class="col">
+    <p class="cap">2 · Pick the app, then the file</p>
+    <p class="capnote">Same sheet as Restore's preview. The steps change with the app picked. <b>Choose file</b> opens the phone's file picker for a .csv. A file that doesn't look like that app's export says so here ("This doesn't look like a Hevy export. Strong?") and offers the other app if its columns match.</p>
+    <div class="phone">
+      <div class="sub-hdr"><span class="icon-btn">‹</span><h2>Import from another app</h2><span class="icon-btn">✕</span></div>
+      <p class="lede">Your past workouts come in as history, so records, "last time", and charts work from day one.</p>
+      <div class="apps">
+        <div class="app sel"><span class="app-name">Strong <span class="radio on"></span></span><span class="app-sub">strong_workouts.csv</span></div>
+        <div class="app"><span class="app-name">Hevy <span class="radio"></span></span><span class="app-sub">workout_data.csv</span></div>
+      </div>
+      <p class="soon">Fitbod, FitNotes, and JEFIT are next.</p>
+      <div class="card">
+        <p class="sec">Export from Strong first</p>
+        <ol class="how">
+          <li>In Strong, open <b>Profile</b> then <b>Settings</b>.</li>
+          <li>Tap <b>Export Workouts</b> (free, no Pro needed).</li>
+          <li>Save the CSV to Files or Downloads.</li>
+        </ol>
+      </div>
+      <div class="privacy"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>The file is read on this phone. Nothing is uploaded.</span></div>
+      <span class="btn btn-accent">Choose file</span>
+    </div>
+  </div>
+
+  <!-- 3a review list -->
+  <div class="col">
+    <p class="cap">3a · Review: choices listed in each row</p>
+    <p class="capnote">Every row shows its choices: the best match preselected, two more, and <b>Add as new</b> (with the tracking type from the file). <b>Show more</b> opens a search. Confirming collapses the row to one line with <b>Change</b>; it stays in place. Unanswered rows float to the top only when the screen opens. Import stays off until all are answered.</p>
+    <div class="phone">
+      <div class="sub-hdr"><span class="icon-btn">‹</span><h2>Match your exercises</h2><span class="icon-btn">✕</span></div>
+      <div class="progress"><span>3 of 14 answered</span><span class="bar"><span style="width:21%"></span></span></div>
+      <div class="scroll">
+        <div class="row">
+          <div class="src"><span class="src-name">Bench Press (Barbell)</span><span class="src-meta">214 sets</span></div>
+          <p class="q">Is it this?</p>
+          <div class="opt sel"><span class="radio on"></span><span><span class="opt-name">Bench press</span><span class="opt-sub">Chest · 38 sets logged</span></span><span class="tag yours">Yours</span></div>
+          <div class="opt"><span class="radio"></span><span><span class="opt-name">Incline Bench Press</span><span class="opt-sub">Chest · Barbell</span></span><span class="tag lib">Library</span></div>
+          <div class="opt"><span class="radio"></span><span><span class="opt-name">Close-Grip Bench Press</span><span class="opt-sub">Arms · Barbell</span></span><span class="tag lib">Library</span></div>
+          <div class="opt addnew"><span class="radio"></span><span><span class="opt-name">Add as new exercise</span><span class="opt-sub">Weight · "Bench Press (Barbell)"</span></span><span class="tag new">New</span></div>
+          <p class="more">Show more matches ›</p>
+          <span class="btn btn-accent" style="min-height:44px;font-size:.88rem;border-radius:12px">Confirm</span>
+        </div>
+        <div class="row">
+          <div class="src"><span class="src-name">Pull Up (Assisted)</span><span class="src-meta">96 sets</span></div>
+          <p class="q">Is it this?</p>
+          <div class="opt sel"><span class="radio on"></span><span><span class="opt-name">Assisted Pull-Up</span><span class="opt-sub">Back · Assisted machine</span></span><span class="tag lib">Library</span></div>
+          <div class="opt"><span class="radio"></span><span><span class="opt-name">Pull-Up</span><span class="opt-sub">Back · Bodyweight</span></span><span class="tag lib">Library</span></div>
+        </div>
+        <div class="row done">
+          <div class="src"><span class="src-name">Lat Pulldown (Cable)</span><span class="src-meta">180 sets</span></div>
+          <div class="ans"><svg class="ok" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><span class="arrow">→</span><b>Lat pulldown</b><span class="tag yours" style="margin-left:4px">Yours</span><span class="change">Change</span></div>
+        </div>
+        <div class="row done">
+          <div class="src"><span class="src-name">Chest Fly (Band)</span><span class="src-meta">12 sets</span></div>
+          <div class="ans"><svg class="ok" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><span class="arrow">→</span><b>New exercise</b><span class="tag new" style="margin-left:4px">Weight</span><span class="change">Change</span></div>
+        </div>
+      </div>
+      <div class="dock"><p class="hintline">Answer all 14 to import. Nothing is saved until then.</p><span class="btn btn-off">Import 312 workouts</span></div>
+    </div>
+  </div>
+
+  <!-- 3b review compact -->
+  <div class="col">
+    <p class="cap">3b · Review: one guess, Yes or Other</p>
+    <p class="capnote">Closer to "Link your exercises": each row shows one guess with <b>Yes</b> and <b>Other</b>. Other opens a sheet with the ranked matches (yours first), a search, and Add as new. Faster for a long file where most guesses are right; one more tap when they aren't. A row with no good guess shows <b>Add as new</b> in place of Yes.</p>
+    <div class="phone">
+      <div class="sub-hdr"><span class="icon-btn">‹</span><h2>Match your exercises</h2><span class="icon-btn">✕</span></div>
+      <div class="progress"><span>3 of 14 answered</span><span class="bar"><span style="width:21%"></span></span></div>
+      <div class="scroll">
+        <div class="row">
+          <div class="src"><span class="src-name">Bench Press (Barbell)</span><span class="src-meta">214 sets</span></div>
+          <div class="guess"><span><span class="opt-name">Bench press</span><span class="opt-sub">Chest · 38 sets logged</span></span><span class="tag yours">Yours</span></div>
+          <div class="acts"><span class="btn btn-accent yes">Yes, same one</span><span class="btn other">Other…</span></div>
+        </div>
+        <div class="row">
+          <div class="src"><span class="src-name">Single Arm Cable Row (Half Kneeling)</span><span class="src-meta">40 sets</span></div>
+          <div class="guess"><span><span class="opt-name">Single-Arm Cable Row</span><span class="opt-sub">Back · Cable</span></span><span class="tag lib">Library</span></div>
+          <div class="acts"><span class="btn btn-accent yes">Yes, same one</span><span class="btn other">Other…</span></div>
+        </div>
+        <div class="row">
+          <div class="src"><span class="src-name">Chest Fly (Band)</span><span class="src-meta">12 sets</span></div>
+          <div class="guess" style="border-style:dashed"><span><span class="opt-name">No close match</span><span class="opt-sub">Adds it as a weight exercise</span></span><span class="tag new">New</span></div>
+          <div class="acts"><span class="btn btn-accent yes">Add as new</span><span class="btn other">Other…</span></div>
+        </div>
+        <div class="row done">
+          <div class="src"><span class="src-name">Lat Pulldown (Cable)</span><span class="src-meta">180 sets</span></div>
+          <div class="ans"><svg class="ok" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><span class="arrow">→</span><b>Lat pulldown</b><span class="tag yours" style="margin-left:4px">Yours</span><span class="change">Change</span></div>
+        </div>
+      </div>
+      <div class="dock"><p class="hintline">Answer all 14 to import. Nothing is saved until then.</p><span class="btn btn-off">Import 312 workouts</span></div>
+    </div>
+  </div>
+
+  <!-- 3b sheet -->
+  <div class="col">
+    <p class="cap">3b · The Other… sheet</p>
+    <p class="capnote">Ranked matches, yours first, then the library, same load type first. Search covers both. A tap answers the row and closes the sheet. <b>Add as new</b> sits at the bottom with the type the file implies (weight, bodyweight, assisted, timed, cardio).</p>
+    <div class="phone">
+      <div class="sub-hdr"><span class="icon-btn">‹</span><h2>Match your exercises</h2><span class="icon-btn">✕</span></div>
+      <div class="scrim"></div>
+      <div class="sheet">
+        <div class="handle"></div>
+        <h3>Bench Press (Barbell)</h3>
+        <p class="opt-sub" style="margin:0">214 sets in your Strong file</p>
+        <div class="search">Search exercises</div>
+        <p class="sec">Your exercises</p>
+        <div class="opt"><span><span class="opt-name">Bench press</span><span class="opt-sub">Chest · 38 sets logged</span></span><span class="tag yours">Yours</span></div>
+        <div class="opt"><span><span class="opt-name">Smith bench</span><span class="opt-sub">Chest · 6 sets logged</span></span><span class="tag yours">Yours</span></div>
+        <p class="sec" style="margin-top:12px">From the library</p>
+        <div class="opt"><span><span class="opt-name">Incline Bench Press</span><span class="opt-sub">Chest · Barbell</span></span><span class="tag lib">Library</span></div>
+        <div class="opt"><span><span class="opt-name">Close-Grip Bench Press</span><span class="opt-sub">Arms · Barbell</span></span><span class="tag lib">Library</span></div>
+        <div class="opt"><span><span class="opt-name">Dumbbell Bench Press</span><span class="opt-sub">Chest · Dumbbell</span></span><span class="tag lib">Library</span></div>
+        <div class="opt addnew" style="margin-top:10px"><span><span class="opt-name">Add as new exercise</span><span class="opt-sub">Weight · keeps the name "Bench Press (Barbell)"</span></span><span class="tag new">New</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 confirm -->
+  <div class="col">
+    <p class="cap">4 · Ready to import</p>
+    <p class="capnote">Once every row is answered. Nothing is deleted, so no typed word. <b>Already in RepBunny</b> is decided by the sets, not the date: a workout from the file is skipped only when you already have a workout on the <b>same day</b> holding <b>the same sets</b> (same exercise, reps, weight and unit, or time and distance for timed sets), whether it came from an earlier import or you typed it in. Anything else on that day, like a different workout you backfilled, still imports. Workouts keep the unit they were logged in.</p>
+    <div class="phone">
+      <div class="sub-hdr"><span class="icon-btn">‹</span><h2>Import 312 workouts?</h2><span class="icon-btn">✕</span></div>
+      <div class="file-card"><span class="file-icon">CSV</span><span><span class="file-name">strong_workouts.csv</span><span class="file-date">From Strong · Mar 4, 2024 – Oct 7, 2026</span></span></div>
+      <div class="counts">
+        <div class="count"><b>312</b><span>workouts</span></div>
+        <div class="count"><b>6,904</b><span>sets</span></div>
+        <div class="count"><b>9</b><span>exercises matched</span></div>
+        <div class="count"><b>5</b><span>new exercises</span></div>
+        <div class="count wide"><b>4 skipped</b><span>you already have these, same day and same sets</span></div>
+      </div>
+      <div class="toggle-row"><span><span class="data-title">Keep warm-up sets</span><span class="data-caption">218 in this file. Off: they're left out, so they don't count as records.</span></span><span class="switch"></span></div>
+      <div class="info">Adds to your history. Nothing is deleted. RPE and notes come along; each workout's name goes in its note.</div>
+      <span class="btn btn-accent">Import 312 workouts</span>
+      <span class="btn btn-ghost" style="margin-top:8px">Back to exercises</span>
+    </div>
+  </div>
+
+  <!-- 5 done -->
+  <div class="col">
+    <p class="cap">5 · Done</p>
+    <p class="capnote">Records, progress, milestones, and "last time" rebuild from the new history (the stores refetch, as after a restore). First-run milestones mark tiers the import reached as seen, so there's no flood of unlock moments on the next finish.</p>
+    <div class="phone">
+      <div class="done-badge"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+      <p class="done-title">Welcome over from Strong</p>
+      <p class="done-copy">Added 312 workouts and 6,904 sets, and created 5 exercises. Your records and charts are up to date.</p>
+      <div class="mascot"><img src="../../public/icon-512.png" alt=""></div>
+      <div style="height:20px"></div>
+      <span class="btn btn-accent">See my progress</span>
+      <span class="btn btn-ghost" style="margin-top:8px">Done</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

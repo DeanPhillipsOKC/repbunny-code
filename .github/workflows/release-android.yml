@@ -1,0 +1,77 @@
+# Builds, signs, and releases the personal Android app (RepBunny (Dev)) for Obtainium.
+# Nightly when main has changed since the last release, or on demand from the Actions tab.
+# The release logic is scripts/Release-PersonalAndroid.ps1; see docs/architecture.md > Native apps.
+name: Release Android build
+
+on:
+  schedule:
+    - cron: '0 9 * * *' # 4am Central (daylight time)
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Release even if nothing changed since the last release
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write # tells status:verify issues which build has them (docs/backlog.md > Owner check)
+
+concurrency:
+  group: release-android
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - run: npm ci --ignore-scripts
+
+      - name: Restore signing key
+        run: echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/repbunny-personal.jks"
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_PERSONAL_KEYSTORE_BASE64 }}
+
+      - name: Token for the backlog repo
+        id: backlog
+        uses: ./.github/actions/backlog-token
+        with:
+          backlog-repo: ${{ vars.BACKLOG_REPO || 'DeanPhillipsOKC/repbunny' }}
+          github-token: ${{ github.token }}
+          builder-app-id: ${{ secrets.BUILDER_APP_ID }}
+          builder-app-key: ${{ secrets.BUILDER_APP_KEY }}
+
+      - name: Build and release
+        shell: pwsh
+        run: |
+          $flags = @{}
+          if ($env:FORCE -ne 'true') { $flags.SkipIfUnchanged = $true }
+          ./scripts/Release-PersonalAndroid.ps1 @flags
+        env:
+          FORCE: ${{ inputs.force }}
+          GH_TOKEN: ${{ github.token }}
+          # The status:verify comments go to the backlog repo with its own token (#944).
+          BACKLOG_REPO: ${{ vars.BACKLOG_REPO || 'DeanPhillipsOKC/repbunny' }}
+          BACKLOG_GH_TOKEN: ${{ steps.backlog.outputs.token }}
+          # Releases go to the private backlog repo too (#946), so the same Builder token writes them.
+          RELEASE_GH_TOKEN: ${{ steps.backlog.outputs.token }}
+          ANDROID_PERSONAL_KEYSTORE: ${{ runner.temp }}/repbunny-personal.jks
+          ANDROID_PERSONAL_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PERSONAL_KEYSTORE_PASSWORD }}
+          ANDROID_PERSONAL_KEY_ALIAS: repbunny-personal
+          ANDROID_PERSONAL_KEY_PASSWORD: ${{ secrets.ANDROID_PERSONAL_KEYSTORE_PASSWORD }}
+          VITE_VAPID_PUBLIC_KEY: ${{ secrets.VITE_VAPID_PUBLIC_KEY }}

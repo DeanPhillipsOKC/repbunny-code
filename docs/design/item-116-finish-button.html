@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Finish Workout Button</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --success: #a9cb8d; --highlight: #f2c069;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .page { display: flex; gap: 26px; padding: 26px; align-items: flex-start; }
+  .col { width: 340px; }
+  .tag { display: inline-block; margin-bottom: 8px; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .tag-now { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+  .tag-new { background: rgba(242,192,105,0.16); color: var(--highlight); }
+  .col-title { font-family: 'Baloo 2', sans-serif; font-size: 1.15rem; margin: 0 0 2px; }
+  .col-note { color: var(--text-dim); font-size: 0.8rem; margin: 0 0 12px; line-height: 1.45; min-height: 58px; }
+
+  .phone { position: relative; height: 700px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; display: flex; flex-direction: column; }
+  .content { flex: 1; padding: 16px 14px 0; display: flex; flex-direction: column; gap: 12px; }
+  .hdr { display: flex; align-items: center; gap: 8px; }
+  .hdr h2 { flex: 1; margin: 0; font-size: 1.05rem; }
+  .timer { color: var(--accent); font-weight: 800; font-size: 1.05rem; }
+  .icon-btn { width: 38px; height: 38px; border-radius: 11px; border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; }
+  .dots { display: flex; justify-content: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 99px; background: var(--border); }
+  .dot.on { width: 22px; background: var(--accent); }
+  .ex-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 14px 16px; }
+  .ex-name { font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; display: flex; justify-content: space-between; }
+  .ex-pos { font-family: Manrope; font-size: 0.75rem; color: var(--text-dim); background: var(--surface-2); padding: 2px 8px; border-radius: 99px; align-self: center; }
+  .ex-sub { font-size: 0.82rem; color: var(--text-dim); }
+  .sets { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .set { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); font-size: 0.9rem; }
+  .set .n { width: 20px; color: var(--text-dim); font-weight: 700; }
+  .set .v { flex: 1; font-weight: 700; }
+  .check { width: 22px; height: 22px; border-radius: 7px; background: rgba(169,203,141,0.2); color: var(--success); display: grid; place-items: center; font-size: 0.8rem; }
+
+  .dock { border-top: 1px solid var(--border); padding: 10px 14px 12px; }
+  .up-next { margin: 0 0 8px; text-align: center; font-size: 0.88rem; font-weight: 600; color: var(--text-dim); }
+  .finish { width: 100%; min-height: 50px; border-radius: 14px; font: inherit; font-size: 1.05rem; font-weight: 800; }
+  .finish-bright { background: var(--accent); border: 1px solid var(--accent); color: var(--accent-text); }
+  .finish-quiet { background: transparent; border: 1.5px solid var(--border); color: var(--text); font-weight: 700; }
+  .nav { height: 58px; border-top: 1px solid var(--border); background: var(--surface); display: flex; justify-content: space-around; align-items: center; font-size: 0.68rem; color: var(--text-dim); }
+  .nav b { color: var(--accent); }
+
+  .scrim { position: absolute; inset: 0; background: rgba(10, 6, 14, 0.66); display: grid; place-items: center; padding: 22px; }
+  .dialog { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 22px; padding: 20px 18px 16px; }
+  .dialog h3 { margin: 0 0 6px; font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; }
+  .dialog p { margin: 0 0 12px; font-size: 0.9rem; color: var(--text-dim); line-height: 1.45; }
+  .left { margin: 0 0 16px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .left li { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 8px 12px; background: var(--surface-2); border-radius: 10px; }
+  .left li span { color: var(--text-dim); }
+  .keep { width: 100%; min-height: 50px; border-radius: 14px; background: var(--accent); border: 1px solid var(--accent); color: var(--accent-text); font: inherit; font-weight: 800; font-size: 1.05rem; }
+  .anyway { width: 100%; margin-top: 6px; min-height: 42px; background: none; border: none; color: var(--text-dim); font: inherit; font-weight: 600; font-size: 0.92rem; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="col">
+    <span class="tag tag-now">Today</span>
+    <h2 class="col-title">Right after the last set</h2>
+    <p class="col-note">The exercise feels done, and the brightest thing on screen says "Finish workout". This is the moment she taps it.</p>
+    <div class="phone" data-screen="bright"></div>
+  </div>
+  <div class="col">
+    <span class="tag tag-new">Proposed</span>
+    <h2 class="col-title">Quieter Finish button</h2>
+    <p class="col-note">Same size and spot, outlined instead of filled pink. Still easy to find; it just stops competing with "Up next".</p>
+    <div class="phone" data-screen="quiet"></div>
+  </div>
+  <div class="col">
+    <span class="tag tag-new">Proposed</span>
+    <h2 class="col-title">Tapped it anyway</h2>
+    <p class="col-note">Only when something's unfinished. "Keep going" is the big, safe choice; "Finish anyway" is still one tap away.</p>
+    <div class="phone" data-screen="confirm"></div>
+  </div>
+</div>
+
+<script>
+  const screen = (finishClass) => `
+    <div class="content">
+      <div class="hdr"><h2>Pull Day</h2><span class="timer">24:18</span>
+        <span class="icon-btn">+</span><span class="icon-btn">&#9786;</span></div>
+      <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
+      <div class="ex-card"><div class="ex-name">Seated Row <span class="ex-pos">4 / 6</span></div>
+        <div class="ex-sub">3 of 3 sets logged · History</div></div>
+      <div class="sets">
+        <div class="set"><span class="n">1</span><span class="v">10 × 90 lb</span><span class="check">✓</span></div>
+        <div class="set"><span class="n">2</span><span class="v">10 × 90 lb</span><span class="check">✓</span></div>
+        <div class="set"><span class="n">3</span><span class="v">8 × 95 lb</span><span class="check">✓</span></div>
+      </div>
+    </div>
+    <div class="dock">
+      <p class="up-next">Up next: Lat Pulldown</p>
+      <button class="finish ${finishClass}">Finish workout</button>
+    </div>
+    <div class="nav"><b>Home</b><span>History</span><span>Templates</span><span>Exercises</span><span>Body</span></div>`
+
+  const dialog = `
+    <div class="scrim"><div class="dialog">
+      <h3>Finish now?</h3>
+      <p>2 exercises in Pull Day still have sets left. Anything you haven't logged won't be saved.</p>
+      <ul class="left">
+        <li>Lat Pulldown <span>0 of 3 sets</span></li>
+        <li>Face Pull <span>0 of 3 sets</span></li>
+      </ul>
+      <button class="keep">Keep going</button>
+      <button class="anyway">Finish anyway</button>
+    </div></div>`
+
+  for (const el of document.querySelectorAll('.phone')) {
+    const kind = el.dataset.screen
+    el.innerHTML = screen(kind === 'bright' ? 'finish-bright' : 'finish-quiet') + (kind === 'confirm' ? dialog : '')
+  }
+</script>
+</body>
+</html>

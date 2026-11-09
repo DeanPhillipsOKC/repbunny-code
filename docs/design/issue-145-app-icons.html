@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>App Icons</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-pressed: #ed6b85; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1240px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 8px; line-height: 1.55; }
+  .note b, .note code { color: var(--text); } .note code { font-family: Consolas, monospace; font-size: 0.82rem; }
+  .page { display: flex; flex-wrap: wrap; gap: 28px; padding: 22px 32px 40px; align-items: flex-start; }
+  .col { width: 377px; }
+  .opt-title { font-family: 'Baloo 2', sans-serif; color: var(--accent); font-size: 1.2rem; margin: 0 0 2px 4px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 58px; }
+  .capnote b { color: var(--text); }
+  .phone { position: relative; width: 377px; height: 780px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; }
+
+  /* the Theme sheet, scrolled down past the theme cards */
+  .sheet { position: absolute; left: 0; right: 0; top: 40px; bottom: 0; background: var(--bg); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 10px 16px 0; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+  .handle { align-self: center; width: 36px; height: 4px; border-radius: 2px; background: var(--border); flex-shrink: 0; }
+  .head { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .head h3 { flex: 1; margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.35rem; line-height: 1.15; }
+  .hbtn { width: 44px; height: 44px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; color: var(--text); }
+  .hbtn.x { color: var(--text-dim); }
+  .scroll-cut { margin: -4px -16px 0; height: 54px; flex-shrink: 0; overflow: hidden; position: relative; }
+  .scroll-cut .cards { position: absolute; bottom: 0; left: 16px; right: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .scroll-cut .card { height: 120px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 8px; display: flex; align-items: flex-end; }
+  .peek { width: 100%; height: 38px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; font-size: 0.82rem; font-weight: 700; }
+  .group-label { margin: 2px 2px -4px; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-dim); }
+  .option { display: flex; align-items: center; gap: 10px; padding: 10px 12px; min-height: 64px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+  .option.sel { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .option img { width: 40px; height: 40px; object-fit: contain; }
+  .olabel { font-size: 0.92rem; font-weight: 700; }
+  .ocap { font-size: 0.74rem; color: var(--text-dim); margin-top: 1px; }
+  .check { margin-left: auto; color: var(--accent); display: flex; }
+  .mascots { display: flex; flex-direction: column; gap: 8px; }
+
+  /* the new App icon group */
+  .icons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 8px; padding: 12px 8px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+  .ic { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; }
+  .ic-img { position: relative; width: 60px; height: 60px; border-radius: 16px; padding: 3px; }
+  .ic-img img { width: 54px; height: 54px; display: block; }
+  .ic.sel .ic-img { box-shadow: 0 0 0 2px var(--accent); }
+  .ic.sel .ic-img::after { content: ''; position: absolute; right: -5px; bottom: -5px; width: 20px; height: 20px; border-radius: 50%; background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23241a2c' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 13px no-repeat; border: 2px solid var(--surface); }
+  .ic.trying .ic-img { box-shadow: 0 0 0 2px var(--secondary); }
+  .ic-label { font-size: 0.7rem; font-weight: 700; text-align: center; line-height: 1.15; color: var(--text); white-space: nowrap; }
+  .ic.sel .ic-label { color: var(--accent); }
+  .pmark { width: 8px; height: 8px; margin-left: 2px; vertical-align: 3px; color: var(--secondary); }
+  .icon-note { margin: -4px 2px 0; font-size: 0.74rem; color: var(--text-dim); line-height: 1.4; }
+
+  /* free preview of an icon */
+  .ipreview { padding: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .home { position: relative; height: 128px; border-radius: 12px; overflow: hidden; background: linear-gradient(160deg, #3b5a7a 0%, #6f7fa8 45%, #c9a9b8 100%); display: grid; grid-template-columns: repeat(4, 1fr); align-content: center; padding: 0 10px; }
+  .app { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .app i { width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,0.82); display: block; }
+  .app img { width: 46px; height: 46px; border-radius: 50%; display: block; object-fit: cover; transform: scale(1.12); }
+  .app .clip { width: 46px; height: 46px; border-radius: 50%; overflow: hidden; }
+  .app span { font-size: 0.62rem; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+  .ptext { margin: 0; font-size: 0.84rem; color: var(--text-dim); line-height: 1.4; }
+  .ptext strong { color: var(--text); }
+  .acts { display: flex; gap: 8px; }
+  .keep { flex: 1; min-height: 46px; border-radius: 12px; background: var(--accent); color: var(--accent-text); font-weight: 800; font-size: 0.9rem; display: grid; place-items: center; }
+  .goback { min-height: 46px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--border); font-weight: 700; font-size: 0.9rem; display: grid; place-items: center; }
+  .tag { align-self: flex-start; padding: 2px 9px; border-radius: 999px; background: color-mix(in srgb, var(--secondary) 16%, transparent); color: var(--secondary); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#145 Alternate app icons per theme (Premium, 2026-10-05)</h1>
+  <p class="note">A new <b>App icon</b> group on the Theme screen, under Mascot: all 7 icons in a 4-column grid (fits 320px without sideways scroll), the current one ringed in the accent with a check. Tapping one switches the home-screen icon right away. It's <b>its own pick</b>, so the icon doesn't follow the theme: someone can run Chalk inside and keep the Classic icon. Default is Classic. Native apps only; the PWA never shows the group (a web app can't change its icon).</p>
+  <p class="note">The icons are the real app icon <b>recolored from each theme's tokens</b> by a script (tile = <code>--bg</code>, bunny = <code>--accent</code>, inner ears and face = <code>--text</code> on dark themes or white on light ones, plus a nose color per theme), so new themes get an icon for free. The question is the art: <b>A</b> recolor only, or <b>B</b> recolor plus the theme's own decoration (candy corn, maple leaves, carrots) for the three themes that have one.</p>
+  <p class="note">Losing Premium keeps the icon (only picking a new one needs it). A Themes trial pass opens the picker too, and the icon also stays after the trial. Free users get the themes-style preview: a home-screen mock with that icon and <b>Keep it with Premium / Go back</b>; nothing changes on the phone until they have Premium.</p>
+</div>
+<div class="page">
+
+  <!-- A -->
+  <div class="col">
+    <div class="opt-title">Option A: recolor only</div>
+    <div class="cap">Premium, Classic icon in use</div>
+    <div class="capnote">Each icon is the same bunny and dumbbell, in that theme's colors. Clean at every size, and reads as the same app on the home screen.</div>
+    <div class="phone">
+      <div class="sheet">
+        <div class="handle"></div>
+        <div class="head">
+          <div class="hbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+          <h3>Theme</h3>
+          <div class="hbtn x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="scroll-cut"><div class="cards"><div class="card"><div class="peek">Preview</div></div><div class="card"><div class="peek">Preview</div></div></div></div>
+        <div class="group-label">Mascot</div>
+        <div class="mascots">
+          <div class="option sel"><img src="../../public/celebration-bunny.png" alt="" /><div><div class="olabel">Full</div><div class="ocap">Bunny art, confetti on records</div></div><span class="check"><svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          <div class="option"><img src="../../public/icon-512.png" alt="" /><div><div class="olabel">Minimal</div><div class="ocap">Just the small mark. Records still show in text.</div></div></div>
+        </div>
+        <div class="group-label">App icon</div>
+        <div class="icons">
+          <div class="ic sel"><div class="ic-img"><img src="art/issue-145/classic.png" alt="" /></div><div class="ic-label">Classic</div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/halloween.png" alt="" /></div><div class="ic-label">Halloween</div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/autumn.png" alt="" /></div><div class="ic-label">Autumn</div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/cotton-candy.png" alt="" /></div><div class="ic-label">Cotton Candy</div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/chalk.png" alt="" /></div><div class="ic-label">Chalk</div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/carrot-patch.png" alt="" /></div><div class="ic-label">Carrot Patch</div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/sunrise.png" alt="" /></div><div class="ic-label">Sunrise</div></div>
+        </div>
+        <p class="icon-note">Changes the icon on your home screen. Your phone may say so once.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- B -->
+  <div class="col">
+    <div class="opt-title">Option B: recolor plus decorations</div>
+    <div class="cap">Premium, Halloween icon in use</div>
+    <div class="capnote">Halloween, Autumn, and Carrot Patch add their day-mark shape around the ears. Themes without decorations look the same as A. More festive, a little busier at small sizes.</div>
+    <div class="phone">
+      <div class="sheet">
+        <div class="handle"></div>
+        <div class="head">
+          <div class="hbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+          <h3>Theme</h3>
+          <div class="hbtn x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="scroll-cut"><div class="cards"><div class="card"><div class="peek">Preview</div></div><div class="card"><div class="peek">Preview</div></div></div></div>
+        <div class="group-label">Mascot</div>
+        <div class="mascots">
+          <div class="option sel"><img src="../../public/celebration-bunny.png" alt="" /><div><div class="olabel">Full</div><div class="ocap">Bunny art, confetti on records</div></div><span class="check"><svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          <div class="option"><img src="../../public/icon-512.png" alt="" /><div><div class="olabel">Minimal</div><div class="ocap">Just the small mark. Records still show in text.</div></div></div>
+        </div>
+        <div class="group-label">App icon</div>
+        <div class="icons">
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/classic.png" alt="" /></div><div class="ic-label">Classic</div></div>
+          <div class="ic sel"><div class="ic-img"><img src="art/issue-145/halloween-decor.png" alt="" /></div><div class="ic-label">Halloween</div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/autumn-decor.png" alt="" /></div><div class="ic-label">Autumn</div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/cotton-candy.png" alt="" /></div><div class="ic-label">Cotton Candy</div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/chalk.png" alt="" /></div><div class="ic-label">Chalk</div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/carrot-patch-decor.png" alt="" /></div><div class="ic-label">Carrot Patch</div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/sunrise.png" alt="" /></div><div class="ic-label">Sunrise</div></div>
+        </div>
+        <p class="icon-note">Changes the icon on your home screen. Your phone may say so once.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Free -->
+  <div class="col">
+    <div class="opt-title">Free: trying an icon (both options)</div>
+    <div class="cap">No Premium, tapped Halloween</div>
+    <div class="capnote">Locked icons carry the small Premium sparkle. A tap shows <b>how it would look on the home screen</b> under the grid, in place of the note; nothing changes on the phone. Go back closes it.</div>
+    <div class="phone">
+      <div class="sheet">
+        <div class="handle"></div>
+        <div class="head">
+          <div class="hbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+          <h3>Theme</h3>
+          <div class="hbtn x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="group-label">App icon</div>
+        <div class="icons">
+          <div class="ic sel"><div class="ic-img"><img src="art/issue-145/classic.png" alt="" /></div><div class="ic-label">Classic</div></div>
+          <div class="ic trying"><div class="ic-img"><img src="art/issue-145/halloween.png" alt="" /></div><div class="ic-label">Halloween<svg class="pmark" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z" fill="currentColor"/></svg></div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/autumn.png" alt="" /></div><div class="ic-label">Autumn<svg class="pmark" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z" fill="currentColor"/></svg></div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/cotton-candy.png" alt="" /></div><div class="ic-label">Cotton Candy<svg class="pmark" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z" fill="currentColor"/></svg></div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/chalk.png" alt="" /></div><div class="ic-label">Chalk<svg class="pmark" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z" fill="currentColor"/></svg></div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/carrot-patch.png" alt="" /></div><div class="ic-label">Carrot Patch<svg class="pmark" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z" fill="currentColor"/></svg></div></div>
+          <div class="ic"><div class="ic-img"><img src="art/issue-145/sunrise.png" alt="" /></div><div class="ic-label">Sunrise<svg class="pmark" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z" fill="currentColor"/></svg></div></div>
+        </div>
+        <div class="ipreview">
+          <span class="tag">Premium</span>
+          <div class="home">
+            <div class="app"><i></i><span>Photos</span></div>
+            <div class="app"><div class="clip"><img src="art/issue-145/halloween.png" alt="" /></div><span>RepBunny</span></div>
+            <div class="app"><i></i><span>Maps</span></div>
+            <div class="app"><i></i><span>Music</span></div>
+          </div>
+          <p class="ptext">This is the <strong>Halloween</strong> icon on your home screen. Icons are part of Premium.</p>
+          <div class="acts"><div class="keep">Keep it with Premium</div><div class="goback">Go back</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

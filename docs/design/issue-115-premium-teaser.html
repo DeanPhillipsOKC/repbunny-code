@@ -1,0 +1,192 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Premium Chart Teaser</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1300px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 10px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 32px; padding: 24px 32px 40px; align-items: flex-start; }
+  .col { width: 375px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 96px; }
+  .phone { width: 375px; height: 760px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; position: relative; overflow: hidden; padding: 22px 16px 0; display: flex; flex-direction: column; gap: 14px; }
+  .new { outline: 2px dashed color-mix(in srgb, var(--highlight) 70%, transparent); outline-offset: 4px; }
+
+  /* recap bits, copied from FinishRecap.vue */
+  .eyebrow-ok { margin: 0; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--success); }
+  .rtitle { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.9rem; line-height: 1.1; }
+  .rmeta { margin: 0; font-size: 0.9rem; color: var(--text-dim); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 16px; }
+  .slabel { margin: 0 0 10px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+  .crow { display: flex; align-items: center; gap: 8px; min-height: 40px; }
+  .crow .n { flex: 1; font-weight: 600; }
+  .crow .d { font-size: 0.875rem; color: var(--text-dim); }
+  .chip { display: inline-flex; padding: 2px 9px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+  .chip.neutral { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+  .chev { color: var(--text-dim); font-weight: 800; }
+
+  /* PremiumPreviewPanel look */
+  .pill { align-self: flex-start; padding: 2px 9px; border-radius: 999px; background: color-mix(in srgb, var(--secondary) 16%, transparent); color: var(--secondary); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+  .ptitle { margin: 4px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 1.05rem; line-height: 1.2; }
+  .pbody { margin: 0; font-size: 0.8rem; line-height: 1.45; color: var(--text-dim); }
+  .acts { display: flex; gap: 8px; margin-top: 8px; }
+  .btn { min-height: 42px; border-radius: var(--radius); display: grid; place-items: center; font-size: 0.86rem; font-weight: 800; padding: 0 14px; }
+  .keep { flex: 1; background: var(--accent); color: var(--accent-text); }
+  .back { border: 1px solid var(--border); color: var(--text); font-weight: 700; }
+
+  /* the teaser */
+  .teaser { position: relative; border-radius: 20px; border: 1px solid color-mix(in srgb, var(--secondary) 35%, var(--border)); background: var(--surface); overflow: hidden; }
+  .blurchart { filter: blur(5px); opacity: 0.75; pointer-events: none; }
+  .blurchart svg { display: block; width: 100%; }
+  .over { position: relative; margin-top: -26px; display: flex; flex-direction: column; padding: 22px 14px 14px; gap: 4px;
+          background: linear-gradient(to bottom, transparent 0, var(--surface) 26px); }
+  .metricrow { display: flex; justify-content: space-between; padding: 12px 14px 0; font-size: 0.7rem; color: var(--text-dim); font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  /* B: compact */
+  .tb { display: flex; gap: 12px; align-items: center; }
+  .thumb { width: 92px; height: 64px; flex-shrink: 0; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; position: relative; }
+  .thumb svg { filter: blur(3px); width: 100%; height: 100%; }
+
+  /* C: history screen */
+  .hback { color: var(--text-dim); font-weight: 700; font-size: 0.85rem; }
+  .hname { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0; line-height: 1.1; }
+  .tabs { display: flex; padding: 3px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; }
+  .tabs span { flex: 1; text-align: center; padding: 7px 0; border-radius: 999px; font-size: 0.78rem; font-weight: 800; color: var(--text-dim); }
+  .tabs span.sel { background: var(--accent); color: var(--accent-text); }
+  .spark { color: var(--secondary); font-size: 0.7rem; }
+  .ranges { display: flex; gap: 6px; margin-top: 10px; }
+  .ranges span { flex: 1; text-align: center; padding: 6px 0; border-radius: 999px; font-size: 0.74rem; font-weight: 800; color: var(--text-dim); border: 1px solid var(--border); }
+  .ranges span.sel { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .bign { font-family: 'Baloo 2', sans-serif; font-size: 1.9rem; color: var(--accent); line-height: 1.1; }
+  .bign small { font-size: 1rem; color: var(--text); }
+  .k { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); }
+  .hintrow { display: flex; gap: 8px; align-items: flex-start; padding: 10px 6px 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--secondary) 9%, transparent); border: 1px solid color-mix(in srgb, var(--secondary) 28%, var(--border)); font-size: 0.82rem; line-height: 1.45; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#115 One-time Premium chart teaser</h1>
+  <p class="note">A free user has now logged one lift in <b>5 different workouts</b>. Once, and only on a screen they opened themselves (never during a workout), we show them that lift's <b>real Est. 1RM line, blurred</b>, with <b>See Premium</b> (opens the Premium sheet) and <b>Not now</b> (hides it for good). Free users already get the plain Heaviest chart, so the copy pitches what Premium adds: est. 1RM, volume, and the all-time view. Part 3 of the issue (locked chart tabs blur the user's own chart) already shipped in #132, so nothing changes there.</p>
+  <p class="note">Data: Incline Dumbbell Bench Press, 5 sessions, 22.5 → 27.5 kg. Dashed outline marks what's new.</p>
+</div>
+<div class="page">
+
+  <!-- A -->
+  <div class="col">
+    <p class="cap">A. Recap card with the blurred chart</p>
+    <p class="capnote">On the finish recap, right below "Vs last time". A full-width card: the blurred est. 1RM line fills the top and the pitch fades in below it. It's the most convincing, and the biggest. It replaces nothing and scrolls with the recap. If several lifts hit 5 in one workout, it picks the one with the most sets today.</p>
+    <div class="phone">
+      <div>
+        <p class="eyebrow-ok">Workout saved</p>
+        <h3 class="rtitle">Push Day</h3>
+        <p class="rmeta">Tue, Oct 6 · 52 min · 18 sets</p>
+      </div>
+      <div class="card">
+        <p class="slabel">Vs last time</p>
+        <div class="crow"><span class="n">Incline Dumbbell Bench Press</span><span class="d">27.5 kg × 8</span><span class="chip">+2.5 kg</span><span class="chev">›</span></div>
+        <div class="crow"><span class="n">Cable Fly</span><span class="d">15 kg × 12</span><span class="chip neutral">Same</span><span class="chev">›</span></div>
+      </div>
+      <div class="teaser new">
+        <div class="metricrow"><span>Est. 1RM</span><span>All</span></div>
+        <div class="blurchart">
+          <svg viewBox="0 0 343 130" height="130">
+            <g stroke="#3a2b40" stroke-width="1"><line x1="0" y1="30" x2="343" y2="30"/><line x1="0" y1="75" x2="343" y2="75"/><line x1="0" y1="120" x2="343" y2="120"/></g>
+            <path d="M18 118 L95 104 L172 96 L249 72 L326 44 L326 150 L18 150 Z" fill="#b79cf0" opacity="0.18"/>
+            <polyline points="18,118 95,104 172,96 249,72 326,44" fill="none" stroke="#b79cf0" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+            <g fill="#b79cf0"><circle cx="18" cy="118" r="4"/><circle cx="95" cy="104" r="4"/><circle cx="172" cy="96" r="4"/><circle cx="249" cy="72" r="4"/><circle cx="326" cy="44" r="5"/></g>
+          </svg>
+        </div>
+        <div class="over">
+          <span class="pill">Premium</span>
+          <p class="ptitle">You've logged Incline Dumbbell Bench Press 5 times</p>
+          <p class="pbody">Premium shows its est. 1RM trend, volume, and all-time chart. This one's yours.</p>
+          <div class="acts"><span class="btn keep">See Premium</span><span class="btn back">Not now</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B -->
+  <div class="col">
+    <p class="cap">B. Compact recap card</p>
+    <p class="capnote">Same spot and copy as A, half the height. The blurred line is a small thumbnail on the left, so the recap stays about workouts and the pitch is quieter. Less convincing than A: at this size the blur reads as "a chart", not "my chart". Shown in lb.</p>
+    <div class="phone">
+      <div>
+        <p class="eyebrow-ok">Workout saved</p>
+        <h3 class="rtitle">Push Day</h3>
+        <p class="rmeta">Tue, Oct 6 · 52 min · 18 sets</p>
+      </div>
+      <div class="card">
+        <p class="slabel">Vs last time</p>
+        <div class="crow"><span class="n">Incline Dumbbell Bench Press</span><span class="d">60 lb × 8</span><span class="chip">+5 lb</span><span class="chev">›</span></div>
+        <div class="crow"><span class="n">Cable Fly</span><span class="d">35 lb × 12</span><span class="chip neutral">Same</span><span class="chev">›</span></div>
+      </div>
+      <div class="card new" style="border-color: color-mix(in srgb, var(--secondary) 35%, var(--border)); display: flex; flex-direction: column; gap: 4px;">
+        <div class="tb">
+          <div class="thumb">
+            <svg viewBox="0 0 92 64" preserveAspectRatio="none"><polyline points="6,52 26,44 46,40 66,28 86,14" fill="none" stroke="#b79cf0" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+            <span class="pill">Premium</span>
+            <p class="ptitle" style="margin: 0; font-size: 1rem;">5 workouts of Incline Dumbbell Bench Press</p>
+          </div>
+        </div>
+        <p class="pbody" style="margin-top: 6px;">Premium shows its est. 1RM trend, volume, and all-time chart.</p>
+        <div class="acts"><span class="btn keep">See Premium</span><span class="btn back">Not now</span></div>
+      </div>
+      <div class="card">
+        <p class="slabel">This week</p>
+        <div style="height: 40px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C -->
+  <div class="col">
+    <p class="cap">C. On the lift's history screen</p>
+    <p class="capnote">Shown the first time they open that lift's history (from Progress or a recap row) after its 5th workout. The free Heaviest chart stays where it is; the teaser sits above it, so the free chart and the blurred Premium one are side by side. The recap stays untouched, but someone who never opens a lift's history never sees it.</p>
+    <div class="phone">
+      <div class="hback">‹ Lift progress</div>
+      <h2 class="hname">Incline Dumbbell Bench Press</h2>
+      <div class="teaser new">
+        <div class="metricrow"><span>Est. 1RM</span><span>All</span></div>
+        <div class="blurchart">
+          <svg viewBox="0 0 343 110" height="110">
+            <path d="M18 92 L95 80 L172 72 L249 52 L326 28 L326 110 L18 110 Z" fill="#b79cf0" opacity="0.18"/>
+            <polyline points="18,92 95,80 172,72 249,52 326,28" fill="none" stroke="#b79cf0" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="over">
+          <span class="pill">Premium</span>
+          <p class="ptitle">5 workouts in. Here's your trend.</p>
+          <p class="pbody">Premium adds est. 1RM, volume, and the all-time chart.</p>
+          <div class="acts"><span class="btn keep">See Premium</span><span class="btn back">Not now</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tabs"><span class="sel">Heaviest</span><span>Est. 1RM <span class="spark">✦</span></span><span>Volume <span class="spark">✦</span></span></div>
+        <div style="margin-top: 12px;" class="k">Heaviest</div>
+        <div class="bign">27.5 <small>kg</small></div>
+        <svg viewBox="0 0 343 100" style="width: 100%; height: 100px; display: block; margin-top: 6px;">
+          <polyline points="18,84 95,70 172,70 249,48 326,30" fill="none" stroke="#f2879c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+          <g fill="#f2879c"><circle cx="18" cy="84" r="4"/><circle cx="95" cy="70" r="4"/><circle cx="172" cy="70" r="4"/><circle cx="249" cy="48" r="4"/><circle cx="326" cy="30" r="5"/></g>
+        </svg>
+        <div class="ranges"><span class="sel">1M</span><span>3M</span><span>1Y ✦</span><span>All ✦</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

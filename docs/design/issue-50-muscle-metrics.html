@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Muscle Volume And Time</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --accent-text: #241a2c;
+    --secondary: #b79cf0; --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0b13; color: var(--text); font-family: Manrope, sans-serif; }
+  .intro { padding: 28px 32px 0; max-width: 1300px; }
+  h1 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 6px; }
+  .note { color: var(--text-dim); font-size: 0.88rem; margin: 0 0 10px; line-height: 1.55; }
+  .note b { color: var(--text); }
+  .page { display: flex; flex-wrap: wrap; gap: 32px; padding: 24px 32px 40px; align-items: flex-start; }
+  .col { width: 390px; }
+  .cap { color: var(--highlight); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800; margin: 0 0 4px 4px; }
+  .capnote { color: var(--text-dim); font-size: 0.78rem; margin: 0 0 10px 4px; line-height: 1.45; min-height: 92px; }
+  .phone { width: 390px; height: 760px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; position: relative; overflow: hidden; padding: 22px 16px 0; }
+  h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.6rem; margin: 0 0 2px; }
+  .back { color: var(--text-dim); font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; }
+  .badge { width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); font-weight: 800; font-size: 0.85rem; flex-shrink: 0; }
+
+  .dhead { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .dhead h2 { margin: 0; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 14px; }
+  .k { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-dim); }
+  .bign { font-family: 'Baloo 2', sans-serif; font-size: 2rem; color: var(--c); line-height: 1.1; }
+  .bign small { font-size: 1rem; }
+  .sub { font-size: 0.74rem; color: var(--text-dim); margin-bottom: 8px; }
+  svg.chart { width: 100%; height: 140px; display: block; }
+  .axis { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; }
+  .ranges { display: flex; gap: 6px; margin-top: 10px; }
+  .ranges span { flex: 1; text-align: center; padding: 6px 0; border-radius: 999px; font-size: 0.74rem; font-weight: 800; color: var(--text-dim); border: 1px solid var(--border); }
+  .ranges span.sel { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .label { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.07em; color: var(--text-dim); text-transform: uppercase; margin: 4px 2px 8px; }
+  .exrow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 9px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 6px; font-size: 0.88rem; font-weight: 700; }
+  .exrow small { display: block; font-size: 0.72rem; color: var(--text-dim); font-weight: 600; margin-top: 1px; }
+  .exrow .c { font-family: 'Baloo 2', sans-serif; font-size: 1.05rem; white-space: nowrap; }
+
+  /* new: metric switch. A segmented control, so it reads differently from the range pills below the chart. */
+  .metric { display: flex; padding: 3px; margin-bottom: 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; }
+  .metric span { flex: 1; text-align: center; padding: 7px 0; border-radius: 999px; font-size: 0.8rem; font-weight: 800; color: var(--text-dim); }
+  .metric span.sel { background: var(--c); color: var(--accent-text); }
+  .new { outline: 2px dashed color-mix(in srgb, var(--highlight) 70%, transparent); outline-offset: 3px; border-radius: 999px; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>#50 Volume and time per muscle (decisions approved 2026-09-30)</h1>
+  <p class="note">Adds a <b>Sets / Volume / Time</b> switch (dashed outline) to the one-muscle screen from #40. Everything on the screen follows the switch: the big number, the average, the bars, and the "This week" list. The range pills keep their selection. "Also works" muscles get <b>½</b> credit on all three. Volume uses the finish recap's rule: bodyweight and assisted sets use your body weight, level and timed sets are left out. <b>A pill only shows if the muscle has that kind of data</b>, and a muscle with sets only gets no switch at all, so it looks exactly like today. Muscle groups list and hub tile don't change.</p>
+</div>
+<div class="page">
+
+  <!-- 1 -->
+  <div class="col">
+    <p class="cap">1. Sets (default)</p>
+    <p class="capnote">Opens on Sets, same as today, with the switch on top. Legs has weighted work but no timed work, so only <b>Sets</b> and <b>Volume</b> show.</p>
+    <div class="phone" style="--c: #7fd4c1">
+      <div class="back">‹ Muscle groups</div>
+      <div class="dhead"><span class="badge">L</span><h2>Legs</h2></div>
+      <div class="card">
+        <div class="metric new"><span class="sel">Sets</span><span>Volume</span></div>
+        <div class="k">Sets this week</div>
+        <div class="bign">11 <small>sets</small></div>
+        <div class="sub">12-week average: 8.5 a week</div>
+        <svg class="chart" data-series="sets" viewBox="0 0 326 140" preserveAspectRatio="none"></svg>
+        <div class="axis"><span>Jul 12</span><span>Aug 16</span><span>Sep 27</span></div>
+        <div class="ranges"><span>4W</span><span class="sel">12W</span><span>1Y</span><span>All</span></div>
+      </div>
+      <div class="label">This week</div>
+      <div class="exrow"><div>Barbell Back Squat<small>main muscle</small></div><span class="c">4</span></div>
+      <div class="exrow"><div>Leg Press<small>main muscle</small></div><span class="c">3</span></div>
+      <div class="exrow"><div>Bulgarian Split Squat<small>main muscle</small></div><span class="c">2</span></div>
+      <div class="exrow"><div>Romanian Deadlift<small>also works legs · 4 sets × ½</small></div><span class="c">2</span></div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="col">
+    <p class="cap">2. Volume</p>
+    <p class="capnote">Weight × reps per week, in the unit you log most. The list shows each exercise's share, with the half credit spelled out. Bodyweight moves like split squats count with your logged body weight.</p>
+    <div class="phone" style="--c: #7fd4c1">
+      <div class="back">‹ Muscle groups</div>
+      <div class="dhead"><span class="badge">L</span><h2>Legs</h2></div>
+      <div class="card">
+        <div class="metric new"><span>Sets</span><span class="sel">Volume</span></div>
+        <div class="k">Volume this week</div>
+        <div class="bign">17,160 <small>lb</small></div>
+        <div class="sub">12-week average: 15,400 lb a week</div>
+        <svg class="chart" data-series="volume" viewBox="0 0 326 140" preserveAspectRatio="none"></svg>
+        <div class="axis"><span>Jul 12</span><span>Aug 16</span><span>Sep 27</span></div>
+        <div class="ranges"><span>4W</span><span class="sel">12W</span><span>1Y</span><span>All</span></div>
+      </div>
+      <div class="label">This week</div>
+      <div class="exrow"><div>Leg Press<small>main muscle</small></div><span class="c">8,100</span></div>
+      <div class="exrow"><div>Barbell Back Squat<small>main muscle</small></div><span class="c">3,700</span></div>
+      <div class="exrow"><div>Bulgarian Split Squat<small>main muscle · body weight</small></div><span class="c">2,880</span></div>
+      <div class="exrow"><div>Romanian Deadlift<small>also works legs · 4,960 lb × ½</small></div><span class="c">2,480</span></div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="col">
+    <p class="cap">3. Time</p>
+    <p class="capnote">Core has weighted, bodyweight, and timed work, so all three pills show. Time adds up timed sets (planks, carries). The half credit works the same way here.</p>
+    <div class="phone" style="--c: #a9cb8d">
+      <div class="back">‹ Muscle groups</div>
+      <div class="dhead"><span class="badge">C</span><h2>Core</h2></div>
+      <div class="card">
+        <div class="metric new"><span>Sets</span><span>Volume</span><span class="sel">Time</span></div>
+        <div class="k">Time this week</div>
+        <div class="bign">6:30</div>
+        <div class="sub">12-week average: 5:10 a week</div>
+        <svg class="chart" data-series="time" viewBox="0 0 326 140" preserveAspectRatio="none"></svg>
+        <div class="axis"><span>Jul 12</span><span>Aug 16</span><span>Sep 27</span></div>
+        <div class="ranges"><span>4W</span><span class="sel">12W</span><span>1Y</span><span>All</span></div>
+      </div>
+      <div class="label">This week</div>
+      <div class="exrow"><div>Plank<small>main muscle</small></div><span class="c">3:00</span></div>
+      <div class="exrow"><div>Farmer's Carry<small>also works core · 4:00 × ½</small></div><span class="c">2:00</span></div>
+      <div class="exrow"><div>Side Plank<small>main muscle</small></div><span class="c">1:30</span></div>
+    </div>
+  </div>
+</div>
+<script>
+  // Last value is the in-progress week (drawn lighter).
+  const SERIES = {
+    sets: { weeks: [7, 9, 8, 6, 10, 9, 8, 0, 9, 10, 9, 11], avg: 8.5, color: '#7fd4c1' },
+    volume: { weeks: [13200, 16100, 15000, 11800, 18400, 16900, 15300, 0, 17100, 19000, 16800, 17160], avg: 15400, color: '#7fd4c1' },
+    time: { weeks: [270, 330, 300, 240, 360, 0, 330, 300, 420, 390, 360, 390], avg: 310, color: '#a9cb8d' },
+  }
+  const W = 326, H = 140, topPad = 12, gap = 6
+  for (const svg of document.querySelectorAll('svg.chart')) {
+    const { weeks, avg, color } = SERIES[svg.dataset.series]
+    const n = weeks.length, max = Math.max(...weeks, avg)
+    const bw = (W - gap * (n - 1)) / n, y = (v) => H - 4 - (v / max) * (H - topPad - 4)
+    let out = weeks.map((v, i) => `<rect x="${i * (bw + gap)}" y="${y(v)}" width="${bw}" height="${H - 4 - y(v)}" rx="4" fill="${color}" opacity="${i === n - 1 ? 0.5 : 1}"/>`).join('')
+    out += `<line x1="0" x2="${W}" y1="${y(avg)}" y2="${y(avg)}" stroke="#b9a8c2" stroke-width="1.4" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/>`
+    out += `<line x1="0" x2="${W}" y1="${H - 4}" y2="${H - 4}" stroke="#3a2b40" stroke-width="1"/>`
+    svg.innerHTML = out
+  }
+</script>
+</body>
+</html>

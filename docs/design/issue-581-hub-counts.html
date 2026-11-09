@@ -1,0 +1,145 @@
+<!doctype html>
+<!-- Issue #581: the Progress hub's "new bests" and "records" counts open a
+     sheet listing what they counted, with the rule each uses. One option:
+     the issue (and the #567 review mockup) already settles the layout. -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>#581 Hub counts open their list</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #17111c; --surface: #211829; --surface-2: #241a2c; --border: #3a2b40;
+    --text: #f5edf2; --text-dim: #b9a8c2; --accent: #f2879c; --secondary: #b79cf0;
+    --highlight: #f2c069; --success: #a9cb8d; --radius: 12px;
+    --font-display: 'Baloo 2', sans-serif; --font-body: 'Manrope', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px; background: #0d0910; color: var(--text); font-family: var(--font-body); display: flex; gap: 28px; align-items: flex-start; }
+  .board { width: 375px; }
+  .label { font: 800 0.8rem var(--font-body); letter-spacing: .5px; text-transform: uppercase; color: var(--text-dim); margin: 0 0 4px; }
+  .note { font-size: .78rem; color: var(--text-dim); margin: 0 0 10px; height: 2.6em; }
+  .phone { position: relative; height: 760px; background: var(--bg); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; padding: 20px 16px; }
+  h1 { font-family: var(--font-display); font-size: 1.7rem; margin: 0; line-height: 1.2; }
+  .lede { margin: 0 0 16px; color: var(--text-dim); font-size: .84rem; }
+  .hero { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; }
+  .bunny { width: 54px; height: 54px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 25%, var(--surface-2)); flex-shrink: 0; }
+  .hero-title { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; margin-bottom: 4px; }
+  .stats { display: flex; gap: 4px 14px; margin-top: 6px; }
+  .stats div { font-size: .7rem; font-weight: 700; color: var(--text-dim); }
+  .stats b { display: block; font-family: var(--font-display); font-size: 1.15rem; color: var(--accent); }
+  .week b { color: var(--text); }
+  .tap { text-decoration: underline dotted; text-underline-offset: 4px; text-decoration-color: color-mix(in srgb, var(--text-dim) 70%, transparent); }
+  .tap.focus { outline: 2px solid var(--secondary); outline-offset: 3px; border-radius: 6px; }
+  .week { font-size: .82rem; color: var(--text-dim); margin: 12px 2px 14px; }
+  .tile { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; height: 74px; margin-bottom: 10px; }
+  .dim { position: absolute; inset: 0; background: color-mix(in srgb, var(--bg) 70%, transparent); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--bg); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 16px 16px 20px; }
+  .top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+  .kicker { font-size: .7rem; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; color: var(--text-dim); }
+  .title { font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; margin: 2px 0 6px; line-height: 1.2; }
+  .close { width: 36px; height: 36px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .rule { margin: 0 0 10px; font-size: .86rem; line-height: 1.45; color: var(--text-dim); }
+  .rule b { color: var(--text); }
+  .link { color: var(--secondary); font-weight: 700; }
+  .diff { margin: 0 0 12px; padding: 10px 12px; border: 1px dashed var(--border); border-radius: var(--radius); background: var(--surface); font-size: .84rem; line-height: 1.45; color: var(--text-dim); }
+  ul { list-style: none; margin: 0 0 6px; padding: 0; }
+  li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid var(--border); }
+  li:last-child { border-bottom: 1px solid var(--border); }
+  .name { font-weight: 700; font-size: .95rem; overflow-wrap: anywhere; }
+  .sub { font-size: .82rem; color: var(--text-dim); margin-top: 2px; }
+  .go { color: var(--secondary); font-weight: 800; font-size: .88rem; white-space: nowrap; min-height: 44px; display: flex; align-items: center; }
+  .empty { padding: 14px 0; color: var(--text-dim); font-size: .88rem; border-top: 1px solid var(--border); }
+  .wrong { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-dim); font-weight: 600; font-size: .9rem; padding: 12px 0 0; }
+  .wrong i { width: 18px; height: 18px; border: 1.5px solid currentColor; border-radius: 50%; font-style: normal; font-size: .7rem; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+</style>
+</head>
+<body>
+
+<div class="board">
+  <p class="label">1 · Hub (unchanged look)</p>
+  <p class="note">Both counts are buttons now. A dotted underline is the only change.</p>
+  <div class="phone">
+    <h1>Progress</h1>
+    <p class="lede">How your training is going.</p>
+    <div class="hero">
+      <div class="bunny"></div>
+      <div>
+        <div class="hero-title">You're on a roll!</div>
+        <div class="stats">
+          <div><b>2</b>this week</div>
+          <div><b>9</b>this month</div>
+          <div class="tap focus"><b>4</b>new bests</div>
+        </div>
+      </div>
+    </div>
+    <p class="week">This week: <b>2 workouts</b>, <b>31 sets</b>, <span class="tap"><b>2 records</b></span></p>
+    <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+  </div>
+</div>
+
+<div class="board">
+  <p class="label">2 · New bests sheet (free)</p>
+  <p class="note">Free users see the set, never the Est. 1RM number. Premium adds "Est. 1RM 192 lb".</p>
+  <div class="phone">
+    <h1>Progress</h1>
+    <div class="dim"></div>
+    <div class="sheet">
+      <div class="top">
+        <div><div class="kicker">Progress · October</div><div class="title">4 new bests</div></div>
+        <div class="close">✕</div>
+      </div>
+      <p class="rule">A lift's <b>highest point ever on its chart</b>. That's Est. 1RM for weighted lifts, Longest for timed ones, Most reps for body weight. <span class="link">What's the difference from records?</span></p>
+      <ul>
+        <li><div><div class="name">Barbell Bench Press</div><div class="sub">6 × 160 lb · Tue, Oct 14</div></div><span class="go">Chart ›</span></li>
+        <li><div><div class="name">Romanian Deadlift with a Pause at the Knee</div><div class="sub">10 × 135 lb · Sun, Oct 12</div></div><span class="go">Chart ›</span></li>
+        <li><div><div class="name">Plank</div><div class="sub">1:35 · Thu, Oct 9</div></div><span class="go">Chart ›</span></li>
+        <li><div><div class="name">Assisted Pull-up</div><div class="sub">8 × 40 lb assist · Sun, Oct 5</div></div><span class="go">Chart ›</span></li>
+      </ul>
+      <div class="wrong"><i>!</i>This looks wrong</div>
+    </div>
+  </div>
+</div>
+
+<div class="board">
+  <p class="label">3 · Records sheet, difference open</p>
+  <p class="note">"Check ›" opens the lift's history with the record check (#579) for that set.</p>
+  <div class="phone">
+    <h1>Progress</h1>
+    <div class="dim"></div>
+    <div class="sheet">
+      <div class="top">
+        <div><div class="kicker">Progress · This week</div><div class="title">2 records</div></div>
+        <div class="close">✕</div>
+      </div>
+      <p class="rule">A <b>single set that beats your best weight × reps</b> for that lift. <span class="link">What's the difference from new bests?</span></p>
+      <div class="diff">Records compare one set with another, so 12 × 120 beats 8 × 150. New bests follow each lift's chart, and Est. 1RM favors heavy sets, so 6 × 160 can be a new best without being a record. <span class="link">See the 4 new bests ›</span></div>
+      <ul>
+        <li><div><div class="name">Barbell Bench Press</div><div class="sub">12 × 120 lb · Mon, Oct 13</div><div class="sub">Beat 8 × 150 lb</div></div><span class="go">Check ›</span></li>
+        <li><div><div class="name">Goblet Squat</div><div class="sub">10 × 55 lb · Sun, Oct 12</div><div class="sub">Beat 10 × 50 lb</div></div><span class="go">Check ›</span></li>
+      </ul>
+      <div class="wrong"><i>!</i>This looks wrong</div>
+    </div>
+  </div>
+</div>
+
+<div class="board">
+  <p class="label">4 · Empty</p>
+  <p class="note">A zero still opens, so the rule is always one tap away.</p>
+  <div class="phone">
+    <h1>Progress</h1>
+    <div class="dim"></div>
+    <div class="sheet">
+      <div class="top">
+        <div><div class="kicker">Progress · This week</div><div class="title">0 records</div></div>
+        <div class="close">✕</div>
+      </div>
+      <p class="rule">A <b>single set that beats your best weight × reps</b> for that lift. <span class="link">What's the difference from new bests?</span></p>
+      <div class="empty">No records yet this week.</div>
+      <div class="wrong"><i>!</i>This looks wrong</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
