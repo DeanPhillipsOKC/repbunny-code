@@ -157,25 +157,33 @@ with `GITHUB_TOKEN` don't fire other workflows, so they don't start a dispatch r
 ### CI on pull requests (#675)
 
 The gate above is self-reported: the agent runs it in its own session. `.github/workflows/ci.yml`
-adds independent evidence on every pull request to `main`, on a hosted runner (a few minutes):
+adds independent evidence on every pull request to `main`, on hosted runners:
 
-- **One job, `ci-required`**, the check the ruleset requires. It used to be three jobs (`checks`,
-  `security`, and an aggregator), but each job bills at least a minute, so they were merged on
-  2026-10-22 to save Actions minutes (see `docs/decisions.md`, the minutes guard, 2026-11-02).
-- **Every PR:** gitleaks on the PR's commits, `npm run check:docs`, `npm run check:public` (no
-  private names, addresses, or support email, `docs/public-content.md`, #942), and `git diff --check`
-  against the base.
-- **Only when a path other than Markdown or `docs/` changed:** `npm ci --ignore-scripts`,
+- **`ci-required`**, the check the ruleset requires, is a small last job that passes only when
+  `checks` passed and `e2e` passed or was skipped. It always reports, so a PR never waits on a
+  skipped required check. (The jobs were merged into one on 2026-10-22 to save Actions minutes;
+  since the #946 cutover this repo is public, its minutes are free, and they're separate again.)
+- **`changes`** decides what runs: `code` (any path that isn't Markdown or under `docs/`) and
+  `app` (application code, the list in Commit & push policy above, plus `site/guides/` and
+  `ci.yml` and `e2e.yml` themselves).
+- **`checks`, every PR:** gitleaks on the PR's commits, `npm run check:docs`, `npm run check:public`
+  (no private names, addresses, or support email, `docs/public-content.md`, #942), and
+  `git diff --check` against the base. **When `code`:** `npm ci --ignore-scripts`,
   `npm run build`, `npm run check:size`, actionlint on the workflows,
   `npm audit --omit=dev --audit-level=high`, and Semgrep OSS (JavaScript, TypeScript, and GitHub
-  Actions rulesets). A docs-only PR still gets a `ci-required` result, so it never sits waiting on
-  a skipped required check. See Security scanning below.
+  Actions rulesets). See Security scanning below.
+- **`e2e`, when `app`** (owner decision 2026-11-10): the full suite through `e2e.yml` (the Release
+  gate's run below, two halves) on the PR merged into its base. It runs beside `checks`, so a code
+  PR's CI takes about 5 to 6 minutes.
 - `permissions: contents: read` only; one run per PR, a newer push cancels the older run.
 
 `next-item` (branch mode) waits for `ci-required` on the PR head before merging, like the Android
-build check, and treats red as a red gate. Its local gate stays for fast feedback. Full e2e is not
-in CI (per-PR e2e stays in the agent's own session; the hosted run below gates releases instead),
-and making the check required is a ruleset setting, not part of this workflow.
+build check, and treats red as a red gate. **The lane decides whether to also run the full e2e
+in its own session** (owner decision 2026-11-10; neither is forced): a change the lane judges
+safe, with a near-zero chance of regression, can leave the full suite to the PR's `e2e` job
+(it still runs the build and any spec it added or touched); anything else runs the full suite
+locally first, for faster feedback before the PR. Either way the hosted run must be green before
+merge. Making the check required is a ruleset setting, not part of this workflow.
 
 ### Release gate (#677)
 
@@ -199,11 +207,11 @@ self-hosted VM (#676 closed; `docs/decisions.md`).
   of the gate. Runs share no data, so a hand-started run and Cut release's run can overlap (the
   queueing #755 added went with the shared test accounts, #940).
 - **`cut-release.yml`** runs an `e2e` job on the exact commit about to be tagged, and the `tag`
-  job `needs:` it. Red e2e means no tag, no Play upload, and no Codemagic build.
+  job `needs:` it. It stays even though every code PR runs the same suite: two PRs that pass alone
+  can break `main` together, and the squash commit that gets tagged was never itself tested. Red e2e means no tag, no Play upload, and no Codemagic build.
 - **By hand:** GitHub app > Actions > **E2E** > Run workflow, any ref.
 - **Not gated:** the personal Android nightly (`release-android.yml`) isn't a store release.
-- **Minutes:** record the run time in the close-out and keep the month inside Pro's 3,000 with
-  the `ci.yml` checks. About weekly releases keep this well under.
+- **Minutes:** this repo is public, so hosted runs cost no Actions minutes.
 - **Break glass if hosted Actions is down during an urgent release:** Cut release can't tag
   either, so tag by hand only on the owner's say-so, after running `npm run test:e2e` locally on
   the commit being tagged and recording the pass count on the release

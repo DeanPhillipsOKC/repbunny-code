@@ -1,8 +1,10 @@
-# CI on every pull request (#675): hosted build and checks, independent of the agent that wrote the change.
-# One job, named for the check the ruleset requires (`ci-required`). Separate jobs each billed at
-# least a minute, so they were merged to save Actions minutes (2026-10-22). Docs-only PRs run only
-# the fast steps: the secret scan, docs references, the public-content check, and the whitespace check.
-# See docs/architecture/commit-policy.md > CI on pull requests.
+# CI on every pull request (#675): hosted build, checks, and e2e, independent of the agent that wrote
+# the change. `ci-required`, the check the ruleset requires, passes only when `checks` passed and
+# `e2e` passed or was skipped. Docs-only PRs run only the fast steps in `checks`: the secret scan,
+# docs references, the public-content check, and the whitespace check. The full e2e suite runs only
+# when the PR touches application code (the commit policy's list). Jobs used to be merged into one
+# to save Actions minutes (2026-10-22); since the #946 cutover this repo is public and its minutes
+# are free. See docs/architecture/commit-policy.md > CI on pull requests.
 name: CI
 
 on:
@@ -17,8 +19,49 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci-required:
-    name: ci-required
+  changes:
+    name: changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      BASE_REF: ${{ github.base_ref }}
+    outputs:
+      code: ${{ steps.changes.outputs.code }}
+      app: ${{ steps.changes.outputs.app }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # code: any path that isn't Markdown or under docs/ (runs the build and the code scanners).
+      # app: application code, the paths the commit policy's gate covers, plus site/guides/ (the app
+      # build reads them) and this workflow and e2e.yml (so a change to the gate tests itself).
+      - name: What does the PR change?
+        id: changes
+        run: |
+          files="$(git diff --name-only "origin/${BASE_REF}...HEAD")"
+          if grep -qvE '(\.md$|^docs/)' <<<"$files"; then code=true; else code=false; fi
+          app_paths='^(src/|public/|index\.html$|vite\.config\.ts$|tsconfig[^/]*\.json$|package(-lock)?\.json$|capacitor\.config\.ts$|android/|ios/|e2e/|playwright\.config\.ts$|scripts/lib/|site/guides/|\.github/workflows/(ci|e2e)\.yml$)'
+          if grep -qE "$app_paths" <<<"$files"; then app=true; else app=false; fi
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "app=$app" >> "$GITHUB_OUTPUT"
+          echo "code=$code app=$app"
+
+  # The full e2e suite (#677's hosted run, in two halves) on the PR merged into its base, the same
+  # commit `checks` builds. Runs beside `checks`, so it adds its own wall clock (about 5 minutes),
+  # not the sum.
+  e2e:
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/e2e.yml
+    with:
+      ref: ${{ github.sha }}
+
+  checks:
+    name: checks
+    needs: changes
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -32,17 +75,6 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-
-      # Docs-only means every changed path is Markdown or under docs/. Those PRs skip the build and
-      # the code scanners; everything else runs the full set.
-      - name: Does the PR change anything besides docs?
-        id: changes
-        run: |
-          if git diff --name-only "origin/${BASE_REF}...HEAD" | grep -qvE '(\.md$|^docs/)'; then
-            echo "code=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "code=false" >> "$GITHUB_OUTPUT"
-          fi
 
       # Security scanning (#678). Free tools only (CodeQL needs Advanced Security on a private repo).
       # No third-party actions: the two binaries are pinned by version and SHA-256, and Semgrep by an
@@ -69,7 +101,7 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-          cache: ${{ steps.changes.outputs.code == 'true' && 'npm' || '' }}
+          cache: ${{ needs.changes.outputs.code == 'true' && 'npm' || '' }}
 
       - name: Docs references
         run: npm run check:docs
@@ -82,30 +114,48 @@ jobs:
         run: git diff --check "origin/${BASE_REF}...HEAD"
 
       - name: Install dependencies
-        if: steps.changes.outputs.code == 'true'
+        if: needs.changes.outputs.code == 'true'
         run: npm ci --ignore-scripts
 
       - name: Typecheck and build
-        if: steps.changes.outputs.code == 'true'
+        if: needs.changes.outputs.code == 'true'
         run: npm run build
 
       - name: File-size ratchet
-        if: steps.changes.outputs.code == 'true'
+        if: needs.changes.outputs.code == 'true'
         run: npm run check:size
 
       - name: Workflow lint (actionlint)
-        if: steps.changes.outputs.code == 'true'
+        if: needs.changes.outputs.code == 'true'
         run: actionlint -color
 
       - name: Production dependency audit (npm audit)
-        if: steps.changes.outputs.code == 'true'
+        if: needs.changes.outputs.code == 'true'
         run: npm audit --omit=dev --audit-level=high
 
       # Blocks on ERROR findings; WARNINGs go to the job summary.
       - name: Static analysis (Semgrep)
-        if: steps.changes.outputs.code == 'true'
+        if: needs.changes.outputs.code == 'true'
         run: |
           set -euo pipefail
           pipx install "semgrep==${SEMGREP_VERSION}"
           semgrep scan --metrics=off --quiet --json --output "$RUNNER_TEMP/semgrep.json"             --config p/javascript --config p/typescript --config p/github-actions
           node scripts/semgrep-summary.mjs "$RUNNER_TEMP/semgrep.json"
+
+  # The required check. `if: always()` so it reports even when a job it needs failed or was
+  # skipped; a skipped required check would leave the PR waiting forever.
+  ci-required:
+    name: ci-required
+    needs: [changes, checks, e2e]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Did changes and checks pass, and e2e pass or skip?
+        env:
+          CHANGES: ${{ needs.changes.result }}
+          CHECKS: ${{ needs.checks.result }}
+          E2E: ${{ needs.e2e.result }}
+        run: |
+          echo "changes=$CHANGES checks=$CHECKS e2e=$E2E"
+          [ "$CHANGES" = success ] && [ "$CHECKS" = success ] && { [ "$E2E" = success ] || [ "$E2E" = skipped ]; }

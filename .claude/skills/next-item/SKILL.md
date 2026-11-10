@@ -1,6 +1,6 @@
 ---
 name: next-item
-description: Pick the single highest-ROI open GitHub issue in this repo's backlog, implement it, gate on npm run build + npm run test:e2e, and on green commit (Fixes #N) on a claude/ branch and open a PR that merges after review (main takes only PRs, #681). Reports a concise change summary (and emails it, if configured) whether shipped or blocked. Works exactly one issue per invocation, then stops. Outputs exactly BACKLOG_EMPTY if nothing is eligible.
+description: Pick the single highest-ROI open GitHub issue in this repo's backlog, implement it, gate on npm run build + npm run test:e2e (locally, or left to the PR's hosted run when the change is near-zero risk), and on green commit (Fixes #N) on a claude/ branch and open a PR that merges after review (main takes only PRs, #681). Reports a concise change summary (and emails it, if configured) whether shipped or blocked. Works exactly one issue per invocation, then stops. Outputs exactly BACKLOG_EMPTY if nothing is eligible.
 ---
 
 # next-item
@@ -146,7 +146,7 @@ Backlog lanes). Any other argument: output `UNKNOWN_LANE: <arg>` and stop. Then:
 - A `ux-intensive` pick only reaches a non-frontier model through an owner's `model:sonnet` label.
   Treat that label as the go-ahead: skip the UX-intensive check and choose the mockup yourself in
   step 2b, as a frontier model would.
-- Run step 4's e2e gate as usual; every spec uses its own on-device database, so routines running
+- Run step 4's e2e gate as usual (including its choice of local or hosted e2e); every spec uses its own on-device database, so routines running
   at the same time can't collide. In the cloud that's `PW_WORKERS=2 npm run test:e2e`.
 
 ### Two repos: issues in the backlog repo (#944)
@@ -279,7 +279,19 @@ under it still runs `npm run build` and the guide specs listed in `docs/architec
 Otherwise, run `npm run build` (typecheck). A failure here always means the implementation is wrong; there is
 no exception for it. Go to step 6 (fix loop).
 
-If build passes, run `npm run test:e2e`.
+If build passes, decide where the full e2e suite runs (owner decision 2026-11-10; neither is forced).
+Every code PR's CI runs the full suite on a hosted runner, and `ci-required` must be green before
+merge (step 7.5 item 4c), so the local run is for faster feedback, not the only evidence:
+
+- **Leave it to the pipeline** only when you judge the change safe, with a near-zero chance of
+  regression (a copy or style tweak, a narrow fix with an obvious blast radius, a spec-only
+  change). Still run every spec you added or touched, plus the specs for the feature area you
+  changed (`npx playwright test <spec paths>`), and they must pass. Say which in the close-out.
+- **Otherwise run `npm run test:e2e`** here, as before: anything touching shared code paths,
+  storage or the schema, navigation, timers, native config, dependencies, or more than one
+  feature area, and any change you aren't sure about.
+
+A red hosted `e2e` run is a red gate either way (steps 5 and 6).
 
 ## 5. Evaluate the test run
 
@@ -407,7 +419,7 @@ Only after 4 genuine attempts still fail:
       (`git merge-base --is-ancestor origin/main HEAD` fails), `git merge origin/main` into the
       branch (never rebase). Resolve any conflicts (release notes can't conflict: each is its own
       file, #558; a branch from before that moves its note to `release-notes/<N>.json`). Commit
-      the merge, then rerun the whole gate (step 4). A red rerun goes through steps 5 and 6 like
+      the merge, then rerun the whole gate (step 4, including its choice of where e2e runs). A red rerun goes through steps 5 and 6 like
       any other, counting toward the same 4 attempts.
    2. `git push -u origin HEAD` (a normal push to this session's own branch; never force).
    3. **Risk tier (#374, #680).** `node scripts/review-risk.mjs --issue <N>` prints
@@ -434,9 +446,11 @@ Only after 4 genuine attempts still fail:
       60 seconds) to finish before the review hand-off or merge. Red is a red gate: read the job
       log, then go to steps 5 and 6 (a fix is a new push, so wait for the check again).
    4c. **CI check (#675).** Every PR also gets `.github/workflows/ci.yml`. Wait for its
-      `ci-required` check on the PR head (same `check-runs` call, about 3 minutes; poll every 60
-      seconds) to finish before the review hand-off or merge. Red or missing after 15 minutes is a
-      red gate: read the `ci-required` job log, then go to steps 5 and 6.
+      `ci-required` check on the PR head (same `check-runs` call, about 3 minutes for docs and
+      scripts, about 6 when it runs the full e2e; poll every 60 seconds) to finish before the
+      review hand-off or merge. Red or missing after 25 minutes is a red gate: read the failed
+      job's log (`checks`, or `e2e / e2e (N of 2)`, whose run has the Playwright report attached),
+      then go to steps 5 and 6.
    5. **Review hand-off**, every PR. Post one PR comment starting
       `<!-- next-item hand-off -->` with: `Issue: #<N>`, `Tier: <T>` and its reasons, the commit
       subject, the commit body (with `Fixes #<N>`, or `Issue: #<N>` for an owner check), and the full close-out comment step 7.6 would
@@ -478,7 +492,9 @@ Only after 4 genuine attempts still fail:
    `gh issue comment <N> --body-file <file>` with: what changed, files touched, notable decisions or
    deviations from the issue, `Docs checked: <docs read in step 2, or "none mention the touched
    files">`, and `Verified via npm run build and a full npm run test:e2e run
-   (<passed>/<total>, <M> min, attempt <K> of 4[, excluded <spec>, tracked in #<X>])`
+   (<passed>/<total>, <M> min, attempt <K> of 4[, excluded <spec>, tracked in #<X>])`, or when
+   step 4 left the full suite to the pipeline, `Verified via npm run build, <specs> locally, and
+   the PR's hosted full e2e run (<why it was safe>)`
    (`<M>` is the gate's wall-clock minutes from Playwright's summary line or `date` around the
    run; `<K>` is the attempt that went green, #545), for a `bug` issue a line `Regression spec: <file> failed before the fix: yes` (or `no: <why>`),
    and, when you can tell which shipped change introduced the bug (the fix undoes or corrects

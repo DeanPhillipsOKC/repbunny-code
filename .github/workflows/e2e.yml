@@ -1,5 +1,6 @@
-# Full e2e run on a hosted runner (#677). Gates every store release: cut-release.yml calls it on
-# the exact commit about to be tagged. Run it by hand from the GitHub app (Actions > E2E > Run
+# Full e2e run on a hosted runner (#677). Gates every pull request that touches application code
+# (ci.yml calls it on the PR merged into its base, and `ci-required` waits for it) and every store
+# release (cut-release.yml calls it on the exact commit about to be tagged). Run it by hand from the GitHub app (Actions > E2E > Run
 # workflow) for any ref. Every spec runs the app on its own empty on-device database, so it
 # needs no accounts or secrets and can run beside any other run (#940). See
 # docs/architecture/commit-policy.md > Release gate.

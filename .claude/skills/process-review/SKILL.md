@@ -67,6 +67,9 @@ previous run's numbers, which the previous run's issues quote.
 - From recent `next-item` close-out comments (`Verified via npm run build and a full npm run
   test:e2e run (<passed>/<total>...)`), collect e2e pass counts, totals, and any `excluded <spec>`
   mentions. Pull them from closed issues in the window (`/comments`).
+- Close-outs that say `the PR's hosted full e2e run (<why>)` left the full suite to CI (owner
+  decision 2026-11-10). Count them separately, and flag any whose merged change later needed a bug
+  fix (`Caused by #<M>`), since that's a lane misjudging "near-zero risk".
 - Read `<M> min` and `attempt <K> of 4` from the same close-outs (and the `Gate: <M> min, <K> of 4
   attempts` line in `Blocked by next-item` comments, #545): report the median gate minutes and
   its trend. Older comments lack them; say so rather than guessing.
