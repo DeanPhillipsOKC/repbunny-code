@@ -225,6 +225,12 @@ clips below. Not part of any gate.
   gitignored `logs/demo-video/play-promo/` (`play-promo.mp4`, a `.vtt` for YouTube captions, and
   `thumbnail.jpg`); the owner uploads it to the RepBunny YouTube channel (unlisted, ads off) and
   puts the link in Play Console.
+- **Routines videos (2026-11-06):** `node --env-file=.env.local scripts/demo-video/routines-video.mjs [stick-to-it|six-day|both]`,
+  against the same local-mode server, records two cuts of about 45 seconds for TikTok and Facebook Reels in the
+  owner's voice, on the social stage: build a routine and repeat it (with the routine art up close), and the
+  starter programs ending on the Machine 6-day split, said out loud as Premium. Sticking to a routine means the
+  same lifts each time, never a calendar or assigned day (`docs/decisions.md`). Output stays in the gitignored
+  `logs/demo-video/routines/` (`.mp4`, `.vtt`, cover `.jpg`).
 - **Launch intro videos (2026-10-30, reworked 2026-10-31):** `node --env-file=.env.local scripts/demo-video/social-intro.mjs [facebook|tiktok|both]`,
   against the same local-mode server, records a 55 second Facebook cut and a 30 second TikTok cut
   in the owner's voice (Deaner2, audio tags), ending on a "Get it on Google Play" card (iPhone is
