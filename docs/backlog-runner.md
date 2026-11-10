@@ -100,15 +100,17 @@ is a full cloud session that counts toward the plan's usage, so nothing polls. A
 `Review (Opus)`, reviews every lane PR before it merges (#680 tiers); lanes fire it themselves (see Review).
 
 **Dispatcher (#250):** `.github/workflows/dispatch-lanes.yml` runs `scripts/dispatch-lanes.mjs`
-whenever an issue closes (a run shipped, so its lane is free) or has `status:needs-review`,
-`status:blocked`, or `interaction-required` removed (it may have just become eligible), every 2 hours
-at :07, and by hand from the Actions tab. An opened issue does not start a run (#542, owner
-decision 2026-10-15): it waits for the next close or the 2-hourly run. A job-level `if:` skips every
-other label change, and a skipped job uses no runner and no minutes. GitHub delays or skips
+whenever an issue is opened, gets its `value:N` score (a refined issue becomes eligible then), closes
+(a run shipped, so its lane is free), or has `status:needs-review`, `status:blocked`, or
+`interaction-required` removed (it may have just become eligible), every 2 hours at :07, and by hand
+from the Actions tab. Opened issues stopped starting a run on 2026-10-15 (#542) to save the private
+repo's minutes, so new issues waited for the 2-hourly run; the owner turned them back on after the
+#946 cutover moved CI and releases to the public code repo. A job-level `if:` skips every other
+label change, and a skipped job uses no runner and no minutes. GitHub delays or skips
 scheduled runs when it's busy: the hourly run never fired in its first 5 hours, so the schedule
 can't be the only trigger (#259, owner decision 2026-10-10). It uses no AI, so no plan usage, and
-about 1 Actions minute per run (about 360 a month for the 2-hourly run, plus one per closed
-issue, about 30 a day at the October pace). The owner's email (below) rides in the scheduled run.
+about 1 Actions minute per run (about 360 a month for the 2-hourly run, plus one per opened, scored, or
+closed issue). The owner's email (below) rides in the scheduled run.
 For each lane and model pair:
 
 - **No work:** nothing happens.
