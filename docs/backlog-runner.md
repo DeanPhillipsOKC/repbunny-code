@@ -210,7 +210,10 @@ To move one issue to another lane or model, add a `lane:<name>` or `model:<opus|
 API-equivalent dollar figure at list prices, plus a `<!-- run-cost: {...} -->` line for scripts. It
 reads the session's own transcript (Claude Code sets `CLAUDE_CODE_SESSION_ID`), subagents
 included. Plan runs aren't billed per token, so the dollars are a unit for comparing changes, not
-a bill. `/process-review` groups it by effort score each month, so a change to how code or rules
+a bill. It also reports the starting context (the first turn's input, #1051) and how many turns
+rewrote the cache after a gap of 5 minutes or more (`startContext`, `gapRewrites`,
+`gapRewriteTokens`, `gapRewriteUsd` in the JSON; the helper is `scripts/run-cost-lib.mjs`), so
+what a run pays just to start, or to wait, can be told from what it pays to work. `/process-review` groups it by effort score each month, so a change to how code or rules
 are written can be judged by whether the same size of change got cheaper. The last few turns of a
 run (the comment itself, the summary) land after the measurement and aren't counted.
 

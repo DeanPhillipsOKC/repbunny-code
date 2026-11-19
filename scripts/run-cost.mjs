@@ -19,6 +19,7 @@
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, basename } from 'node:path'
+import { contextStats } from './run-cost-lib.mjs'
 
 // $ per million tokens: [input, output, cache read]. Cache writes derive from input.
 const PRICES = {
@@ -76,7 +77,10 @@ const seen = new Set()
 const byModel = {}
 let first = Infinity
 let last = 0
+const turnsOf = []
 for (const file of files) {
+  const fileTurns = []
+  turnsOf.push(fileTurns)
   for (const line of readFileSync(file, 'utf8').split('\n')) {
     if (!line.includes('"usage"')) continue
     let row
@@ -104,6 +108,14 @@ for (const file of files) {
     m.write5m += (u.cache_creation_input_tokens || 0) - w1h
     m.read += u.cache_read_input_tokens || 0
     m.output += u.output_tokens || 0
+    fileTurns.push({
+      t,
+      model: msg.model,
+      input: u.input_tokens || 0,
+      write5m: (u.cache_creation_input_tokens || 0) - w1h,
+      write1h: w1h,
+      read: u.cache_read_input_tokens || 0,
+    })
   }
 }
 
@@ -121,6 +133,17 @@ for (const [model, m] of Object.entries(byModel)) {
 }
 const inTotal = totals.input + totals.write5m + totals.write1h + totals.read
 const minutes = last > first ? Math.round((last - first) / 60000) : 0
+// Starting context is the first turn of the main transcript; rewrites are counted per transcript
+// (the cache is per conversation), so a subagent's own gaps count too.
+const byTime = (a, b) => a.t - b.t
+const startContext = contextStats(turnsOf[0].sort(byTime)).startContext
+const gaps = { rewrites: 0, rewriteTokens: 0, rewriteUsd: 0 }
+for (const ft of turnsOf) {
+  const c = contextStats(ft.sort(byTime), PRICES)
+  gaps.rewrites += c.rewrites
+  gaps.rewriteTokens += c.rewriteTokens
+  gaps.rewriteUsd += c.rewriteUsd
+}
 const result = {
   session: sessionId,
   subagents: files.length - 1,
@@ -130,6 +153,10 @@ const result = {
   cachedShare: inTotal ? +(totals.read / inTotal).toFixed(3) : 0,
   outputTokens: totals.output,
   usd: +totals.usd.toFixed(2),
+  startContext,
+  gapRewrites: gaps.rewrites,
+  gapRewriteTokens: gaps.rewriteTokens,
+  gapRewriteUsd: +gaps.rewriteUsd.toFixed(2),
   models: byModel,
   unpriced: totals.unpriced,
 }
@@ -144,7 +171,9 @@ if (asJson) {
   console.log(
     `Cost: ~$${result.usd.toFixed(2)} API-equivalent${note}; ${k(inTotal)} input tokens ` +
       `(${Math.round(result.cachedShare * 100)}% cache reads), ${k(totals.output)} output, ` +
-      `${result.turns} turns, ${minutes} min (${models}${sub})`,
+      `${result.turns} turns, ${minutes} min (${models}${sub}); start context ${k(startContext)}, ` +
+      `${gaps.rewrites} rewrite${gaps.rewrites === 1 ? '' : 's'} after a 5+ min gap ` +
+      `(${k(gaps.rewriteTokens)} tokens, ~$${gaps.rewriteUsd.toFixed(2)})`,
   )
   const { models: _m, ...compact } = result
   console.log(`<!-- run-cost: ${JSON.stringify(compact)} -->`)
