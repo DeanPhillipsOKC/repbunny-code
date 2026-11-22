@@ -1,6 +1,7 @@
 import type { BackupFile, BackupTable } from '../../lib/backup'
 import { existingDataFrom, planMerge, profilePatchFrom, V2_PROFILE_KEYS } from '../../lib/backupMerge'
 import type { ExerciseHistoryWorkout } from '../../lib/exerciseHistory'
+import { matchOrderedPrevious } from '../../lib/orderedPrevious'
 import { combineExerciseNotes } from '../../lib/exerciseNotes'
 import type { PriorSet, RecapWorkoutSummary } from '../../lib/finishRecap'
 import type { ProgressSetRow } from '../../lib/progressHub'
@@ -264,6 +265,12 @@ export function createSqliteRepos(openDb: () => Promise<SqlDb>, options: SqliteR
 
   const WORKOUT_WITH_TEMPLATE = `SELECT w.*, t.name AS t_name
     FROM workouts w LEFT JOIN workout_templates t ON t.id = w.template_id`
+
+  // The template's newest workouts that have a set, with their sets.
+  async function templateSessions(templateId: string, excludeWorkoutId: string | null, limit: number) {
+    const sql = `${WORKOUT_WITH_TEMPLATE} WHERE w.template_id = ? AND w.id IS NOT ? AND EXISTS (SELECT 1 FROM sets s WHERE s.workout_id = w.id) ORDER BY w.performed_at DESC LIMIT ${limit}`
+    return withSets(await (await db()).query(sql, [templateId, excludeWorkoutId]))
+  }
 
   // The SUMMARY_COLUMNS shape: id, performed_at, and each set's volume inputs.
   async function summaries(workoutRows: Row[]): Promise<RecapWorkoutSummary[]> {
@@ -663,19 +670,10 @@ export function createSqliteRepos(openDb: () => Promise<SqlDb>, options: SqliteR
       })
     },
 
-    // Only a workout with at least one set can win on recency (the `!inner`
-    // embed on Supabase).
-    getPreviousForTemplate(templateId, excludeWorkoutId) {
-      return attempt(null, async () => {
-        const rows = await (await db()).query(
-          `${WORKOUT_WITH_TEMPLATE}
-           WHERE w.template_id = ? AND w.id IS NOT ? AND EXISTS (SELECT 1 FROM sets s WHERE s.workout_id = w.id)
-           ORDER BY w.performed_at DESC LIMIT 1`,
-          [templateId, excludeWorkoutId],
-        )
-        return (await withSets(rows))[0] ?? null
-      })
-    },
+    // Only a workout with at least one set can win on recency.
+    getPreviousForTemplate: (templateId, exclude) => attempt(null, async () => (await templateSessions(templateId, exclude, 1))[0] ?? null),
+    getOrderedPreviousSets: (templateId, exclude, exerciseId, prior) =>
+      attempt(null, async () => matchOrderedPrevious(await templateSessions(templateId, exclude, 40), exerciseId, prior)),
 
     getLatestSetsForExercise(exerciseId, excludeWorkoutId) {
       return attempt([], async () => {
