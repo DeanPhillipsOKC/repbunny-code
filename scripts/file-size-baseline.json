@@ -8,6 +8,6 @@
   "src/components/ThemeSheet.vue": 1044,
   "src/components/WorkoutHistory.vue": 1912,
   "src/components/WorkoutLogger.vue": 5779,
-  "src/data/sqlite/repos.ts": 1101,
+  "src/data/sqlite/repos.ts": 1099,
   "src/stores/workouts.ts": 1478
 }

@@ -177,6 +177,14 @@ export interface WorkoutsRepo {
   getLastExerciseNote(exerciseId: string, excludeWorkoutId: string | null): Result<string | null>
   // Most recent workout for the template that has at least one set.
   getPreviousForTemplate(templateId: string, excludeWorkoutId: string | null): Result<WorkoutWithSets | null>
+  // Issue #1061: the exercise's sets from the template's most recent workout
+  // where it came after the same exercises (else the same position), or null.
+  getOrderedPreviousSets(
+    templateId: string,
+    excludeWorkoutId: string | null,
+    exerciseId: string,
+    priorExerciseIds: string[],
+  ): Result<SetWithExercise[] | null>
   // The exercise's sets from its most recent workout, any template.
   getLatestSetsForExercise(exerciseId: string, excludeWorkoutId: string | null): Result<SetWithExercise[]>
   // The most recent workout's id and sets (no other workout columns).

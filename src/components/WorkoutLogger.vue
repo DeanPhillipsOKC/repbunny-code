@@ -8,6 +8,7 @@ import { useProfileStore } from '../stores/profile'
 import { useRestStore } from '../stores/rest'
 import { useTemplatesStore } from '../stores/templates'
 import { useWorkoutsStore } from '../stores/workouts'
+import { usePreviousSets } from '../lib/usePreviousSets'
 import AddExerciseSheet from './AddExerciseSheet.vue'
 import BodyStatsModal from './BodyStatsModal.vue'
 import DayMark from './DayMark.vue'
@@ -279,18 +280,8 @@ const elapsedLabel = computed(() => {
   return hours > 0 ? `${hours}:${minutes}:${seconds}` : `${minutes}:${seconds}`
 })
 
-// Backlog item 3: sets from the previous workout against this template,
-// grouped by exercise in the order they were logged, so the reps/weight
-// pre-fill (item 21's applyPrefillToRow below) can read off it. Used to also
-// back a "Last time" summary card; removed in the redesign (item 67) since
-// the per-row pre-fill already surfaces the same numbers.
-const previousSetsByExercise = computed(() => {
-  const grouped: Record<string, SetWithExercise[]> = {}
-  for (const set of workout.previousWorkout?.sets ?? []) {
-    ;(grouped[set.exercise_id] ??= []).push(set)
-  }
-  return grouped
-})
+// Sets from last time, by exercise (lib/usePreviousSets.ts): pre-fill, next target, heaviest.
+const { fallbackSetsByExercise, previousSetsFor, orderChanged, loadOrderedPrevious } = usePreviousSets(workout)
 
 // Backlog item 25: a template can still reference an exercise after it's
 // been archived (archiving only flips exercises.is_archived, it doesn't
@@ -1119,7 +1110,7 @@ function fillRowFromSet(row: DraftRow, set: SetWithExercise) {
 // superset's interleaved order would otherwise pre-fill from the wrong
 // exercise's most recent set.
 function applyPrefillToRow(row: DraftRow, id: string, position: number) {
-  const matchingSet = previousSetsByExercise.value[id]?.[position]
+  const matchingSet = previousSetsFor(id)?.[position]
   if (!matchingSet) {
     row.reps = null
     row.weight = null
@@ -1145,18 +1136,26 @@ function applyPrefillToRow(row: DraftRow, id: string, position: number) {
 // every row after the first), but a resumed workout (recover-interrupted-
 // workout item) can reach this on first selection with sets already logged
 // last session, and still needs an open row to keep logging.
-// Issue #183: item 88's fallback sets, kept so the rest line can compare a
-// set with the same set last time.
-const fallbackSetsByExercise: Record<string, SetWithExercise[]> = {}
-watch(
-  () => workout.activeWorkoutId,
-  () => {
-    for (const id of Object.keys(fallbackSetsByExercise)) delete fallbackSetsByExercise[id]
-  },
-)
+
+// Issue #1061: pre-fill from the routine's session where this exercise came
+// after the same exercises as today. Skips a row the lifter already typed in.
+async function reseedForOrder(id: string) {
+  const rows = draftRowsByExercise.value[id]
+  if (!workout.activeTemplateId || !rows || loggedCountFor(id) > 0 || !orderChanged(id)) return
+  const scratch = makeDraftRow()
+  const untouched = rows.every((row, i) => {
+    applyPrefillToRow(scratch, id, i)
+    return !row.attempted && !row.saving && scratch.reps === row.reps && scratch.weight === row.weight && scratch.durationInput === row.durationInput
+  })
+  await loadOrderedPrevious(id)
+  if (!untouched || draftRowsByExercise.value[id] !== rows) return
+  rows.forEach((row, i) => applyPrefillToRow(row, id, i))
+  const seed = previousSetsFor(id)?.[0]
+  if (seed) rowWeightUnit.value = seed.weight_unit
+}
 
 async function ensureDraftRows(id: string) {
-  if (draftRowsByExercise.value[id]) return
+  if (draftRowsByExercise.value[id]) return reseedForOrder(id)
   const target = configuredTargetFor(id)
   const loggedCount = loggedCountFor(id)
   const repeatCount = workout.repeatSetCounts[id]
@@ -1172,16 +1171,17 @@ async function ensureDraftRows(id: string) {
   // Issue #53: with no set last time to copy, a new exercise starts in the
   // profile's default unit rather than whatever the previous exercise used.
   // The item 88 fallback below still overrides it if older history exists.
-  rowWeightUnit.value = previousSetsByExercise.value[id]?.[loggedCount]?.weight_unit ?? profile.defaultWeightUnit
-  const seedDistanceUnit = previousSetsByExercise.value[id]?.[loggedCount]?.distance_unit
+  rowWeightUnit.value = previousSetsFor(id)?.[loggedCount]?.weight_unit ?? profile.defaultWeightUnit
+  const seedDistanceUnit = previousSetsFor(id)?.[loggedCount]?.distance_unit
   if (seedDistanceUnit) rowDistanceUnit.value = seedDistanceUnit
+  await reseedForOrder(id)
 
   // Backlog item 88: same-template previous-workout data always wins when it
   // exists. Only fall back to this exercise's own most-recent-any-workout
   // history (freeform or another template) when the template's last session
   // had nothing at all for it — including a freeform workout, which never
   // has same-template data to begin with.
-  if (previousSetsByExercise.value[id]) return
+  if (previousSetsFor(id)) return
   const fallback = await workout.fetchFallbackPreviousSets(id)
   if (fallback.length === 0) return
   fallbackSetsByExercise[id] = fallback
@@ -1497,7 +1497,7 @@ function startRestIfConfigured(id: string) {
 function restHeadlineFor(id: string): string {
   const logged = workout.activeSets.filter((s) => s.exercise_id === id)
   const set = logged[logged.length - 1]
-  const last = (previousSetsByExercise.value[id] ?? fallbackSetsByExercise[id])?.[logged.length - 1] ?? null
+  const last = (previousSetsFor(id) ?? fallbackSetsByExercise[id])?.[logged.length - 1] ?? null
   return restLine(
     {
       exerciseName: exerciseName(id),
@@ -1765,7 +1765,7 @@ function passesSetCheck(id: string, row: DraftRow, unit: WeightUnit, action: 'lo
     weight: row.weight,
     weightUnit: unit,
     level: row.level,
-    previousHeaviest: heaviestWeight(previousSetsByExercise.value[id] ?? fallbackSetsByExercise[id], unit),
+    previousHeaviest: heaviestWeight(previousSetsFor(id) ?? fallbackSetsByExercise[id], unit),
     action,
   })
   row.notice = check.block ?? ''
@@ -2143,7 +2143,7 @@ function startStopwatch(id: string, row: DraftRow) {
   const number = entries.find((entry) => entry.type === 'draft' && entry.row === row)?.number ?? null
   const setLabel =
     number === null ? null : configuredTargetFor(id) !== null ? `Set ${number} of ${entries.length}` : `Set ${number}`
-  const last = number === null ? null : (previousSetsByExercise.value[id] ?? fallbackSetsByExercise[id])?.[number - 1]
+  const last = number === null ? null : (previousSetsFor(id) ?? fallbackSetsByExercise[id])?.[number - 1]
   const lastTimeLabel =
     last && last.duration_seconds !== null
       ? formatSetLabel('timed', last.reps, last.weight, last.weight_unit, last.level, {
