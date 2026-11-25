@@ -82,3 +82,27 @@ test('same-order prefill: no matching order keeps the latest session', async ({ 
   await selectExercise(page, name('Bench', stamp), true)
   await expect(page.getByLabel('Weight')).toHaveValue('120')
 })
+
+test('same-order prefill: a weight typed while the lookup loads survives', async ({ page, stamp }) => {
+  await start(page, stamp, ['Press', 'Bench'], [
+    { daysAgo: 1, order: [['Bench', 150], ['Press', 55]] },
+    { daysAgo: 3, order: [['Press', 50], ['Bench', 100]] },
+  ])
+  await logPressFirst(page, stamp)
+  // Hold the ordered lookup until the test releases it.
+  await page.evaluate(async () => {
+    const { repos } = await window.__rbImport('/src/data/index.ts')
+    const original = repos.workouts.getOrderedPreviousSets.bind(repos.workouts)
+    ;(window as any).__release = () => {}
+    repos.workouts.getOrderedPreviousSets = async (...args: any[]) => {
+      await new Promise<void>((resolve) => ((window as any).__release = resolve))
+      return original(...args)
+    }
+  })
+  await selectExercise(page, name('Bench', stamp), true)
+  const weight = page.getByLabel('Weight')
+  await weight.fill('222')
+  await page.evaluate(() => (window as any).__release())
+  await page.waitForTimeout(500)
+  await expect(weight).toHaveValue('222')
+})

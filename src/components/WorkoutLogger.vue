@@ -9,6 +9,7 @@ import { useRestStore } from '../stores/rest'
 import { useTemplatesStore } from '../stores/templates'
 import { useWorkoutsStore } from '../stores/workouts'
 import { usePreviousSets } from '../lib/usePreviousSets'
+import { rowSignature } from '../lib/draftRowSignature'
 import AddExerciseSheet from './AddExerciseSheet.vue'
 import BodyStatsModal from './BodyStatsModal.vue'
 import DayMark from './DayMark.vue'
@@ -1138,20 +1139,17 @@ function applyPrefillToRow(row: DraftRow, id: string, position: number) {
 // last session, and still needs an open row to keep logging.
 
 // Issue #1061: pre-fill from the routine's session where this exercise came
-// after the same exercises as today. Skips a row the lifter already typed in.
+// after the same exercises as today. Only a row untouched during the lookup is refilled (#1062).
 async function reseedForOrder(id: string) {
   const rows = draftRowsByExercise.value[id]
   if (!workout.activeTemplateId || !rows || loggedCountFor(id) > 0 || !orderChanged(id)) return
   const scratch = makeDraftRow()
-  const untouched = rows.every((row, i) => {
-    applyPrefillToRow(scratch, id, i)
-    return !row.attempted && !row.saving && scratch.reps === row.reps && scratch.weight === row.weight && scratch.durationInput === row.durationInput
-  })
+  const snap = rows.map((row, i) => (applyPrefillToRow(scratch, id, i), !row.attempted && !row.saving && rowSignature(scratch) === rowSignature(row) ? rowSignature(row) : null))
   await loadOrderedPrevious(id)
-  if (!untouched || draftRowsByExercise.value[id] !== rows) return
-  rows.forEach((row, i) => applyPrefillToRow(row, id, i))
-  const seed = previousSetsFor(id)?.[0]
-  if (seed) rowWeightUnit.value = seed.weight_unit
+  if (draftRowsByExercise.value[id] !== rows) return
+  rows.forEach((row, i) => snap[i] === rowSignature(row) && !row.attempted && !row.saving && applyPrefillToRow(row, id, i))
+  const seed = exerciseId.value === id ? previousSetsFor(id)?.[0] : undefined // units are shared across exercises
+  if (seed) [rowWeightUnit.value, rowDistanceUnit.value] = [seed.weight_unit, seed.distance_unit ?? rowDistanceUnit.value]
 }
 
 async function ensureDraftRows(id: string) {
